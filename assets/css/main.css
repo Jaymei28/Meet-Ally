@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* Add custom brand styles matched with the Credit Remedi logo colors */
+@layer base {
+  :root {
+    --primary-color: #00D8E6;
+    --primary-color-hover: #00A3B0;
+    --neutral-dark: #111827;
+    --neutral-light: #FFFFFF;
+    --neutral-bg: #F9FAFB;
+
+    /* PrimeVue Aura Theme Custom Accent Color (Teal/Cyan Override) */
+    --p-primary-50: #e0fcfd;
+    --p-primary-100: #bef8fa;
+    --p-primary-200: #7ef0f4;
+    --p-primary-300: #3de8ee;
+    --p-primary-400: #00d8e6;
+    --p-primary-500: #00a3b0;
+    --p-primary-600: #00828e;
+    --p-primary-700: #00626b;
+    --p-primary-800: #004247;
+    --p-primary-900: #002224;
+    --p-primary-950: #001112;
+
+    /* Custom surface colors */
+    --p-surface-0: #ffffff;
+    --p-surface-50: #f9fafb;
+    --p-surface-100: #f3f4f6;
+    --p-surface-200: #e5e7eb;
+    --p-surface-300: #d1d5db;
+    --p-surface-400: #9ca3af;
+    --p-surface-500: #6b7280;
+    --p-surface-600: #4b5563;
+    --p-surface-700: #374151;
+    --p-surface-800: #1f2937;
+    --p-surface-900: #111827;
+    --p-surface-950: #030712;
+  }
+}
+
+/* Printing rules */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background-color: white !important;
+    color: black !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}

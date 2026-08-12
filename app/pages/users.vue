@@ -72,7 +72,7 @@
             <thead>
               <tr class="border-b border-neutral-100 text-neutral-400 text-[10px] font-extrabold uppercase tracking-wider bg-neutral-50/30">
                 <th class="py-3 px-4">User</th>
-                <th class="py-3 px-4 text-center">Role</th>
+                <th class="py-3 px-4">IdentityIQ Credentials</th>
                 <th class="py-3 px-4 text-center">Manage</th>
               </tr>
             </thead>
@@ -93,11 +93,28 @@
                   </div>
                 </td>
 
-                <!-- Role Badge -->
-                <td class="py-4 px-4 text-center">
-                  <span class="text-[9px] px-2 py-0.5 rounded-full border font-extrabold uppercase tracking-widest inline-block" :class="u.role === 'admin' ? 'bg-neutral-100 text-neutral-700 border-neutral-300' : 'bg-blue-50 text-blue-600 border-blue-100'">
-                    {{ u.role }}
-                  </span>
+                <!-- IdentityIQ Credentials Column -->
+                <td class="py-4 px-4">
+                  <div v-if="u.role === 'admin'" class="text-[10px] text-neutral-400 font-semibold italic">
+                    Administrator Account
+                  </div>
+                  <div v-else-if="u.identityiq_username || u.identityiq_password" class="space-y-1 text-[10px] text-neutral-500 font-bold">
+                    <div>
+                      <span class="text-neutral-400">User:</span> 
+                      <span class="font-mono text-neutral-800 ml-1">{{ u.identityiq_username || '---' }}</span>
+                    </div>
+                    <div>
+                      <span class="text-[#00828E]">Pass:</span> 
+                      <span class="font-mono text-neutral-800 ml-1 bg-neutral-50 px-1.5 py-0.5 rounded border border-neutral-200">{{ u.identityiq_password || '---' }}</span>
+                    </div>
+                    <div v-if="u.identityiq_secret_answer">
+                      <span class="text-neutral-400">Secret:</span> 
+                      <span class="font-mono text-neutral-800 ml-1">{{ u.identityiq_secret_answer }}</span>
+                    </div>
+                  </div>
+                  <div v-else class="text-[10px] text-neutral-400 font-semibold italic">
+                    No credentials registered
+                  </div>
                 </td>
 
                 <!-- Management Actions -->

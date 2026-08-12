@@ -66,8 +66,8 @@
           </div>
         </div>
 
-        <!-- User List -->
-        <div class="overflow-x-auto">
+        <!-- User List (Desktop view, hidden on mobile) -->
+        <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-neutral-100 text-neutral-400 text-[10px] font-extrabold uppercase tracking-wider bg-neutral-50/30">
@@ -153,6 +153,83 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- Mobile view: Stack of user info cards (hidden on desktop, visible on mobile) -->
+        <div class="md:hidden space-y-4">
+          <div v-for="u in paginatedUsers" :key="u.id" class="bg-neutral-50/70 border border-neutral-200 rounded-3xl p-5 space-y-4">
+            
+            <!-- User avatar + Info header -->
+            <div class="flex items-center gap-3">
+              <div class="relative w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-xs shrink-0 uppercase border border-neutral-200 bg-white" :class="getAvatarBgClass(u.name)">
+                {{ getInitials(u.name) }}
+                <span 
+                  class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white"
+                  :class="u.registration_status === 'completed' ? 'bg-emerald-500' : 'bg-amber-400'"
+                ></span>
+              </div>
+              <div class="min-w-0">
+                <span class="font-extrabold text-neutral-900 block truncate">{{ u.name }}</span>
+                <span class="text-[10px] text-neutral-400 font-semibold block truncate mt-0.5">{{ u.email }}</span>
+              </div>
+            </div>
+
+            <!-- Credentials Block -->
+            <div class="p-3.5 bg-white border border-neutral-100 rounded-2xl space-y-2">
+              <span class="text-[9px] text-neutral-400 font-extrabold uppercase tracking-wider block">IdentityIQ Credentials</span>
+              <div v-if="u.role === 'admin'" class="text-[10px] text-neutral-400 font-semibold italic pt-1">
+                Administrator Account
+              </div>
+              <div v-else-if="u.identityiq_username || u.identityiq_password" class="space-y-1.5 text-[10px] text-neutral-500 font-bold pt-1">
+                <div class="flex justify-between">
+                  <span class="text-neutral-400">Username:</span> 
+                  <span class="font-mono text-neutral-800">{{ u.identityiq_username || '---' }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-neutral-400">Password:</span> 
+                  <span class="font-mono text-neutral-800 bg-neutral-50 px-1.5 py-0.5 rounded border border-neutral-200">{{ u.identityiq_password || '---' }}</span>
+                </div>
+                <div v-if="u.identityiq_secret_answer" class="flex justify-between">
+                  <span class="text-neutral-400">Secret Answer:</span> 
+                  <span class="font-mono text-neutral-800">{{ u.identityiq_secret_answer }}</span>
+                </div>
+              </div>
+              <div v-else class="text-[10px] text-neutral-400 font-semibold italic pt-1">
+                No credentials registered
+              </div>
+            </div>
+
+            <!-- Action buttons grid -->
+            <div class="flex items-center gap-2 pt-1.5">
+              <button 
+                @click="openResetPassword(u)" 
+                class="flex-1 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-xl text-[10px] font-extrabold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <i class="pi pi-lock text-[10px]"></i>
+                Reset PW
+              </button>
+              <button 
+                v-if="u.role !== 'admin'"
+                @click="openChangePlan(u)" 
+                class="flex-1 py-2 bg-[#00A3B0]/10 hover:bg-[#00A3B0]/20 text-[#00828E] border border-[#00A3B0]/20 rounded-xl text-[10px] font-extrabold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <i class="pi pi-sync text-[10px]"></i>
+                Plan
+              </button>
+              <button 
+                v-if="u.role !== 'admin'"
+                @click="confirmDelete(u)" 
+                class="flex-1 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl text-[10px] font-extrabold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <i class="pi pi-trash text-[10px]"></i>
+                Delete
+              </button>
+            </div>
+          </div>
+          
+          <div v-if="filteredUsers.length === 0" class="py-8 text-center text-neutral-400 font-semibold bg-neutral-50 rounded-3xl border border-neutral-200">
+            No users found matching the search.
+          </div>
         </div>
       </div>
 

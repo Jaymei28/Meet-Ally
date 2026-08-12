@@ -84,7 +84,8 @@ const navItems = [
   { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
   { name: 'Upload Report', path: '/upload', icon: 'pi pi-upload' },
   { name: 'Discrepancies', path: '/discrepancies', icon: 'pi pi-table' },
-  { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' }
+  { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' },
+  { name: 'Admin Portal', path: '/admin', icon: 'pi pi-cog' }
 ];
 
 function isActive(path) {

@@ -1,6 +1,32 @@
 import { useQuery } from '../../utils/db';
 
 export default defineEventHandler(async (event) => {
+  // Enforce server-side RBAC check via auth_user cookie
+  const userCookie = getCookie(event, 'auth_user');
+  if (!userCookie) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized. Please sign in.'
+    });
+  }
+
+  let sessionUser: any = null;
+  try {
+    sessionUser = JSON.parse(userCookie);
+  } catch (e) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid session cookie.'
+    });
+  }
+
+  if (!sessionUser || sessionUser.role !== 'admin') {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Forbidden. Admin privileges required.'
+    });
+  }
+
   try {
     // 1. Fetch total registered users (excluding administrators)
     const userCountRes = await useQuery("SELECT COUNT(*) AS count FROM users WHERE role != 'admin'");
@@ -22,8 +48,12 @@ export default defineEventHandler(async (event) => {
     const letterCountRes = await useQuery("SELECT COUNT(*) AS count FROM dispute_letters");
     const totalLetters = letterCountRes[0]?.count || 0;
 
-    // 6. Fetch client list with metadata (sorted by ID descending)
-    const clientList = await useQuery("SELECT id, name, email, role, plan_type, registration_status, created_at FROM users ORDER BY id DESC");
+    // 6. Fetch client list with metadata and dispute letters count (sorted by ID descending)
+    const clientList = await useQuery(`
+      SELECT id, name, email, role, plan_type, registration_status, created_at,
+             (SELECT COUNT(*) FROM dispute_letters WHERE user_id = users.id) AS letters_filed
+      FROM users ORDER BY id DESC
+    `);
 
     return {
       success: true,

@@ -36,10 +36,22 @@
         </NuxtLink>
       </nav>
 
-      <!-- Footer Info -->
-      <div class="p-6 border-t border-neutral-200 text-xs text-neutral-400">
-        <p>Logged in as Customer</p>
-        <p class="mt-1 font-semibold text-[#00828E]">Status: Active Plan</p>
+      <!-- Footer Info (RBAC User Status & Logout) -->
+      <div v-if="user" class="p-5 border-t border-neutral-200 space-y-4">
+        <div class="text-xs text-neutral-500">
+          <p class="font-extrabold text-neutral-800">{{ user.name }}</p>
+          <p class="text-[10px] text-neutral-400 font-medium truncate">{{ user.email }}</p>
+          <p class="mt-1.5 font-bold uppercase tracking-wider text-[9px]" :class="user.role === 'admin' ? 'text-slate-600' : 'text-[#00828E]'">
+            {{ user.role }} Plan: {{ user.plan_type || 'None' }}
+          </p>
+        </div>
+        <button 
+          @click="handleLogout"
+          class="w-full py-2 bg-neutral-50 hover:bg-red-50 text-neutral-600 hover:text-red-600 border border-neutral-200 hover:border-red-200 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+        >
+          <i class="pi pi-sign-out text-[10px]"></i>
+          Logout
+        </button>
       </div>
     </aside>
 
@@ -64,15 +76,24 @@
         <i :class="[item.icon, 'text-xl']"></i>
         <span class="text-[10px] font-semibold">{{ item.name }}</span>
       </NuxtLink>
+      <!-- Mobile Logout button -->
+      <button 
+        @click="handleLogout"
+        class="flex flex-col items-center gap-1 py-1 px-3 text-neutral-400 hover:text-red-500 transition duration-300 cursor-pointer"
+      >
+        <i class="pi pi-sign-out text-xl"></i>
+        <span class="text-[10px] font-semibold">Logout</span>
+      </button>
     </nav>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 const route = useRoute();
 const showLoader = ref(true);
+const user = useCookie('auth_user');
 
 onMounted(() => {
   setTimeout(() => {
@@ -80,19 +101,36 @@ onMounted(() => {
   }, 1200); // 1.2s loading screen
 });
 
-const navItems = [
-  { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
-  { name: 'Upload Report', path: '/upload', icon: 'pi pi-upload' },
-  { name: 'Discrepancies', path: '/discrepancies', icon: 'pi pi-table' },
-  { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' },
-  { name: 'Admin Portal', path: '/admin', icon: 'pi pi-cog' }
-];
+const navItems = computed(() => {
+  if (user.value && user.value.role === 'admin') {
+    return [
+      { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
+      { name: 'User Management', path: '/users', icon: 'pi pi-users' }
+    ];
+  }
+  return [
+    { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
+    { name: 'Upload Report', path: '/upload', icon: 'pi pi-upload' },
+    { name: 'Discrepancies', path: '/discrepancies', icon: 'pi pi-table' },
+    { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' }
+  ];
+});
 
 function isActive(path) {
   if (path === '/') {
     return route.path === '/';
   }
   return route.path.startsWith(path);
+}
+
+async function handleLogout() {
+  try {
+    await $fetch('/api/auth/logout', { method: 'POST' });
+    user.value = null; // Clear reactively
+    navigateTo('/login');
+  } catch (err) {
+    console.error('Failed to log out:', err);
+  }
 }
 </script>
 

@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "mysql2": "^3.23.3",
     "nuxt": "^4.5.2",
     "pdf-parse": "^2.4.5",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@primevue/nuxt-module": "^5.0.0",
-    "@tailwindcss/vite": "^4.3.3"
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/bcryptjs": "^2.4.6"
   }
 }

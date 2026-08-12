@@ -208,6 +208,14 @@ ROUND/PHASE: ${phase}`
           letterText
         ]
       );
+
+      // Decrement the global Claude API credits balance by $0.03 per letter generated
+      await conn.execute(
+        `UPDATE system_settings 
+         SET setting_value = CAST(GREATEST(0.00, CAST(setting_value AS DECIMAL(10,2)) - 0.03) AS CHAR) 
+         WHERE setting_key = 'claude_api_balance'`
+      );
+
       return [res];
     });
 

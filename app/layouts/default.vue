@@ -105,6 +105,7 @@ const navItems = computed(() => {
   if (user.value && user.value.role === 'admin') {
     return [
       { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
+      { name: 'Agent Credits', path: '/credits', icon: 'pi pi-bolt' },
       { name: 'User Management', path: '/users', icon: 'pi pi-users' }
     ];
   }
@@ -112,8 +113,7 @@ const navItems = computed(() => {
     { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
     { name: 'Upload Report', path: '/upload', icon: 'pi pi-upload' },
     { name: 'Discrepancies', path: '/discrepancies', icon: 'pi pi-table' },
-    { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' },
-    { name: 'Ally AI', path: '/credits', icon: 'pi pi-sparkles' }
+    { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' }
   ];
 });
 

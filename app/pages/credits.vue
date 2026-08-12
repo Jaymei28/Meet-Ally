@@ -5,7 +5,7 @@
       <div class="pt-2"></div>
       <div class="flex items-center justify-between gap-4 mt-6 w-full max-w-lg mx-auto">
         <div class="flex-1 bg-white/10 backdrop-blur-md border border-white/25 rounded-2xl px-4 py-3 text-[11px] md:text-xs font-semibold leading-relaxed shadow-sm text-left">
-          "Hi! Need more credit for your AI Agent? Top up here to keep me working on parsing reports and generating dispute letters."
+          "Manage system-wide Anthropic Claude API credits for credit report analysis and dispute letter generation."
         </div>
         <img 
           src="/AllyAI.png" 
@@ -20,37 +20,37 @@
       
       <!-- Balance & Status Cards Row -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- Credit Balance -->
+        <!-- API Balance -->
         <div class="bg-white border border-neutral-200 rounded-3xl p-6 shadow-md flex items-center justify-between">
           <div class="space-y-1.5">
-            <span class="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Agent Credits</span>
+            <span class="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Claude API Balance</span>
             <div class="flex items-baseline gap-1">
-              <span class="text-3xl font-black text-neutral-900">{{ balance }}</span>
-              <span class="text-[10px] text-neutral-400 font-bold">Credits</span>
+              <span class="text-3xl font-black text-neutral-900">${{ balance.toFixed(2) }}</span>
+              <span class="text-[10px] text-neutral-400 font-bold">USD</span>
             </div>
             <span class="text-[10px] px-2.5 py-0.5 rounded-full border font-bold inline-block bg-emerald-50 border-emerald-200 text-emerald-600">
-              Active Balance
+              Console Balance
             </span>
           </div>
           <div class="w-14 h-14 rounded-2xl bg-[#00A3B0]/10 flex items-center justify-center text-[#00828E] border border-[#00A3B0]/20 shadow-inner">
-            <i class="pi pi-sparkles text-2xl"></i>
+            <i class="pi pi-wallet text-2xl"></i>
           </div>
         </div>
 
-        <!-- Agent Status -->
+        <!-- Remaining Letter Generations -->
         <div class="bg-white border border-neutral-200 rounded-3xl p-6 shadow-md flex items-center justify-between">
           <div class="space-y-1.5">
-            <span class="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Agent Status</span>
+            <span class="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Est. Generations Remaining</span>
             <div class="flex items-baseline gap-1">
-              <span class="text-3xl font-black text-neutral-900">Ready</span>
-              <span class="text-[10px] text-[#00828E] font-bold">Sonnet 3.5</span>
+              <span class="text-3xl font-black text-neutral-900">~{{ Math.floor(balance / 0.03) }}</span>
+              <span class="text-[10px] text-[#00828E] font-bold">Dispute Letters</span>
             </div>
             <span class="text-[10px] px-2.5 py-0.5 rounded-full border font-bold inline-block bg-indigo-50 border-indigo-200 text-indigo-600">
-              Model Online
+              Avg $0.03 / generation
             </span>
           </div>
           <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 border border-indigo-100 shadow-inner">
-            <i class="pi pi-bolt text-2xl animate-pulse"></i>
+            <i class="pi pi-file-pdf text-2xl animate-pulse"></i>
           </div>
         </div>
       </div>
@@ -58,8 +58,8 @@
       <!-- Pricing Plans Grid -->
       <div class="bg-white border border-neutral-200 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
         <div class="text-center max-w-md mx-auto space-y-1">
-          <h3 class="font-extrabold text-xl text-neutral-900">Purchase Agent Credits</h3>
-          <p class="text-neutral-500 text-xs font-semibold">Choose a package to top up your agent credits. Credits do not expire.</p>
+          <h3 class="font-extrabold text-xl text-neutral-900">Top Up Claude Console</h3>
+          <p class="text-neutral-500 text-xs font-semibold">Fund the global AI Agent credits directly instead of logging into Anthropic.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
@@ -67,62 +67,44 @@
           <div class="border border-neutral-200 rounded-3xl p-6 flex flex-col justify-between hover:border-neutral-300 hover:shadow-lg transition duration-300 relative bg-neutral-50/20">
             <div class="space-y-4">
               <div class="space-y-1">
-                <span class="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400">Starter Topup</span>
-                <h4 class="text-lg font-black text-neutral-900">50 Agent Credits</h4>
+                <span class="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400">Micro Topup</span>
+                <h4 class="text-lg font-black text-neutral-900">Add $20.00 USD</h4>
               </div>
               <div class="flex items-baseline text-neutral-900">
                 <span class="text-2xl font-black">$</span>
-                <span class="text-4xl font-black tracking-tight">10</span>
+                <span class="text-4xl font-black tracking-tight">20</span>
                 <span class="text-xs font-semibold text-neutral-400 ml-1">/ one-time</span>
               </div>
-              <ul class="space-y-2.5 text-xs text-neutral-600 font-semibold pt-2">
-                <li class="flex items-center gap-2">
-                  <i class="pi pi-check text-[10px] text-[#00828E]"></i>
-                  <span>50 dispute generation actions</span>
-                </li>
-                <li class="flex items-center gap-2">
-                  <i class="pi pi-check text-[10px] text-[#00828E]"></i>
-                  <span>Valid for all 3 bureaus</span>
-                </li>
-              </ul>
+              <p class="text-xs text-neutral-500 font-semibold leading-relaxed">
+                Adds $20.00 to the shared API pool. Provides approximately <span class="font-bold text-neutral-900">660 dispute generations</span>.
+              </p>
             </div>
-            <button @click="openPaymentModal(50, 10)" class="mt-6 w-full py-2.5 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition cursor-pointer shadow-sm">
-              Buy 50 Credits
+            <button @click="openPaymentModal(20)" class="mt-6 w-full py-2.5 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition cursor-pointer shadow-sm">
+              Add $20.00
             </button>
           </div>
 
           <!-- Pack 2 -->
           <div class="border-2 border-[#00A3B0] rounded-3xl p-6 flex flex-col justify-between hover:shadow-lg transition duration-300 relative bg-gradient-to-br from-white to-[#00A3B0]/5">
             <div class="absolute -top-3.5 right-6 bg-[#00A3B0] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 border-white shadow-sm">
-              Popular
+              Recommended
             </div>
             <div class="space-y-4">
               <div class="space-y-1">
                 <span class="text-[9px] font-extrabold uppercase tracking-widest text-[#00828E]">Standard Topup</span>
-                <h4 class="text-lg font-black text-neutral-900">150 Agent Credits</h4>
+                <h4 class="text-lg font-black text-neutral-900">Add $50.00 USD</h4>
               </div>
               <div class="flex items-baseline text-neutral-900">
                 <span class="text-2xl font-black">$</span>
-                <span class="text-4xl font-black tracking-tight">25</span>
+                <span class="text-4xl font-black tracking-tight">50</span>
                 <span class="text-xs font-semibold text-neutral-400 ml-1">/ one-time</span>
               </div>
-              <ul class="space-y-2.5 text-xs text-neutral-600 font-semibold pt-2">
-                <li class="flex items-center gap-2">
-                  <i class="pi pi-check text-[10px] text-[#00828E]"></i>
-                  <span>150 dispute generation actions</span>
-                </li>
-                <li class="flex items-center gap-2">
-                  <i class="pi pi-check text-[10px] text-[#00828E]"></i>
-                  <span>High-Priority API processing</span>
-                </li>
-                <li class="flex items-center gap-2">
-                  <i class="pi pi-check text-[10px] text-[#00828E]"></i>
-                  <span>Save up to 16% on credits</span>
-                </li>
-              </ul>
+              <p class="text-xs text-neutral-500 font-semibold leading-relaxed">
+                Adds $50.00 to the shared API pool. Provides approximately <span class="font-bold text-neutral-900">1,660 dispute generations</span>.
+              </p>
             </div>
-            <button @click="openPaymentModal(150, 25)" class="mt-6 w-full py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white rounded-xl text-xs font-extrabold hover:from-[#005F6A] hover:to-[#00828E] transition cursor-pointer shadow-md">
-              Buy 150 Credits
+            <button @click="openPaymentModal(50)" class="mt-6 w-full py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white rounded-xl text-xs font-extrabold hover:from-[#005F6A] hover:to-[#00828E] transition cursor-pointer shadow-md">
+              Add $50.00
             </button>
           </div>
 
@@ -130,31 +112,20 @@
           <div class="border border-neutral-200 rounded-3xl p-6 flex flex-col justify-between hover:border-neutral-300 hover:shadow-lg transition duration-300 relative bg-neutral-50/20">
             <div class="space-y-4">
               <div class="space-y-1">
-                <span class="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400">Power Topup</span>
-                <h4 class="text-lg font-black text-neutral-900">400 Agent Credits</h4>
+                <span class="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400">Pro Topup</span>
+                <h4 class="text-lg font-black text-neutral-900">Add $100.00 USD</h4>
               </div>
               <div class="flex items-baseline text-neutral-900">
                 <span class="text-2xl font-black">$</span>
-                <span class="text-4xl font-black tracking-tight">50</span>
+                <span class="text-4xl font-black tracking-tight">100</span>
                 <span class="text-xs font-semibold text-neutral-400 ml-1">/ one-time</span>
               </div>
-              <ul class="space-y-2.5 text-xs text-neutral-600 font-semibold pt-2">
-                <li class="flex items-center gap-2">
-                  <i class="pi pi-check text-[10px] text-[#00828E]"></i>
-                  <span>400 dispute generation actions</span>
-                </li>
-                <li class="flex items-center gap-2">
-                  <i class="pi pi-check text-[10px] text-[#00828E]"></i>
-                  <span>Factual, aggressives, & custom tones</span>
-                </li>
-                <li class="flex items-center gap-2">
-                  <i class="pi pi-check text-[10px] text-[#00828E]"></i>
-                  <span>Save up to 37% on credits</span>
-                </li>
-              </ul>
+              <p class="text-xs text-neutral-500 font-semibold leading-relaxed">
+                Adds $100.00 to the shared API pool. Provides approximately <span class="font-bold text-neutral-900">3,330 dispute generations</span>.
+              </p>
             </div>
-            <button @click="openPaymentModal(400, 50)" class="mt-6 w-full py-2.5 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition cursor-pointer shadow-sm">
-              Buy 400 Credits
+            <button @click="openPaymentModal(100)" class="mt-6 w-full py-2.5 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition cursor-pointer shadow-sm">
+              Add $100.00
             </button>
           </div>
         </div>
@@ -173,7 +144,7 @@
             </div>
             <div class="space-y-1">
               <h4 class="text-lg font-black text-neutral-900">Payment Successful!</h4>
-              <p class="text-neutral-500 text-xs font-semibold">Topped up {{ selectedAmount }} credits to your AI Agent.</p>
+              <p class="text-neutral-500 text-xs font-semibold">Added ${{ selectedAmount }}.00 to Claude API console credits.</p>
             </div>
           </div>
 
@@ -185,8 +156,8 @@
                 <i class="pi pi-credit-card text-lg"></i>
               </div>
               <div>
-                <h4 class="font-extrabold text-neutral-900 text-base">Topup AI Agent</h4>
-                <p class="text-[10px] text-neutral-500 font-semibold">Adding {{ selectedAmount }} Credits for ${{ selectedPrice }}.00</p>
+                <h4 class="font-extrabold text-neutral-900 text-base">Top Up API Console</h4>
+                <p class="text-[10px] text-neutral-500 font-semibold">Topping up ${{ selectedAmount }}.00 via secure invoice gateway</p>
               </div>
             </div>
 
@@ -210,7 +181,6 @@
                 <input 
                   type="text" 
                   required
-                  v-maska="'#### #### #### ####'"
                   placeholder="4111 2222 3333 4444" 
                   class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/10 focus:border-[#00A3B0] transition"
                 />
@@ -260,28 +230,26 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-const balance = ref(100);
+const balance = ref(45.82);
 const loading = ref(false);
 const success = ref(false);
 
 const showPaymentModal = ref(false);
 const selectedAmount = ref(0);
-const selectedPrice = ref(0);
 
 async function fetchCredits() {
   try {
-    const res = await $fetch('/api/auth/get-credits');
+    const res = await $fetch('/api/admin/get-agent-credits');
     if (res.success) {
-      balance.value = res.credits;
+      balance.value = res.balance;
     }
   } catch (err) {
     console.error('Failed to fetch credits:', err);
   }
 }
 
-function openPaymentModal(amount, price) {
+function openPaymentModal(amount) {
   selectedAmount.value = amount;
-  selectedPrice.value = price;
   success.value = false;
   showPaymentModal.value = true;
 }
@@ -289,12 +257,12 @@ function openPaymentModal(amount, price) {
 async function submitPayment() {
   loading.value = true;
   try {
-    const res = await $fetch('/api/auth/topup-credits', {
+    const res = await $fetch('/api/admin/topup-agent-credits', {
       method: 'POST',
       body: { amount: selectedAmount.value }
     });
     if (res.success) {
-      balance.value = res.credits; // Update balance reactively
+      balance.value = res.balance; // Update balance reactively
       success.value = true;
       setTimeout(() => {
         showPaymentModal.value = false;

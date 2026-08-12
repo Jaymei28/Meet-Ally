@@ -5,7 +5,7 @@
       <div class="pt-2"></div>
       <div class="flex items-center justify-between gap-4 mt-6 w-full max-w-lg mx-auto">
         <div class="flex-1 bg-white/10 backdrop-blur-md border border-white/25 rounded-2xl px-4 py-3 text-[11px] md:text-xs font-semibold leading-relaxed shadow-sm text-left">
-          "Manage system-wide Anthropic Claude API credits for credit report analysis and dispute letter generation."
+          "Monitor your Anthropic Claude API credits and sync your balance after adding funds on the console."
         </div>
         <img 
           src="/AllyAI.png" 
@@ -15,10 +15,10 @@
       </div>
     </div>
 
-    <!-- Main Content Grid -->
+    <!-- Main Content -->
     <div class="px-4 md:px-8 space-y-6 relative z-10 -mt-10">
       
-      <!-- Balance & Status Cards Row -->
+      <!-- Balance & Generations Row -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <!-- API Balance -->
         <div class="bg-white border border-neutral-200 rounded-3xl p-6 shadow-md flex items-center justify-between">
@@ -28,8 +28,8 @@
               <span class="text-3xl font-black text-neutral-900">${{ balance.toFixed(2) }}</span>
               <span class="text-[10px] text-neutral-400 font-bold">USD</span>
             </div>
-            <span class="text-[10px] px-2.5 py-0.5 rounded-full border font-bold inline-block bg-emerald-50 border-emerald-200 text-emerald-600">
-              Console Balance
+            <span class="text-[10px] px-2.5 py-0.5 rounded-full border font-bold inline-block" :class="balance > 5 ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-red-50 border-red-200 text-red-600'">
+              {{ balance > 5 ? 'Healthy Balance' : 'Low Balance' }}
             </span>
           </div>
           <div class="w-14 h-14 rounded-2xl bg-[#00A3B0]/10 flex items-center justify-center text-[#00828E] border border-[#00A3B0]/20 shadow-inner">
@@ -37,205 +37,134 @@
           </div>
         </div>
 
-        <!-- Remaining Letter Generations -->
+        <!-- Est. Generations -->
         <div class="bg-white border border-neutral-200 rounded-3xl p-6 shadow-md flex items-center justify-between">
           <div class="space-y-1.5">
-            <span class="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Est. Generations Remaining</span>
+            <span class="text-xs font-extrabold text-neutral-400 uppercase tracking-widest">Est. Generations Left</span>
             <div class="flex items-baseline gap-1">
               <span class="text-3xl font-black text-neutral-900">~{{ Math.floor(balance / 0.03) }}</span>
               <span class="text-[10px] text-[#00828E] font-bold">Dispute Letters</span>
             </div>
             <span class="text-[10px] px-2.5 py-0.5 rounded-full border font-bold inline-block bg-indigo-50 border-indigo-200 text-indigo-600">
-              Avg $0.03 / generation
+              Avg ~$0.03 / generation
             </span>
           </div>
           <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-500 border border-indigo-100 shadow-inner">
-            <i class="pi pi-file-pdf text-2xl animate-pulse"></i>
+            <i class="pi pi-file-pdf text-2xl"></i>
           </div>
         </div>
       </div>
 
-      <!-- Pricing Plans Grid -->
-      <div class="bg-white border border-neutral-200 rounded-[32px] p-6 md:p-8 shadow-sm space-y-6">
-        <div class="text-center max-w-md mx-auto space-y-1">
-          <h3 class="font-extrabold text-xl text-neutral-900">Top Up Claude Console</h3>
-          <p class="text-neutral-500 text-xs font-semibold">Fund the global AI Agent credits directly instead of logging into Anthropic.</p>
+      <!-- Add Funds & Sync Section -->
+      <div class="bg-white border border-neutral-200 rounded-[32px] p-6 md:p-8 shadow-sm space-y-8">
+
+        <!-- Step 1: Add Funds on Anthropic -->
+        <div class="space-y-4">
+          <div class="flex items-start gap-4">
+            <div class="w-9 h-9 rounded-xl bg-[#00A3B0]/10 border border-[#00A3B0]/20 flex items-center justify-center text-[#00828E] shrink-0 mt-0.5">
+              <span class="font-black text-sm">1</span>
+            </div>
+            <div class="space-y-1.5 flex-1">
+              <h4 class="font-extrabold text-neutral-900 text-base">Add Funds on Anthropic Console</h4>
+              <p class="text-xs text-neutral-500 font-semibold leading-relaxed">
+                Open the Claude platform dashboard to purchase API credits with your payment method. Once funds are added, come back here and sync the amount.
+              </p>
+            </div>
+          </div>
+          <a 
+            href="https://console.anthropic.com/settings/billing" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-neutral-900 text-white rounded-2xl text-xs font-extrabold hover:bg-neutral-800 transition cursor-pointer shadow-sm"
+          >
+            <i class="pi pi-external-link text-[10px]"></i>
+            Open Anthropic Billing Console
+          </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-          <!-- Pack 1 -->
-          <div class="border border-neutral-200 rounded-3xl p-6 flex flex-col justify-between hover:border-neutral-300 hover:shadow-lg transition duration-300 relative bg-neutral-50/20">
-            <div class="space-y-4">
-              <div class="space-y-1">
-                <span class="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400">Micro Topup</span>
-                <h4 class="text-lg font-black text-neutral-900">Add $20.00 USD</h4>
-              </div>
-              <div class="flex items-baseline text-neutral-900">
-                <span class="text-2xl font-black">$</span>
-                <span class="text-4xl font-black tracking-tight">20</span>
-                <span class="text-xs font-semibold text-neutral-400 ml-1">/ one-time</span>
-              </div>
+        <div class="border-t border-neutral-100"></div>
+
+        <!-- Step 2: Sync Balance -->
+        <div class="space-y-4">
+          <div class="flex items-start gap-4">
+            <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0 mt-0.5">
+              <span class="font-black text-sm">2</span>
+            </div>
+            <div class="space-y-1.5 flex-1">
+              <h4 class="font-extrabold text-neutral-900 text-base">Sync Your New Balance</h4>
               <p class="text-xs text-neutral-500 font-semibold leading-relaxed">
-                Adds $20.00 to the shared API pool. Provides approximately <span class="font-bold text-neutral-900">660 dispute generations</span>.
+                After adding funds, enter the amount you added below to keep the dashboard in sync. Or set your exact current console balance directly.
               </p>
             </div>
-            <button @click="openPaymentModal(20)" class="mt-6 w-full py-2.5 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition cursor-pointer shadow-sm">
-              Add $20.00
+          </div>
+
+          <!-- Sync Mode Toggle -->
+          <div class="flex items-center gap-2 bg-neutral-50 border border-neutral-200 rounded-2xl p-1.5 w-full sm:w-fit">
+            <button 
+              @click="syncMode = 'add'" 
+              class="px-4 py-2 rounded-xl text-[10px] font-extrabold transition cursor-pointer"
+              :class="syncMode === 'add' ? 'bg-white text-neutral-900 shadow-sm border border-neutral-200' : 'text-neutral-500 hover:text-neutral-700'"
+            >
+              I Added Funds
+            </button>
+            <button 
+              @click="syncMode = 'set'" 
+              class="px-4 py-2 rounded-xl text-[10px] font-extrabold transition cursor-pointer"
+              :class="syncMode === 'set' ? 'bg-white text-neutral-900 shadow-sm border border-neutral-200' : 'text-neutral-500 hover:text-neutral-700'"
+            >
+              Set Exact Balance
             </button>
           </div>
 
-          <!-- Pack 2 -->
-          <div class="border-2 border-[#00A3B0] rounded-3xl p-6 flex flex-col justify-between hover:shadow-lg transition duration-300 relative bg-gradient-to-br from-white to-[#00A3B0]/5">
-            <div class="absolute -top-3.5 right-6 bg-[#00A3B0] text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 border-white shadow-sm">
-              Recommended
-            </div>
-            <div class="space-y-4">
-              <div class="space-y-1">
-                <span class="text-[9px] font-extrabold uppercase tracking-widest text-[#00828E]">Standard Topup</span>
-                <h4 class="text-lg font-black text-neutral-900">Add $50.00 USD</h4>
+          <!-- Input & Action -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
+            <div class="flex-1 space-y-1.5">
+              <label class="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider">
+                {{ syncMode === 'add' ? 'Amount Added (USD)' : 'Current Console Balance (USD)' }}
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 font-extrabold text-sm">$</span>
+                <input 
+                  v-model.number="syncAmount" 
+                  type="number" 
+                  step="0.01" 
+                  min="0.01"
+                  :placeholder="syncMode === 'add' ? '20.00' : '40.00'"
+                  class="w-full pl-9 pr-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/10 focus:border-[#00A3B0] transition"
+                />
               </div>
-              <div class="flex items-baseline text-neutral-900">
-                <span class="text-2xl font-black">$</span>
-                <span class="text-4xl font-black tracking-tight">50</span>
-                <span class="text-xs font-semibold text-neutral-400 ml-1">/ one-time</span>
-              </div>
-              <p class="text-xs text-neutral-500 font-semibold leading-relaxed">
-                Adds $50.00 to the shared API pool. Provides approximately <span class="font-bold text-neutral-900">1,660 dispute generations</span>.
-              </p>
             </div>
-            <button @click="openPaymentModal(50)" class="mt-6 w-full py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white rounded-xl text-xs font-extrabold hover:from-[#005F6A] hover:to-[#00828E] transition cursor-pointer shadow-md">
-              Add $50.00
+            <button 
+              @click="submitSync" 
+              :disabled="loading || !syncAmount || syncAmount <= 0"
+              class="px-6 py-3 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white rounded-2xl text-xs font-extrabold hover:from-[#005F6A] hover:to-[#00828E] transition duration-300 flex items-center justify-center gap-1.5 shadow-md disabled:opacity-40 cursor-pointer whitespace-nowrap"
+            >
+              <i v-if="loading" class="pi pi-spin pi-spinner text-[10px]"></i>
+              <span>{{ syncMode === 'add' ? 'Add to Balance' : 'Set Balance' }}</span>
             </button>
           </div>
 
-          <!-- Pack 3 -->
-          <div class="border border-neutral-200 rounded-3xl p-6 flex flex-col justify-between hover:border-neutral-300 hover:shadow-lg transition duration-300 relative bg-neutral-50/20">
-            <div class="space-y-4">
-              <div class="space-y-1">
-                <span class="text-[9px] font-extrabold uppercase tracking-widest text-neutral-400">Pro Topup</span>
-                <h4 class="text-lg font-black text-neutral-900">Add $100.00 USD</h4>
-              </div>
-              <div class="flex items-baseline text-neutral-900">
-                <span class="text-2xl font-black">$</span>
-                <span class="text-4xl font-black tracking-tight">100</span>
-                <span class="text-xs font-semibold text-neutral-400 ml-1">/ one-time</span>
-              </div>
-              <p class="text-xs text-neutral-500 font-semibold leading-relaxed">
-                Adds $100.00 to the shared API pool. Provides approximately <span class="font-bold text-neutral-900">3,330 dispute generations</span>.
-              </p>
-            </div>
-            <button @click="openPaymentModal(100)" class="mt-6 w-full py-2.5 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition cursor-pointer shadow-sm">
-              Add $100.00
-            </button>
-          </div>
+          <!-- Success Message -->
+          <Transition name="fade">
+            <p v-if="successMsg" class="text-xs font-bold px-3 py-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center gap-2">
+              <i class="pi pi-check-circle text-xs"></i>
+              {{ successMsg }}
+            </p>
+          </Transition>
         </div>
       </div>
     </div>
-
-    <!-- Credit Card Payment Modal -->
-    <Transition name="fade">
-      <div v-if="showPaymentModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="showPaymentModal = false">
-        <div class="bg-white rounded-[32px] p-8 w-full max-w-md shadow-2xl space-y-6 relative overflow-hidden animate-scale-up border border-neutral-100">
-          
-          <!-- Success State -->
-          <div v-if="success" class="flex flex-col items-center justify-center py-6 text-center space-y-4">
-            <div class="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-500 flex items-center justify-center text-emerald-500 animate-scale-up">
-              <i class="pi pi-check text-2xl font-black"></i>
-            </div>
-            <div class="space-y-1">
-              <h4 class="text-lg font-black text-neutral-900">Payment Successful!</h4>
-              <p class="text-neutral-500 text-xs font-semibold">Added ${{ selectedAmount }}.00 to Claude API console credits.</p>
-            </div>
-          </div>
-
-          <!-- Input Form State -->
-          <div v-else class="space-y-5">
-            <!-- Modal Header -->
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#00A3B0]/10 border border-[#00A3B0]/20 flex items-center justify-center text-[#00828E]">
-                <i class="pi pi-credit-card text-lg"></i>
-              </div>
-              <div>
-                <h4 class="font-extrabold text-neutral-900 text-base">Top Up API Console</h4>
-                <p class="text-[10px] text-neutral-500 font-semibold">Topping up ${{ selectedAmount }}.00 via secure invoice gateway</p>
-              </div>
-            </div>
-
-            <!-- Card Inputs Form -->
-            <form @submit.prevent="submitPayment" class="space-y-4 pt-1">
-              
-              <!-- Cardholder Name -->
-              <div class="space-y-1.5">
-                <label class="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider">Cardholder Name</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="John Doe" 
-                  class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/10 focus:border-[#00A3B0] transition"
-                />
-              </div>
-
-              <!-- Card Number -->
-              <div class="space-y-1.5">
-                <label class="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider">Card Number</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="4111 2222 3333 4444" 
-                  class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/10 focus:border-[#00A3B0] transition"
-                />
-              </div>
-
-              <!-- Expiry & CVC Grid -->
-              <div class="grid grid-cols-2 gap-4">
-                <div class="space-y-1.5">
-                  <label class="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider">Expiry Date</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="MM/YY" 
-                    class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/10 focus:border-[#00A3B0] transition"
-                  />
-                </div>
-                <div class="space-y-1.5">
-                  <label class="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider">CVC</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="123" 
-                    class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/10 focus:border-[#00A3B0] transition"
-                  />
-                </div>
-              </div>
-
-              <!-- Action buttons -->
-              <div class="flex gap-3 pt-3">
-                <button type="button" @click="showPaymentModal = false" class="flex-1 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-extrabold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer">
-                  Cancel
-                </button>
-                <button type="submit" :disabled="loading" class="flex-1 py-3 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white rounded-2xl text-xs font-extrabold hover:from-[#005F6A] hover:to-[#00828E] transition duration-300 flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50 cursor-pointer">
-                  <i v-if="loading" class="pi pi-spin pi-spinner text-[10px]"></i>
-                  <span>{{ loading ? 'Processing...' : 'Pay Now' }}</span>
-                </button>
-              </div>
-            </form>
-          </div>
-
-        </div>
-      </div>
-    </Transition>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 
-const balance = ref(45.82);
+const balance = ref(0);
 const loading = ref(false);
-const success = ref(false);
-
-const showPaymentModal = ref(false);
-const selectedAmount = ref(0);
+const syncMode = ref('add'); // 'add' or 'set'
+const syncAmount = ref(null);
+const successMsg = ref('');
 
 async function fetchCredits() {
   try {
@@ -248,36 +177,39 @@ async function fetchCredits() {
   }
 }
 
-function openPaymentModal(amount) {
-  selectedAmount.value = amount;
-  success.value = false;
-  showPaymentModal.value = true;
-}
-
-async function submitPayment() {
+async function submitSync() {
   loading.value = true;
+  successMsg.value = '';
   try {
-    const res = await $fetch('/api/admin/topup-agent-credits', {
-      method: 'POST',
-      body: { amount: selectedAmount.value }
-    });
-    if (res.success) {
-      balance.value = res.balance; // Update balance reactively
-      success.value = true;
-      setTimeout(() => {
-        showPaymentModal.value = false;
-      }, 1500); // Close modal automatically
+    if (syncMode.value === 'add') {
+      const res = await $fetch('/api/admin/topup-agent-credits', {
+        method: 'POST',
+        body: { amount: syncAmount.value }
+      });
+      if (res.success) {
+        balance.value = res.balance;
+        successMsg.value = `Added $${syncAmount.value.toFixed(2)} — new balance: $${res.balance.toFixed(2)}`;
+      }
+    } else {
+      const res = await $fetch('/api/admin/set-agent-credits', {
+        method: 'POST',
+        body: { balance: syncAmount.value }
+      });
+      if (res.success) {
+        balance.value = res.balance;
+        successMsg.value = `Balance set to $${res.balance.toFixed(2)}`;
+      }
     }
+    syncAmount.value = null;
+    setTimeout(() => { successMsg.value = ''; }, 4000);
   } catch (err) {
-    alert(err.data?.statusMessage || 'Payment transaction failed.');
+    alert(err.data?.statusMessage || 'Failed to sync balance.');
   } finally {
     loading.value = false;
   }
 }
 
-onMounted(() => {
-  fetchCredits();
-});
+onMounted(() => { fetchCredits(); });
 </script>
 
 <style scoped>
@@ -288,15 +220,6 @@ onMounted(() => {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-.animate-scale-up {
-  animation: scaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-@keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.92) translateY(12px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
-}
-
 .animate-bounce-slow {
   animation: bounceSlow 3s ease-in-out infinite;
 }
@@ -304,7 +227,6 @@ onMounted(() => {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
-
 .fade-enter-active, .fade-leave-active { transition: opacity 0.25s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>

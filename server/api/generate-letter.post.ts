@@ -128,6 +128,7 @@ export default defineEventHandler(async (event) => {
     console.log(`Generating AI dispute letter for ${bureau} using tone: ${tone}`);
 
     let letterText = '';
+    let letterCost = 0.03; // Default estimate; overridden by real usage data
     try {
       const aiResponse = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -175,12 +176,23 @@ ROUND/PHASE: ${phase}`
         if (aiResponse.status === 429 || aiResponse.status === 400 || errText.includes('insufficient_quota') || errText.includes('credit_balance_exhausted') || errText.includes('credit balance') || errText.includes('balance is too low')) {
           console.warn(`Anthropic API quota exhausted or rate limited. Falling back to high-accuracy Mock Letter Writer for ${bureau}.`);
           letterText = getMockDisputeLetter(bureau, userAddressBlock, bureauAddressBlock, accountsDescription, tone);
+          letterCost = 0; // Mock letters have no API cost
         } else {
           throw new Error(`Anthropic API error: ${errText}`);
         }
       } else {
         const resJson = await aiResponse.json();
         letterText = resJson.content[0]?.text || '';
+        
+        // Calculate real cost from token usage
+        // Claude 3.5 Sonnet: $3.00/1M input tokens, $15.00/1M output tokens
+        const usage = resJson.usage;
+        if (usage) {
+          const inputCost = (usage.input_tokens / 1_000_000) * 3.00;
+          const outputCost = (usage.output_tokens / 1_000_000) * 15.00;
+          letterCost = inputCost + outputCost;
+          console.log(`[${bureau}] Token usage — Input: ${usage.input_tokens}, Output: ${usage.output_tokens}, Cost: $${letterCost.toFixed(4)}`);
+        }
       }
     } catch (err: any) {
       throw createError({
@@ -209,12 +221,15 @@ ROUND/PHASE: ${phase}`
         ]
       );
 
-      // Decrement the global Claude API credits balance by $0.03 per letter generated
-      await conn.execute(
-        `UPDATE system_settings 
-         SET setting_value = CAST(GREATEST(0.00, CAST(setting_value AS DECIMAL(10,2)) - 0.03) AS CHAR) 
-         WHERE setting_key = 'claude_api_balance'`
-      );
+      // Deduct real token cost from the global Claude API credits balance
+      if (letterCost > 0) {
+        await conn.execute(
+          `UPDATE system_settings 
+           SET setting_value = CAST(GREATEST(0.00, CAST(setting_value AS DECIMAL(10,2)) - ?) AS CHAR) 
+           WHERE setting_key = 'claude_api_balance'`,
+          [letterCost.toFixed(4)]
+        );
+      }
 
       return [res];
     });

@@ -191,8 +191,11 @@
                 <tr v-for="client in paginatedClients" :key="client.id" class="hover:bg-neutral-50/30 transition">
                   <!-- Avatar + Name + Email Column -->
                   <td class="py-4 px-4 flex items-center gap-3">
-                    <div class="relative w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-[11px] shrink-0 uppercase border border-neutral-100" :class="getAvatarBgClass(client.name)">
-                      {{ getInitials(client.name) }}
+                    <div class="relative w-9 h-9 rounded-full shrink-0 flex items-center justify-center border border-neutral-100 bg-white">
+                      <img v-if="client.profile_picture" :src="client.profile_picture" alt="Avatar" class="w-full h-full rounded-full object-cover" />
+                      <div v-else class="w-full h-full rounded-full flex items-center justify-center font-extrabold text-[11px] uppercase" :class="getAvatarBgClass(client.name)">
+                        {{ getInitials(client.name) }}
+                      </div>
                       <!-- Dynamic Status indicator dot -->
                       <span 
                         class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white"

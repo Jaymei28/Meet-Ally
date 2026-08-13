@@ -80,8 +80,11 @@
               <tr v-for="u in paginatedUsers" :key="u.id" class="hover:bg-neutral-50/30 transition">
                 <!-- Avatar + Name + Plan -->
                 <td class="py-4 px-4 flex items-center gap-3">
-                  <div class="relative w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-[11px] shrink-0 uppercase border border-neutral-100" :class="getAvatarBgClass(u.name)">
-                    {{ getInitials(u.name) }}
+                  <div class="relative w-9 h-9 rounded-full shrink-0 flex items-center justify-center border border-neutral-100 bg-white">
+                    <img v-if="u.profile_picture" :src="u.profile_picture" alt="Avatar" class="w-full h-full rounded-full object-cover" />
+                    <div v-else class="w-full h-full rounded-full flex items-center justify-center font-extrabold text-[11px] uppercase" :class="getAvatarBgClass(u.name)">
+                      {{ getInitials(u.name) }}
+                    </div>
                     <span 
                       class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white"
                       :class="u.registration_status === 'completed' ? 'bg-emerald-500' : 'bg-amber-400'"
@@ -161,8 +164,11 @@
             
             <!-- User avatar + Info header -->
             <div class="flex items-center gap-3">
-              <div class="relative w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-xs shrink-0 uppercase border border-neutral-200 bg-white" :class="getAvatarBgClass(u.name)">
-                {{ getInitials(u.name) }}
+              <div class="relative w-10 h-10 rounded-full shrink-0 flex items-center justify-center border border-neutral-200 bg-white">
+                <img v-if="u.profile_picture" :src="u.profile_picture" alt="Avatar" class="w-full h-full rounded-full object-cover" />
+                <div v-else class="w-full h-full rounded-full flex items-center justify-center font-extrabold text-xs uppercase" :class="getAvatarBgClass(u.name)">
+                  {{ getInitials(u.name) }}
+                </div>
                 <span 
                   class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white"
                   :class="u.registration_status === 'completed' ? 'bg-emerald-500' : 'bg-amber-400'"

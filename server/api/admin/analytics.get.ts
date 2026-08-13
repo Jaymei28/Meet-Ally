@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
 
     // 6. Fetch client list with metadata, IdentityIQ credentials, and dispute letters count (sorted by ID descending)
     const clientList = await useQuery(`
-      SELECT id, name, email, role, plan_type, registration_status, created_at,
+      SELECT id, name, email, role, plan_type, profile_picture, registration_status, created_at,
              identityiq_username, identityiq_password, identityiq_secret_answer,
              (SELECT COUNT(*) FROM dispute_letters WHERE user_id = users.id) AS letters_filed
       FROM users ORDER BY id DESC

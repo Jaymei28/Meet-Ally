@@ -14,9 +14,9 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return navigateTo('/login');
   }
 
-  // 3. Enforce RBAC route restrictions
+  // 3. Enforce RBAC and subscription route restrictions
   const clientRoutes = ['/upload', '/discrepancies', '/letters'];
-  const adminRoutes = ['/users', '/credits'];
+  const adminRoutes = ['/users', '/credits', '/waitlist'];
 
   // Administrators cannot access client-only routes
   if (user.value.role === 'admin' && clientRoutes.includes(to.path)) {
@@ -25,6 +25,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   // Clients cannot access admin-only routes
   if (user.value.role !== 'admin' && adminRoutes.includes(to.path)) {
+    return navigateTo('/');
+  }
+
+  // Clients without active plan (starter/turbo) cannot access credit repair feature routes
+  if (user.value.role !== 'admin' && !user.value.plan_type && clientRoutes.includes(to.path)) {
     return navigateTo('/');
   }
 });

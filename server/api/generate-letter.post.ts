@@ -100,6 +100,31 @@ export default defineEventHandler(async (event) => {
     checkAndAdd('Equifax', 'bureau_3', 'value_3');
   }
 
+  // 2.5 Enforce Standard vs Turbo letter generation limits
+  if (user.role !== 'admin' && user.plan_type !== 'turbo') {
+    const letterCountRes = await useQuery(
+      `SELECT COUNT(*) AS count FROM dispute_letters 
+       WHERE user_id = ? 
+         AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01 00:00:00')`,
+      [userId]
+    );
+    const letterCount = Number((letterCountRes as any)[0]?.count || 0);
+
+    let bureausToGenerateCount = 0;
+    for (const bureau of ['TransUnion', 'Experian', 'Equifax']) {
+      if (bureauDisputes[bureau] && bureauDisputes[bureau].length > 0) {
+        bureausToGenerateCount++;
+      }
+    }
+
+    if (letterCount + bureausToGenerateCount > 5) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: `You've reached your monthly limit of dispute letters on the Standard Plan. You have generated ${letterCount} letters this month, and this request attempts to generate ${bureausToGenerateCount} more (Max limit: 5). Please upgrade to the Turbo Plan for unlimited letter generation.`
+      });
+    }
+  }
+
   // 3. Generate Letter for each Bureau that has disputes
   const generatedLetters: any[] = [];
 

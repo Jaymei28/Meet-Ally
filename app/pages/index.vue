@@ -232,6 +232,17 @@
 
     <!-- 2. CLIENT DASHBOARD VIEW -->
     <div v-else class="space-y-6 -mx-4 md:-mx-8">
+      <!-- Subscription Warning (if free/unsubscribed) -->
+      <div v-if="!user?.plan_type" class="mx-6 px-6 py-4 bg-amber-500/10 border border-amber-500/20 text-amber-800 rounded-3xl flex items-start gap-3 shadow-sm">
+        <i class="pi pi-exclamation-triangle text-lg mt-0.5 shrink-0 text-amber-600"></i>
+        <div>
+          <h4 class="font-extrabold text-sm text-amber-900">Active Subscription Required</h4>
+          <p class="text-xs text-neutral-600 mt-1 font-semibold leading-relaxed">
+            You are currently on the Free plan. To upload credit reports, run AI audits, and generate dispute letters, please upgrade to standard or turbo. You can check your account details on the Profile tab.
+          </p>
+        </div>
+      </div>
+
       <!-- Header Block (Indigo/Teal Gradient Banner) -->
       <div class="bg-gradient-to-br from-[#005F6A] to-[#00A3B0] text-white p-6 pb-16 rounded-b-[40px] shadow-[0_10px_30px_rgba(0,95,106,0.15)] relative">
         <!-- Top Padding Spacer -->

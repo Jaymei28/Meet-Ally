@@ -1,4 +1,5 @@
 import { useQuery, useTransaction } from '../utils/db';
+import { getCookie } from 'h3';
 import { runCrossBureauValidation } from '../utils/validation';
 import { PDFParse } from 'pdf-parse';
 
@@ -70,9 +71,21 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Get first user in DB to attach database records
-  const users = await useQuery('SELECT id FROM users LIMIT 1');
-  const userId = users[0]?.id || 1;
+  // Get authenticated user from cookie
+  const userCookie = getCookie(event, 'auth_user');
+  if (!userCookie) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized. Please log in.' });
+  }
+  const loggedInUser = JSON.parse(userCookie);
+  const userId = loggedInUser.id;
+
+  // Enforce active subscription check for parsing reports (Standard or Turbo)
+  if (loggedInUser.role !== 'admin' && !loggedInUser.plan_type) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'AI Credit Analysis requires an active subscription. Please upgrade your plan.'
+    });
+  }
 
   console.log(`Sending extracted text to Anthropic Claude for structured parsing...`);
 

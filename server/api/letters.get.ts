@@ -1,8 +1,15 @@
 import { useQuery } from '../utils/db';
+import { getCookie, createError } from 'h3';
 
 export default defineEventHandler(async (event) => {
-  const users = await useQuery('SELECT id FROM users LIMIT 1');
-  const userId = users[0]?.id || 1;
+  // Get authenticated user from cookie
+  const userCookie = getCookie(event, 'auth_user');
+  if (!userCookie) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+  }
+
+  const loggedInUser = JSON.parse(userCookie);
+  const userId = loggedInUser.id;
 
   const letters = await useQuery(
     `SELECT * FROM dispute_letters WHERE user_id = ? ORDER BY id DESC`,

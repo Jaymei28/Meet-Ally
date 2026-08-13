@@ -402,8 +402,7 @@ function getInitials(name) {
 async function handleLogout() {
   try {
     await $fetch('/api/auth/logout', { method: 'POST' });
-    const userCookie = useCookie('auth_user');
-    userCookie.value = null; // Clear reactively
+    user.value = null; // Clear reactively
     navigateTo('/login');
   } catch (err) {
     console.error('Failed to log out:', err);

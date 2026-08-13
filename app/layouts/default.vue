@@ -31,7 +31,8 @@
           class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 group"
           :class="isActive(item.path) ? 'bg-[#00A3B0]/10 text-[#00828E] font-semibold border border-[#00A3B0]/20' : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100/50'"
         >
-          <i :class="[item.icon, 'text-lg transition-transform group-hover:scale-110']"></i>
+          <img v-if="item.icon.endsWith('.png')" :src="item.icon" alt="Icon" class="w-5 h-5 object-contain transition-transform group-hover:scale-110 shrink-0" />
+          <i v-else :class="[item.icon, 'text-lg transition-transform group-hover:scale-110']"></i>
           <span>{{ item.name }}</span>
         </NuxtLink>
       </nav>
@@ -74,7 +75,8 @@
         class="flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-all duration-300"
         :class="isActive(item.path) ? 'text-[#00828E] font-bold' : 'text-neutral-400 hover:text-neutral-600'"
       >
-        <i :class="[item.icon, 'text-xl']"></i>
+        <img v-if="item.icon.endsWith('.png')" :src="item.icon" alt="Icon" class="w-6 h-6 object-contain" />
+        <i v-else :class="[item.icon, 'text-xl']"></i>
         <span class="text-[10px] font-semibold">{{ item.name }}</span>
       </NuxtLink>
     </nav>
@@ -98,7 +100,7 @@ const navItems = computed(() => {
   if (user.value && user.value.role === 'admin') {
     return [
       { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
-      { name: 'Ally', path: '/credits', icon: 'pi pi-bolt' },
+      { name: 'Ally', path: '/credits', icon: '/AllyAI.png' },
       { name: 'User', path: '/users', icon: 'pi pi-users' },
       { name: 'Waitlist', path: '/waitlist', icon: 'pi pi-list' },
       { name: 'Profile', path: '/profile', icon: 'pi pi-user' }

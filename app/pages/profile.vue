@@ -79,6 +79,21 @@
               </span>
             </div>
           </div>
+
+          <!-- Session Card -->
+          <div class="bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm flex flex-col space-y-4">
+            <h3 class="font-extrabold text-lg text-neutral-900">Session</h3>
+            <p class="text-neutral-500 text-xs leading-relaxed">
+              If you want to end your current session, you can log out below.
+            </p>
+            <button 
+              @click="handleLogout"
+              class="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-2xl text-xs font-extrabold transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+            >
+              <i class="pi pi-sign-out text-xs"></i>
+              Logout
+            </button>
+          </div>
         </div>
 
         <!-- Right Side: Edit Form (2 Cols) -->
@@ -400,6 +415,17 @@ function getInitials(name) {
   const parts = name.trim().split(/\s+/);
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+async function handleLogout() {
+  try {
+    await $fetch('/api/auth/logout', { method: 'POST' });
+    const userCookie = useCookie('auth_user');
+    userCookie.value = null; // Clear reactively
+    navigateTo('/login');
+  } catch (err) {
+    console.error('Failed to log out:', err);
+  }
 }
 </script>
 

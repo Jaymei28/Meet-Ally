@@ -53,13 +53,6 @@
             {{ user.role }} Plan: {{ user.plan_type || 'None' }}
           </p>
         </div>
-        <button 
-          @click="handleLogout"
-          class="w-full py-2 bg-neutral-50 hover:bg-red-50 text-neutral-600 hover:text-red-600 border border-neutral-200 hover:border-red-200 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-        >
-          <i class="pi pi-sign-out text-[10px]"></i>
-          Logout
-        </button>
       </div>
     </aside>
 
@@ -84,14 +77,6 @@
         <i :class="[item.icon, 'text-xl']"></i>
         <span class="text-[10px] font-semibold">{{ item.name }}</span>
       </NuxtLink>
-      <!-- Mobile Logout button -->
-      <button 
-        @click="handleLogout"
-        class="flex flex-col items-center gap-1 py-1 px-3 text-neutral-400 hover:text-red-500 transition duration-300 cursor-pointer"
-      >
-        <i class="pi pi-sign-out text-xl"></i>
-        <span class="text-[10px] font-semibold">Logout</span>
-      </button>
     </nav>
   </div>
 </template>
@@ -135,15 +120,6 @@ function isActive(path) {
   return route.path.startsWith(path);
 }
 
-async function handleLogout() {
-  try {
-    await $fetch('/api/auth/logout', { method: 'POST' });
-    user.value = null; // Clear reactively
-    navigateTo('/login');
-  } catch (err) {
-    console.error('Failed to log out:', err);
-  }
-}
 
 function getAvatarBgClass(name) {
   const colors = [

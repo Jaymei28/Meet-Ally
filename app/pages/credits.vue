@@ -1,22 +1,5 @@
 <template>
-  <div class="animate-fade-in space-y-6 -mx-4 md:-mx-8">
-    <!-- Header Block (Teal Gradient Banner) -->
-    <div class="bg-gradient-to-br from-[#005F6A] to-[#00A3B0] text-white p-6 pb-16 rounded-b-[40px] shadow-[0_10px_30px_rgba(0,95,106,0.15)] relative">
-      <div class="pt-2"></div>
-      <div class="flex items-center justify-between gap-4 mt-6 w-full max-w-lg mx-auto">
-        <div class="flex-1 bg-white/10 backdrop-blur-md border border-white/25 rounded-2xl px-4 py-3 text-[11px] md:text-xs font-semibold leading-relaxed shadow-sm text-left">
-          "Monitor your Anthropic Claude API credits and sync your balance after adding funds on the console."
-        </div>
-        <img 
-          src="/AllyAI.png" 
-          alt="Ally AI Assistant" 
-          class="h-28 w-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.25)] animate-bounce-slow shrink-0"
-        />
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="px-4 md:px-8 space-y-6 relative z-10 -mt-10">
+  <div class="animate-fade-in space-y-6">
       
       <!-- Balance & Generations Row -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -153,7 +136,6 @@
           </Transition>
         </div>
       </div>
-    </div>
   </div>
 </template>
 

@@ -1,15 +1,23 @@
-import { defineEventHandler, readBody, createError } from 'h3';
+import { defineEventHandler, readBody, createError, getCookie } from 'h3';
 import bcrypt from 'bcryptjs';
 
 export default defineEventHandler(async (event) => {
+  const userCookie = getCookie(event, 'auth_user');
+  if (!userCookie) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+  }
+
+  const user = JSON.parse(userCookie);
+  if (user.role !== 'admin') {
+    throw createError({ statusCode: 403, statusMessage: 'Forbidden' });
+  }
+
   const body = await readBody(event);
   const { action, userId, newPassword, newPlan } = body;
 
   if (!action || !userId) {
     throw createError({ statusCode: 400, statusMessage: 'Missing action or userId.' });
   }
-
-  const { useQuery } = useDatabase();
 
   if (action === 'reset-password') {
     if (!newPassword || newPassword.length < 6) {

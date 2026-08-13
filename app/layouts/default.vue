@@ -106,7 +106,8 @@ const navItems = computed(() => {
     return [
       { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
       { name: 'Agent Credits', path: '/credits', icon: 'pi pi-bolt' },
-      { name: 'User Management', path: '/users', icon: 'pi pi-users' }
+      { name: 'User Management', path: '/users', icon: 'pi pi-users' },
+      { name: 'Waitlist Report', path: '/waitlist', icon: 'pi pi-list' }
     ];
   }
   return [

@@ -234,130 +234,136 @@
       </div>
 
       <!-- Reset Password Modal -->
-      <Transition name="fade">
-        <div v-if="showResetModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="showResetModal = false">
-          <div class="bg-white rounded-[28px] p-8 w-full max-w-md shadow-2xl space-y-5 animate-scale-up">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
-                <i class="pi pi-lock text-amber-600"></i>
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="showResetModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="showResetModal = false">
+            <div class="bg-white rounded-[28px] p-8 w-full max-w-md shadow-2xl space-y-5 animate-scale-up">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
+                  <i class="pi pi-lock text-amber-600"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-neutral-900">Reset Password</h4>
+                  <p class="text-[10px] text-neutral-500 font-semibold">{{ selectedUser?.name }} ({{ selectedUser?.email }})</p>
+                </div>
               </div>
-              <div>
-                <h4 class="font-extrabold text-neutral-900">Reset Password</h4>
-                <p class="text-[10px] text-neutral-500 font-semibold">{{ selectedUser?.name }} ({{ selectedUser?.email }})</p>
+
+              <div class="space-y-1.5">
+                <label class="text-xs font-extrabold text-neutral-700 uppercase tracking-wider">New Password</label>
+                <input 
+                  v-model="newPassword" 
+                  type="password" 
+                  placeholder="Min 6 characters"
+                  class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
+                />
               </div>
-            </div>
 
-            <div class="space-y-1.5">
-              <label class="text-xs font-extrabold text-neutral-700 uppercase tracking-wider">New Password</label>
-              <input 
-                v-model="newPassword" 
-                type="password" 
-                placeholder="Min 6 characters"
-                class="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition"
-              />
-            </div>
+              <Transition name="fade">
+                <p v-if="modalMessage" class="text-xs font-bold px-3 py-2 rounded-xl" :class="modalSuccess ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'">
+                  {{ modalMessage }}
+                </p>
+              </Transition>
 
-            <Transition name="fade">
-              <p v-if="modalMessage" class="text-xs font-bold px-3 py-2 rounded-xl" :class="modalSuccess ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'">
-                {{ modalMessage }}
-              </p>
-            </Transition>
-
-            <div class="flex gap-3">
-              <button @click="showResetModal = false" class="flex-1 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-extrabold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer">Cancel</button>
-              <button @click="submitResetPassword" :disabled="actionLoading" class="flex-1 py-2.5 bg-amber-500 text-white rounded-2xl text-xs font-extrabold hover:bg-amber-600 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5">
-                <i v-if="actionLoading" class="pi pi-spin pi-spinner text-[10px]"></i>
-                Reset
-              </button>
+              <div class="flex gap-3">
+                <button @click="showResetModal = false" class="flex-1 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-extrabold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer">Cancel</button>
+                <button @click="submitResetPassword" :disabled="actionLoading" class="flex-1 py-2.5 bg-amber-500 text-white rounded-2xl text-xs font-extrabold hover:bg-amber-600 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5">
+                  <i v-if="actionLoading" class="pi pi-spin pi-spinner text-[10px]"></i>
+                  Reset
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </Transition>
+        </Transition>
+      </Teleport>
 
       <!-- Change Plan Modal -->
-      <Transition name="fade">
-        <div v-if="showPlanModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="showPlanModal = false">
-          <div class="bg-white rounded-[28px] p-8 w-full max-w-md shadow-2xl space-y-5 animate-scale-up">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#00A3B0]/10 border border-[#00A3B0]/20 flex items-center justify-center">
-                <i class="pi pi-sync text-[#00828E]"></i>
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="showPlanModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="showPlanModal = false">
+            <div class="bg-white rounded-[28px] p-8 w-full max-w-md shadow-2xl space-y-5 animate-scale-up">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-[#00A3B0]/10 border border-[#00A3B0]/20 flex items-center justify-center">
+                  <i class="pi pi-sync text-[#00828E]"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-neutral-900">Change Plan</h4>
+                  <p class="text-[10px] text-neutral-500 font-semibold">{{ selectedUser?.name }} — Current: <span class="uppercase font-extrabold text-neutral-700">{{ selectedUser?.plan_type || 'None' }}</span></p>
+                </div>
               </div>
-              <div>
-                <h4 class="font-extrabold text-neutral-900">Change Plan</h4>
-                <p class="text-[10px] text-neutral-500 font-semibold">{{ selectedUser?.name }} — Current: <span class="uppercase font-extrabold text-neutral-700">{{ selectedUser?.plan_type || 'None' }}</span></p>
+
+              <div class="grid grid-cols-2 gap-3">
+                <button 
+                  @click="selectedPlan = 'starter'" 
+                  class="p-4 border-2 rounded-2xl text-center transition cursor-pointer"
+                  :class="selectedPlan === 'starter' ? 'border-[#00A3B0] bg-[#00A3B0]/5' : 'border-neutral-200 hover:border-neutral-300'"
+                >
+                  <span class="text-xs font-extrabold text-neutral-900 block">Standard</span>
+                  <span class="text-[10px] text-neutral-500 font-semibold">Starter Plan</span>
+                </button>
+                <button 
+                  @click="selectedPlan = 'turbo'" 
+                  class="p-4 border-2 rounded-2xl text-center transition cursor-pointer"
+                  :class="selectedPlan === 'turbo' ? 'border-indigo-500 bg-indigo-50/50' : 'border-neutral-200 hover:border-neutral-300'"
+                >
+                  <span class="text-xs font-extrabold text-neutral-900 block">Pro</span>
+                  <span class="text-[10px] text-neutral-500 font-semibold">Turbo Plan</span>
+                </button>
               </div>
-            </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <button 
-                @click="selectedPlan = 'starter'" 
-                class="p-4 border-2 rounded-2xl text-center transition cursor-pointer"
-                :class="selectedPlan === 'starter' ? 'border-[#00A3B0] bg-[#00A3B0]/5' : 'border-neutral-200 hover:border-neutral-300'"
-              >
-                <span class="text-xs font-extrabold text-neutral-900 block">Standard</span>
-                <span class="text-[10px] text-neutral-500 font-semibold">Starter Plan</span>
-              </button>
-              <button 
-                @click="selectedPlan = 'turbo'" 
-                class="p-4 border-2 rounded-2xl text-center transition cursor-pointer"
-                :class="selectedPlan === 'turbo' ? 'border-indigo-500 bg-indigo-50/50' : 'border-neutral-200 hover:border-neutral-300'"
-              >
-                <span class="text-xs font-extrabold text-neutral-900 block">Pro</span>
-                <span class="text-[10px] text-neutral-500 font-semibold">Turbo Plan</span>
-              </button>
-            </div>
+              <Transition name="fade">
+                <p v-if="modalMessage" class="text-xs font-bold px-3 py-2 rounded-xl" :class="modalSuccess ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'">
+                  {{ modalMessage }}
+                </p>
+              </Transition>
 
-            <Transition name="fade">
-              <p v-if="modalMessage" class="text-xs font-bold px-3 py-2 rounded-xl" :class="modalSuccess ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'">
-                {{ modalMessage }}
-              </p>
-            </Transition>
-
-            <div class="flex gap-3">
-              <button @click="showPlanModal = false" class="flex-1 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-extrabold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer">Cancel</button>
-              <button @click="submitChangePlan" :disabled="actionLoading" class="flex-1 py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white rounded-2xl text-xs font-extrabold hover:from-[#005F6A] hover:to-[#00828E] transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5">
-                <i v-if="actionLoading" class="pi pi-spin pi-spinner text-[10px]"></i>
-                Update Plan
-              </button>
+              <div class="flex gap-3">
+                <button @click="showPlanModal = false" class="flex-1 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-extrabold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer">Cancel</button>
+                <button @click="submitChangePlan" :disabled="actionLoading" class="flex-1 py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white rounded-2xl text-xs font-extrabold hover:from-[#005F6A] hover:to-[#00828E] transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5">
+                  <i v-if="actionLoading" class="pi pi-spin pi-spinner text-[10px]"></i>
+                  Update Plan
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </Transition>
+        </Transition>
+      </Teleport>
 
       <!-- Delete Confirmation Modal -->
-      <Transition name="fade">
-        <div v-if="showDeleteModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="showDeleteModal = false">
-          <div class="bg-white rounded-[28px] p-8 w-full max-w-md shadow-2xl space-y-5 animate-scale-up">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center">
-                <i class="pi pi-trash text-red-600"></i>
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="showDeleteModal" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4" @click.self="showDeleteModal = false">
+            <div class="bg-white rounded-[28px] p-8 w-full max-w-md shadow-2xl space-y-5 animate-scale-up">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center">
+                  <i class="pi pi-trash text-red-600"></i>
+                </div>
+                <div>
+                  <h4 class="font-extrabold text-neutral-900">Delete Account</h4>
+                  <p class="text-[10px] text-neutral-500 font-semibold">This action cannot be undone.</p>
+                </div>
               </div>
-              <div>
-                <h4 class="font-extrabold text-neutral-900">Delete Account</h4>
-                <p class="text-[10px] text-neutral-500 font-semibold">This action cannot be undone.</p>
-              </div>
-            </div>
 
-            <p class="text-xs text-neutral-700 font-semibold bg-red-50 border border-red-100 p-3 rounded-2xl">
-              Are you sure you want to permanently delete <span class="font-extrabold text-red-600">{{ selectedUser?.name }}</span> ({{ selectedUser?.email }})?
-            </p>
-
-            <Transition name="fade">
-              <p v-if="modalMessage" class="text-xs font-bold px-3 py-2 rounded-xl" :class="modalSuccess ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'">
-                {{ modalMessage }}
+              <p class="text-xs text-neutral-700 font-semibold bg-red-50 border border-red-100 p-3 rounded-2xl">
+                Are you sure you want to permanently delete <span class="font-extrabold text-red-600">{{ selectedUser?.name }}</span> ({{ selectedUser?.email }})?
               </p>
-            </Transition>
 
-            <div class="flex gap-3">
-              <button @click="showDeleteModal = false" class="flex-1 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-extrabold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer">Cancel</button>
-              <button @click="submitDelete" :disabled="actionLoading" class="flex-1 py-2.5 bg-red-500 text-white rounded-2xl text-xs font-extrabold hover:bg-red-600 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5">
-                <i v-if="actionLoading" class="pi pi-spin pi-spinner text-[10px]"></i>
-                Delete
-              </button>
+              <Transition name="fade">
+                <p v-if="modalMessage" class="text-xs font-bold px-3 py-2 rounded-xl" :class="modalSuccess ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'">
+                  {{ modalMessage }}
+                </p>
+              </Transition>
+
+              <div class="flex gap-3">
+                <button @click="showDeleteModal = false" class="flex-1 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-extrabold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer">Cancel</button>
+                <button @click="submitDelete" :disabled="actionLoading" class="flex-1 py-2.5 bg-red-500 text-white rounded-2xl text-xs font-extrabold hover:bg-red-600 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5">
+                  <i v-if="actionLoading" class="pi pi-spin pi-spinner text-[10px]"></i>
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </Transition>
+        </Transition>
+      </Teleport>
     </div>
   </div>
 </template>

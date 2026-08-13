@@ -31,8 +31,10 @@
           class="flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 group"
           :class="isActive(item.path) ? 'bg-[#00A3B0]/10 text-[#00828E] font-semibold border border-[#00A3B0]/20' : 'text-neutral-500 hover:text-neutral-950 hover:bg-neutral-100/50'"
         >
-          <img v-if="item.icon.endsWith('.png')" :src="item.icon" alt="Icon" class="w-5 h-5 object-contain transition-transform group-hover:scale-110 shrink-0" />
-          <i v-else :class="[item.icon, 'text-lg transition-transform group-hover:scale-110']"></i>
+          <div class="w-6 h-6 flex items-center justify-center shrink-0">
+            <img v-if="item.icon.endsWith('.png')" :src="item.icon" alt="Icon" class="w-5 h-5 object-contain transition-transform group-hover:scale-110" />
+            <i v-else :class="[item.icon, 'text-lg transition-transform group-hover:scale-110']"></i>
+          </div>
           <span>{{ item.name }}</span>
         </NuxtLink>
       </nav>
@@ -72,12 +74,14 @@
         v-for="item in navItems"
         :key="item.path"
         :to="item.path"
-        class="flex flex-col items-center gap-1 py-1 px-3 rounded-lg transition-all duration-300"
+        class="flex-1 flex flex-col items-center gap-1 py-1 px-1 rounded-lg transition-all duration-300 min-w-0"
         :class="isActive(item.path) ? 'text-[#00828E] font-bold' : 'text-neutral-400 hover:text-neutral-600'"
       >
-        <img v-if="item.icon.endsWith('.png')" :src="item.icon" alt="Icon" class="w-6 h-6 object-contain" />
-        <i v-else :class="[item.icon, 'text-xl']"></i>
-        <span class="text-[10px] font-semibold">{{ item.name }}</span>
+        <div class="w-6 h-6 flex items-center justify-center shrink-0">
+          <img v-if="item.icon.endsWith('.png')" :src="item.icon" alt="Icon" class="w-5 h-5 object-contain" />
+          <i v-else :class="[item.icon, 'text-lg']"></i>
+        </div>
+        <span class="text-[10px] font-semibold truncate w-full text-center">{{ item.name }}</span>
       </NuxtLink>
     </nav>
   </div>

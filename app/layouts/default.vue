@@ -38,10 +38,18 @@
 
       <!-- Footer Info (RBAC User Status & Logout) -->
       <div v-if="user" class="p-5 border-t border-neutral-200 space-y-4">
+        <div class="flex items-center gap-3">
+          <img v-if="user.profile_picture" :src="user.profile_picture" alt="Avatar" class="w-9 h-9 rounded-full object-cover border border-neutral-200 shrink-0" />
+          <div v-else class="w-9 h-9 rounded-full flex items-center justify-center font-extrabold text-[11px] shrink-0 uppercase border border-neutral-100" :class="getAvatarBgClass(user.name)">
+            {{ getInitials(user.name) }}
+          </div>
+          <div class="text-xs text-neutral-500 min-w-0 flex-1">
+            <p class="font-extrabold text-neutral-800 truncate">{{ user.name }}</p>
+            <p class="text-[10px] text-neutral-400 font-medium truncate">{{ user.email }}</p>
+          </div>
+        </div>
         <div class="text-xs text-neutral-500">
-          <p class="font-extrabold text-neutral-800">{{ user.name }}</p>
-          <p class="text-[10px] text-neutral-400 font-medium truncate">{{ user.email }}</p>
-          <p class="mt-1.5 font-bold uppercase tracking-wider text-[9px]" :class="user.role === 'admin' ? 'text-slate-600' : 'text-[#00828E]'">
+          <p class="font-bold uppercase tracking-wider text-[9px]" :class="user.role === 'admin' ? 'text-slate-600' : 'text-[#00828E]'">
             {{ user.role }} Plan: {{ user.plan_type || 'None' }}
           </p>
         </div>
@@ -107,14 +115,16 @@ const navItems = computed(() => {
       { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
       { name: 'Agent Credits', path: '/credits', icon: 'pi pi-bolt' },
       { name: 'User Management', path: '/users', icon: 'pi pi-users' },
-      { name: 'Waitlist Report', path: '/waitlist', icon: 'pi pi-list' }
+      { name: 'Waitlist Report', path: '/waitlist', icon: 'pi pi-list' },
+      { name: 'My Profile', path: '/profile', icon: 'pi pi-user' }
     ];
   }
   return [
     { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
     { name: 'Upload Report', path: '/upload', icon: 'pi pi-upload' },
     { name: 'Discrepancies', path: '/discrepancies', icon: 'pi pi-table' },
-    { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' }
+    { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' },
+    { name: 'My Profile', path: '/profile', icon: 'pi pi-user' }
   ];
 });
 
@@ -133,6 +143,29 @@ async function handleLogout() {
   } catch (err) {
     console.error('Failed to log out:', err);
   }
+}
+
+function getAvatarBgClass(name) {
+  const colors = [
+    'bg-indigo-50 text-indigo-700 border-indigo-100',
+    'bg-[#00A3B0]/10 text-[#00828E] border-[#00A3B0]/20',
+    'bg-emerald-50 text-emerald-700 border-emerald-100',
+    'bg-amber-50 text-amber-700 border-amber-100',
+    'bg-pink-50 text-pink-700 border-pink-100',
+    'bg-rose-50 text-rose-700 border-rose-100'
+  ];
+  let sum = 0;
+  for (let i = 0; i < (name?.length || 0); i++) {
+    sum += name.charCodeAt(i);
+  }
+  return colors[sum % colors.length];
+}
+
+function getInitials(name) {
+  if (!name) return 'U';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 </script>
 

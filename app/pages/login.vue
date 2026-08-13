@@ -137,7 +137,7 @@ async function handleLogin() {
     });
 
     if (res.success) {
-      navigateTo(res.user.role === 'admin' ? '/admin' : '/');
+      navigateTo('/');
     }
   } catch (err) {
     error.value = err.data?.statusMessage || 'Failed to authenticate. Please check your credentials.';

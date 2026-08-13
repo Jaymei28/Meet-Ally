@@ -112,9 +112,10 @@ const navItems = computed(() => {
   }
   return [
     { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
-    { name: 'Upload Report', path: '/upload', icon: 'pi pi-upload' },
-    { name: 'Discrepancies', path: '/discrepancies', icon: 'pi pi-table' },
-    { name: 'Dispute Letters', path: '/letters', icon: 'pi pi-file-pdf' },
+    { name: 'Upload', path: '/upload', icon: 'pi pi-upload' },
+    { name: 'Conflicts', path: '/discrepancies', icon: 'pi pi-table' },
+    { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
+    { name: 'Fundability', path: '/fundability', icon: 'pi pi-verified' },
     { name: 'Profile', path: '/profile', icon: 'pi pi-user' }
   ];
 });

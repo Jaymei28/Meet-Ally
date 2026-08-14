@@ -48,26 +48,48 @@ export default defineEventHandler(async (event) => {
   }
 
   const originalFilename = file.filename || 'credit_report.pdf';
-  console.log(`Processing file: ${originalFilename}, size: ${file.data.length} bytes`);
+  console.log(`Processing file: ${originalFilename}, size: ${file.data.length} bytes, type: ${file.type}`);
 
-  // 2. Parse PDF buffer to text
+  let isImage = false;
   let rawText = '';
-  try {
-    const parser = new PDFParse({ data: file.data });
-    const pdfData = await parser.getText();
-    await parser.destroy();
-    rawText = pdfData.text;
-  } catch (err: any) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: `Failed to parse PDF text: ${err.message}`
-    });
+  let base64Image = '';
+  let mimeType = file.type || '';
+
+  // Determine file type from extension/mime type
+  const extension = originalFilename.split('.').pop()?.toLowerCase();
+
+  if (mimeType.startsWith('image/') || ['jpg', 'jpeg', 'png'].includes(extension || '')) {
+    isImage = true;
+    base64Image = file.data.toString('base64');
+    if (!mimeType) {
+      mimeType = extension === 'png' ? 'image/png' : 'image/jpeg';
+    }
+  } else if (mimeType === 'text/html' || ['html', 'htm'].includes(extension || '')) {
+    rawText = file.data.toString('utf-8');
+  } else {
+    // Treat as PDF
+    try {
+      const parser = new PDFParse({ data: file.data });
+      const pdfData = await parser.getText();
+      await parser.destroy();
+      rawText = pdfData.text;
+    } catch (err: any) {
+      // Fallback: decode as utf-8 in case it's a text/html file masquerading
+      try {
+        rawText = file.data.toString('utf-8');
+      } catch (innerErr) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: `Failed to parse PDF credit report: ${err.message}`
+        });
+      }
+    }
   }
 
-  if (!rawText || rawText.trim().length === 0) {
+  if (!isImage && (!rawText || rawText.trim().length === 0)) {
     throw createError({
       statusCode: 422,
-      statusMessage: 'PDF contains no extractable text content.'
+      statusMessage: 'Credit report file contains no extractable text content.'
     });
   }
 
@@ -87,7 +109,77 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  console.log(`Sending extracted text to Anthropic Claude for structured parsing...`);
+  console.log(`Sending content to Anthropic Claude for structured parsing...`);
+
+  // Build schema payload
+  const schemaDescription = `Your response MUST strictly match this JSON structure:
+${JSON.stringify({
+  personal_information: {
+    names: ["string"],
+    addresses: ["string"],
+    employers: ["string"]
+  },
+  credit_scores: {
+    transunion: 0,
+    experian: 0,
+    equifax: 0
+  },
+  accounts: [
+    {
+      creditor_name: "string",
+      account_number: "string",
+      account_type: "string",
+      is_negative: false,
+      bureau_data: [
+        {
+          bureau: "TransUnion/Experian/Equifax",
+          balance: 0.00,
+          credit_limit: 0.00,
+          date_opened: "YYYY-MM-DD",
+          date_reported: "YYYY-MM-DD",
+          payment_status: "string",
+          account_status: "string",
+          comments: "string"
+        }
+      ]
+    }
+  ],
+  inquiries: [
+    {
+      bureau: "TransUnion/Experian/Equifax",
+      creditor_name: "string",
+      date_of_inquiry: "YYYY-MM-DD",
+      business_type: "string"
+    }
+  ]
+})}`;
+
+  let messagesContent: any[] = [];
+  if (isImage) {
+    messagesContent = [
+      {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: mimeType,
+          data: base64Image
+        }
+      },
+      {
+        type: 'text',
+        text: `Extract the details from this credit report image. Look for credit scores, personal info (names, addresses, employers), inquiries, and negative accounts. Fill in the JSON fields carefully.
+        
+${schemaDescription}`
+      }
+    ];
+  } else {
+    messagesContent = [
+      {
+        type: 'text',
+        text: `Extract the details from this raw credit report content:\n\n${rawText}\n\n${schemaDescription}`
+      }
+    ];
+  }
 
   // 3. Call Claude using Messages API
   let extractedJson: any = null;
@@ -106,46 +198,7 @@ export default defineEventHandler(async (event) => {
         messages: [
           {
             role: 'user',
-            content: `Extract the details from this raw credit report text:\n\n${rawText}\n\nYour response MUST strictly match this JSON structure:\n${JSON.stringify({
-              personal_information: {
-                names: ["string"],
-                addresses: ["string"],
-                employers: ["string"]
-              },
-              credit_scores: {
-                transunion: 0,
-                experian: 0,
-                equifax: 0
-              },
-              accounts: [
-                {
-                  creditor_name: "string",
-                  account_number: "string",
-                  account_type: "string",
-                  is_negative: false,
-                  bureau_data: [
-                    {
-                      bureau: "TransUnion/Experian/Equifax",
-                      balance: 0.00,
-                      credit_limit: 0.00,
-                      date_opened: "YYYY-MM-DD",
-                      date_reported: "YYYY-MM-DD",
-                      payment_status: "string",
-                      account_status: "string",
-                      comments: "string"
-                    }
-                  ]
-                }
-              ],
-              inquiries: [
-                {
-                  bureau: "TransUnion/Experian/Equifax",
-                  creditor_name: "string",
-                  date_of_inquiry: "YYYY-MM-DD",
-                  business_type: "string"
-                }
-              ]
-            })}`
+            content: messagesContent
           }
         ]
       })

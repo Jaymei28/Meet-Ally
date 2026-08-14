@@ -112,7 +112,7 @@ const navItems = computed(() => {
   }
   return [
     { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
-    { name: 'Upload', path: '/upload', icon: 'pi pi-upload' },
+    { name: 'Ally', path: '/upload', icon: '/AllyAI.png' },
     { name: 'Conflicts', path: '/discrepancies', icon: 'pi pi-table' },
     { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
     { name: 'Fundability', path: '/fundability', icon: 'pi pi-verified' },

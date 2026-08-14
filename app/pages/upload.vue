@@ -138,7 +138,7 @@
         @dragover.prevent="dragOver = true"
         @dragleave.prevent="dragOver = false"
         @drop.prevent="handleDrop"
-        class="border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition duration-300 relative overflow-hidden"
+        class="border-2 border-dashed rounded-3xl p-6 sm:p-10 text-center transition duration-300 relative overflow-hidden"
         :class="[
           dragOver ? 'border-[#00828E] bg-[#00A3B0]/5' : 'border-neutral-200 bg-neutral-50 hover:border-neutral-400 hover:bg-white shadow-inner',
           loading ? 'opacity-50 pointer-events-none' : ''
@@ -173,12 +173,14 @@
         </label>
 
         <!-- Selected File Pill -->
-        <div v-if="selectedFile" class="mt-6 inline-flex items-center gap-3 px-4 py-2 bg-white border border-[#00A3B0]/40 shadow-sm rounded-full text-xs animate-fade-in">
-          <i :class="['pi', getFileIcon(selectedFile.name), 'text-[#00828E] font-bold']"></i>
-          <span class="font-bold text-neutral-800 truncate max-w-[240px]">{{ selectedFile.name }}</span>
-          <span class="text-[10px] text-neutral-400 font-mono">({{ formatBytes(selectedFile.size) }})</span>
-          <button @click.prevent="clearFile" class="text-neutral-400 hover:text-red-500 transition cursor-pointer">
-            <i class="pi pi-times-circle"></i>
+        <div v-if="selectedFile" class="mt-5 max-w-[92%] sm:max-w-md mx-auto inline-flex items-center justify-between gap-2.5 px-3.5 py-2 bg-white border border-[#00A3B0]/50 shadow-sm rounded-2xl sm:rounded-full text-xs animate-fade-in">
+          <div class="flex items-center gap-2 min-w-0 overflow-hidden">
+            <i :class="['pi', getFileIcon(selectedFile.name), 'text-[#00828E] font-bold text-sm shrink-0']"></i>
+            <span class="font-bold text-neutral-800 truncate max-w-[130px] sm:max-w-[220px] text-left block">{{ selectedFile.name }}</span>
+            <span class="text-[10px] text-neutral-400 font-mono shrink-0 whitespace-nowrap">({{ formatBytes(selectedFile.size) }})</span>
+          </div>
+          <button @click.prevent="clearFile" class="text-neutral-400 hover:text-red-500 transition cursor-pointer shrink-0 p-0.5" title="Remove file">
+            <i class="pi pi-times-circle text-sm"></i>
           </button>
         </div>
       </div>

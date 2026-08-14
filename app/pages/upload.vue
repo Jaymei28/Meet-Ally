@@ -134,9 +134,6 @@
             Ally parses 3-bureau records, flags reporting conflicts, and formats your game plan automatically.
           </p>
         </div>
-        <span class="text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700">
-          Multi-Format Supported
-        </span>
       </div>
 
       <!-- Drag & Drop Area -->

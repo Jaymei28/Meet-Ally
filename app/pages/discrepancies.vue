@@ -13,6 +13,58 @@
       </div>
     </div>
 
+    <!-- Instruction Guide: How Dispute Drafting Works -->
+    <div class="bg-gradient-to-br from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-3xl p-6 sm:p-7 shadow-[0_10px_30px_rgba(0,95,106,0.18)] relative overflow-hidden border border-white/20">
+      <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="flex items-start gap-4 relative z-10">
+        <div class="w-12 h-12 rounded-2xl bg-white/15 border border-white/30 p-1 flex items-center justify-center shrink-0 backdrop-blur-md shadow-sm">
+          <img src="/AllyAI.png" alt="Ally" class="w-full h-full object-contain" />
+        </div>
+        <div class="space-y-1 flex-1">
+          <h2 class="text-base sm:text-lg font-extrabold text-white">
+            How to Dispute Bureau Inconsistencies
+          </h2>
+          <p class="text-xs text-teal-50/90 font-medium leading-relaxed max-w-2xl">
+            Follow these 3 simple steps to generate legal dispute letters targeting conflicting records across TransUnion, Experian, and Equifax.
+          </p>
+        </div>
+      </div>
+
+      <!-- 3-Step Instruction Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5 pt-5 border-t border-white/15 relative z-10">
+        <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-white/20 text-white font-black text-[10px] flex items-center justify-center">1</span>
+            <span class="text-xs font-black text-white">Select Accounts</span>
+          </div>
+          <p class="text-[11px] text-teal-100/90 leading-normal font-medium">
+            Check the conflicting accounts or payment history discrepancies you want to dispute below.
+          </p>
+        </div>
+
+        <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-white/20 text-white font-black text-[10px] flex items-center justify-center">2</span>
+            <span class="text-xs font-black text-white">Choose Tone & Round</span>
+          </div>
+          <p class="text-[11px] text-teal-100/90 leading-normal font-medium">
+            Select <strong>Legal (FCRA)</strong> for statutory violations, <strong>Factual</strong>, or <strong>Aggressive</strong>, and set Round 1.
+          </p>
+        </div>
+
+        <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-white/20 text-white font-black text-[10px] flex items-center justify-center">3</span>
+            <span class="text-xs font-black text-white">Draft & Mail Letters</span>
+          </div>
+          <p class="text-[11px] text-teal-100/90 leading-normal font-medium">
+            Click <strong>"Draft Dispute Letters"</strong> to write and send dispute letters directly from your Letters hub.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Empty State -->
     <div v-if="!discrepancies || discrepancies.length === 0" class="flex flex-col items-center justify-center p-12 sm:p-16 bg-white border border-neutral-200 rounded-3xl text-center space-y-4 shadow-sm">
       <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">

@@ -1,38 +1,30 @@
 <template>
   <div class="space-y-8 animate-fade-in pb-28 max-w-6xl mx-auto">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 pb-6">
-      <div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900">Bureau Discrepancies</h1>
-        <p class="text-xs sm:text-sm text-neutral-500 mt-1 font-medium">Cross-reference conflicts discovered across reporting credit bureaus.</p>
-      </div>
-      <div v-if="discrepancies && discrepancies.length > 0" class="flex items-center gap-2">
-        <span class="text-xs px-3.5 py-1.5 rounded-xl bg-white border border-neutral-200 text-neutral-700 font-extrabold shadow-sm">
-          <span class="text-[#00828E]">{{ selectedDiscrepancies.length }}</span> / {{ discrepancies.length }} Selected
-        </span>
-      </div>
-    </div>
-
-    <!-- Instruction Guide: How Dispute Drafting Works -->
-    <div class="bg-gradient-to-br from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-3xl p-6 sm:p-7 shadow-[0_10px_30px_rgba(0,95,106,0.18)] relative overflow-hidden border border-white/20">
+    <!-- Header with Branding Background & Instructions -->
+    <div class="bg-gradient-to-br from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-3xl p-6 sm:p-8 shadow-[0_10px_30px_rgba(0,95,106,0.22)] relative overflow-hidden border border-white/20">
       <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
       
-      <div class="flex items-start gap-4 relative z-10">
-        <div class="w-12 h-12 rounded-2xl bg-white/15 border border-white/30 p-1 flex items-center justify-center shrink-0 backdrop-blur-md shadow-sm">
-          <img src="/AllyAI.png" alt="Ally" class="w-full h-full object-contain" />
+      <!-- Top Title Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-white/15 border border-white/30 p-1 flex items-center justify-center shrink-0 backdrop-blur-md shadow-sm">
+            <img src="/AllyAI.png" alt="Ally" class="w-full h-full object-contain" />
+          </div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-sm">Bureau Discrepancies</h1>
+            <p class="text-xs sm:text-sm text-teal-50/90 font-medium mt-0.5">Cross-reference conflicts discovered across reporting credit bureaus.</p>
+          </div>
         </div>
-        <div class="space-y-1 flex-1">
-          <h2 class="text-base sm:text-lg font-extrabold text-white">
-            How to Dispute Bureau Inconsistencies
-          </h2>
-          <p class="text-xs text-teal-50/90 font-medium leading-relaxed max-w-2xl">
-            Follow these 3 simple steps to generate legal dispute letters targeting conflicting records across TransUnion, Experian, and Equifax.
-          </p>
+
+        <div v-if="discrepancies && discrepancies.length > 0" class="flex items-center gap-2 self-start sm:self-auto">
+          <span class="text-xs px-3.5 py-1.5 rounded-xl bg-black/20 border border-white/20 text-white font-extrabold shadow-sm backdrop-blur-sm">
+            <span class="text-[#00D8E6]">{{ selectedDiscrepancies.length }}</span> / {{ discrepancies.length }} Selected
+          </span>
         </div>
       </div>
 
       <!-- 3-Step Instruction Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-5 pt-5 border-t border-white/15 relative z-10">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-6 border-t border-white/15 relative z-10">
         <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm space-y-1">
           <div class="flex items-center gap-2">
             <span class="w-5 h-5 rounded-full bg-white/20 text-white font-black text-[10px] flex items-center justify-center">1</span>

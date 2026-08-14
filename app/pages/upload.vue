@@ -179,8 +179,8 @@
             <span class="font-bold text-neutral-800 truncate max-w-[130px] sm:max-w-[220px] text-left block">{{ selectedFile.name }}</span>
             <span class="text-[10px] text-neutral-400 font-mono shrink-0 whitespace-nowrap">({{ formatBytes(selectedFile.size) }})</span>
           </div>
-          <button @click.prevent="clearFile" class="text-neutral-400 hover:text-red-500 transition cursor-pointer shrink-0 p-0.5" title="Remove file">
-            <i class="pi pi-times-circle text-sm"></i>
+          <button @click.prevent="clearFile" class="text-neutral-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-full transition cursor-pointer shrink-0" title="Remove file">
+            <i class="pi pi-times-circle text-base"></i>
           </button>
         </div>
       </div>
@@ -200,18 +200,19 @@
       </div>
 
       <!-- Action Button -->
-      <div v-else class="flex justify-end gap-3">
+      <div v-else class="flex items-center justify-end gap-3">
         <button 
           v-if="hasReport && showUploadModal"
           @click="showUploadModal = false"
-          class="px-5 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-bold rounded-xl text-xs transition cursor-pointer"
+          class="px-6 py-3 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 text-neutral-700 font-extrabold rounded-xl text-xs sm:text-sm transition cursor-pointer shadow-sm flex items-center justify-center gap-2"
         >
-          Cancel
+          <i class="pi pi-times text-xs"></i>
+          <span>Cancel</span>
         </button>
         <button 
           @click="uploadReport"
           :disabled="!selectedFile"
-          class="px-6 py-3 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 disabled:opacity-40 disabled:pointer-events-none shadow-sm flex items-center gap-2.5 text-xs cursor-pointer"
+          class="px-6 py-3 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 disabled:opacity-40 disabled:pointer-events-none shadow-sm flex items-center gap-2.5 text-xs sm:text-sm cursor-pointer"
         >
           <img src="/AllyAI.png" alt="Ally" class="w-5 h-5 object-contain shrink-0" />
           <span>Let Ally Analyze</span>

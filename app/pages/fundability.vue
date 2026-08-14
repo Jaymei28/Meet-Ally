@@ -445,8 +445,12 @@
 
               <!-- Action Button -->
               <div class="pt-2">
-                <button class="w-full py-2 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition shadow-xs cursor-pointer active:scale-[0.98]">
-                  Apply Now
+                <button 
+                  @click="applyForOffer(offer)"
+                  class="w-full py-2.5 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition shadow-xs cursor-pointer active:scale-[0.98] flex items-center justify-center gap-1.5"
+                >
+                  <span>Apply Now</span>
+                  <i class="pi pi-external-link text-[10px]"></i>
                 </button>
               </div>
 
@@ -581,6 +585,18 @@ async function upgradeToTurbo() {
     alert(err.data?.statusMessage || err.message || 'Upgrade failed.');
   } finally {
     upgrading.value = false;
+  }
+}
+
+function applyForOffer(offer) {
+  if (!offer) return;
+  const url = offer.application_url;
+  if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } else {
+    // Official search fallback for the lender offer
+    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent((offer.lender_name || 'Credit card') + ' apply online official website')}`;
+    window.open(searchUrl, '_blank', 'noopener,noreferrer');
   }
 }
 

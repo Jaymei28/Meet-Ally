@@ -91,6 +91,7 @@ const navItems = computed(() => {
       { name: 'Ally', path: '/credits', icon: '/AllyAI.png' },
       { name: 'User', path: '/users', icon: 'pi pi-users' },
       { name: 'Waitlist', path: '/waitlist', icon: 'pi pi-list' },
+      { name: 'Resources', path: '/resources', icon: 'pi pi-book' },
       { name: 'Profile', path: '/profile', icon: 'pi pi-user' }
     ];
   }
@@ -100,6 +101,7 @@ const navItems = computed(() => {
     { name: 'Conflicts', path: '/discrepancies', icon: 'pi pi-table' },
     { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
     { name: 'Fundability', path: '/fundability', icon: 'pi pi-verified' },
+    { name: 'Resources', path: '/resources', icon: 'pi pi-book' },
     { name: 'Profile', path: '/profile', icon: 'pi pi-user' }
   ];
 });

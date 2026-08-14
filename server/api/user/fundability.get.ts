@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
   // 4. Fetch matched lenders
   let matches = await useQuery(
-    `SELECT lm.*, l.name as lender_name, l.type as lender_type, l.bureau_pull, l.recommended_score, l.score_model, l.intro_apr_months, l.min_apr, l.max_apr, l.requirements, l.notes
+    `SELECT lm.*, l.name as lender_name, l.type as lender_type, l.bureau_pull, l.recommended_score, l.score_model, l.intro_apr_months, l.min_apr, l.max_apr, l.requirements, l.notes, l.application_url
      FROM lender_matches lm
      JOIN lenders l ON lm.lender_id = l.id
      WHERE lm.user_id = ? AND lm.fundability_score_id = ?
@@ -72,6 +72,7 @@ export default defineEventHandler(async (event) => {
         max_apr: l.max_apr || reqs.max_apr || '28.99',
         estimated_apr_min: l.min_apr || reqs.min_apr || '14.99',
         estimated_apr_max: l.max_apr || reqs.max_apr || '28.99',
+        application_url: l.application_url,
         requirements: reqs,
         notes: l.notes || reqs.notes || l.description || 'Pre-approved offer based on credit evaluation',
         match_score: Math.max(50, 85 - (idx * 5)),

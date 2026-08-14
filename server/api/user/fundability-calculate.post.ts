@@ -340,6 +340,7 @@ export default defineEventHandler(async (event) => {
       intro_apr_months: introAprMonths,
       min_apr: estMin.toFixed(2),
       max_apr: estMax.toFixed(2),
+      application_url: lender.application_url,
       requirements: reqs,
       notes: notes,
       match_score: matchScore,

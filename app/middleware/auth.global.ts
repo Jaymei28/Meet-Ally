@@ -15,7 +15,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   }
 
   // 3. Enforce RBAC and subscription route restrictions
-  const clientRoutes = ['/upload', '/discrepancies', '/letters'];
+  const clientRoutes = ['/upload', '/discrepancies', '/letters', '/fundability'];
   const adminRoutes = ['/users', '/credits', '/waitlist'];
 
   // Administrators cannot access client-only routes

@@ -1,9 +1,14 @@
 import { useTransaction } from '../utils/db';
 
 export default defineEventHandler(async (event) => {
+  // Auth guard
+  const userCookie = getCookie(event, 'auth_user');
+  if (!userCookie) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
+  }
+
   const body = await readBody(event);
   const { id, content, posted_1, sent } = body || {};
-
   if (!id) {
     throw createError({
       statusCode: 400,

@@ -11,6 +11,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // Auth guard
+  const userCookie = getCookie(event, 'auth_user');
+  if (!userCookie) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized. Please log in.' });
+  }
+  const sessionUser = JSON.parse(userCookie);
+
   const body = await readBody(event);
   const { discrepancyIds, tone = 'factual', phase = 1 } = body || {};
 

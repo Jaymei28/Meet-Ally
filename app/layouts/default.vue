@@ -59,7 +59,7 @@
       </div>
     </main>
 
-    <!-- 4. MOBILE BOTTOM NAVIGATION (hidden on desktop, fixed at bottom on mobile) -->
+    <!-- 4. MOBILE BOTTOM NAVIGATION -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-neutral-200 py-2 px-4 flex justify-around items-center z-40 no-print shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
       <NuxtLink
         v-for="item in mobileNavItems"
@@ -74,15 +74,53 @@
         </div>
         <span class="text-[10px] font-semibold truncate w-full text-center">{{ item.name }}</span>
       </NuxtLink>
+
+      <!-- More Button -->
+      <button
+        @click="showMoreMenu = !showMoreMenu"
+        class="flex-1 flex flex-col items-center gap-1 py-1 px-1 rounded-lg transition-all duration-300 min-w-0 cursor-pointer"
+        :class="showMoreMenu ? 'text-[#00828E] font-bold' : 'text-neutral-400 hover:text-neutral-600'"
+      >
+        <div class="w-6 h-6 flex items-center justify-center shrink-0">
+          <i class="pi pi-ellipsis-h text-lg"></i>
+        </div>
+        <span class="text-[10px] font-semibold">More</span>
+      </button>
     </nav>
+
+    <!-- More Menu Overlay -->
+    <Transition name="slide-up">
+      <div v-if="showMoreMenu" class="md:hidden fixed inset-0 z-50" @click.self="showMoreMenu = false">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" @click="showMoreMenu = false"></div>
+        <!-- Drawer -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl border-t border-neutral-200 shadow-xl p-5 pb-8 space-y-2">
+          <div class="w-10 h-1 bg-neutral-200 rounded-full mx-auto mb-4"></div>
+          <NuxtLink
+            v-for="item in moreMenuItems"
+            :key="item.path"
+            :to="item.path"
+            @click="showMoreMenu = false"
+            class="flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200"
+            :class="isActive(item.path) ? 'bg-[#00A3B0]/10 text-[#00828E] font-bold border border-[#00A3B0]/20' : 'text-neutral-600 hover:bg-neutral-50'"
+          >
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" :class="isActive(item.path) ? 'bg-[#00A3B0]/15' : 'bg-neutral-100'">
+              <i :class="[item.icon, 'text-base']"></i>
+            </div>
+            <span class="text-sm font-semibold">{{ item.name }}</span>
+          </NuxtLink>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const route = useRoute();
 const user = useCookie('auth_user');
+const showMoreMenu = ref(false);
 
 // Sidebar nav (desktop) — full list
 const navItems = computed(() => {
@@ -124,6 +162,19 @@ const mobileNavItems = computed(() => {
     { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
     { name: 'Funding', path: '/fundability', icon: 'pi pi-verified' },
     { name: 'Profile', path: '/profile', icon: 'pi pi-user' }
+  ];
+});
+
+// Items shown in the "More" slide-up drawer on mobile
+const moreMenuItems = computed(() => {
+  if (user.value && user.value.role === 'admin') {
+    return [
+      { name: 'Waitlist', path: '/waitlist', icon: 'pi pi-list' },
+    ];
+  }
+  return [
+    { name: 'Conflicts', path: '/discrepancies', icon: 'pi pi-table' },
+    { name: 'Resources', path: '/resources', icon: 'pi pi-book' },
   ];
 });
 
@@ -209,5 +260,16 @@ function getInitials(name) {
 }
 .animate-pulse-logo {
   animation: pulseLogo 1.6s ease-in-out infinite;
+}
+
+/* Slide-up transition for More menu */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(100%);
 }
 </style>

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const users = await useQuery("SELECT id, name, email, password, role, plan_type FROM users WHERE email = ? LIMIT 1", [email]);
+    const users = await useQuery("SELECT id, name, email, password, role, plan_type, profile_picture FROM users WHERE email = ? LIMIT 1", [email]);
     if (users.length === 0) {
       throw createError({
         statusCode: 401,
@@ -35,7 +35,8 @@ export default defineEventHandler(async (event) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      plan_type: user.plan_type
+      plan_type: user.plan_type,
+      profile_picture: user.profile_picture || null
     };
 
     // Set cookie that expires in 7 days

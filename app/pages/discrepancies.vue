@@ -79,16 +79,79 @@
         </p>
       </div>
 
-      <!-- PrimeVue DataTable Container -->
-      <div class="bg-white border border-neutral-200 rounded-3xl overflow-hidden shadow-sm">
-        <!-- Mobile scroll hint banner -->
-        <div class="sm:hidden bg-neutral-50 border-b border-neutral-200 px-4 py-2 text-[10px] font-bold text-neutral-500 flex items-center justify-between">
-          <span class="flex items-center gap-1.5">
-            <i class="pi pi-arrows-h text-[#00828E]"></i> Swipe horizontally to view full table
-          </span>
-          <span class="text-neutral-400 font-semibold">{{ discrepancies.length }} items</span>
+      <!-- Mobile View (Compact Cards - No Swiping Needed!) -->
+      <div class="sm:hidden space-y-3">
+        <!-- Select All Header -->
+        <div class="flex items-center justify-between px-1 py-1">
+          <button 
+            @click="toggleSelectAll"
+            class="text-xs font-extrabold text-[#00828E] flex items-center gap-1.5 cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-neutral-200 shadow-sm"
+          >
+            <i :class="['pi', isAllSelected ? 'pi-check-square' : 'pi-stop', 'text-xs text-[#00828E]']"></i>
+            <span>{{ isAllSelected ? 'Deselect All' : 'Select All Items' }}</span>
+          </button>
+          <span class="text-[10px] text-neutral-500 font-extrabold uppercase tracking-wider">{{ selectedDiscrepancies.length }}/{{ discrepancies.length }} selected</span>
         </div>
 
+        <div 
+          v-for="item in discrepancies" 
+          :key="item.id"
+          @click="toggleSelect(item)"
+          class="bg-white border rounded-2xl p-4 shadow-sm transition duration-200 cursor-pointer space-y-3"
+          :class="isSelected(item) ? 'border-[#00A3B0] ring-2 ring-[#00A3B0]/20 bg-teal-50/15' : 'border-neutral-200 hover:border-neutral-300'"
+        >
+          <!-- Card Top: Checkbox + Creditor + Severity -->
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-start gap-2.5 min-w-0">
+              <input 
+                type="checkbox" 
+                :checked="isSelected(item)"
+                @click.stop="toggleSelect(item)"
+                class="mt-1 rounded text-[#00A3B0] focus:ring-[#00A3B0] cursor-pointer h-4 w-4 shrink-0"
+              />
+              <div class="min-w-0">
+                <span class="font-extrabold text-xs text-neutral-900 leading-snug block truncate">{{ item.creditor_name }}</span>
+                <span class="text-[10px] text-[#00828E] font-extrabold uppercase tracking-wider block">{{ item.account_type }}</span>
+                <span class="font-mono text-[10px] text-neutral-500 font-semibold block mt-0.5 truncate">{{ item.account_number || '---' }}</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col items-end gap-1 shrink-0">
+              <span class="text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider" :class="getSeverityClass(item.severity)">
+                {{ item.severity }}
+              </span>
+              <span class="text-[10px] font-black text-neutral-600">Priority: {{ item.dispute_priority }}</span>
+            </div>
+          </div>
+
+          <!-- Mismatch Field -->
+          <div class="pt-2 border-t border-neutral-100 flex items-center justify-between gap-2">
+            <span class="text-[10px] font-extrabold uppercase tracking-wide text-neutral-400">Conflict Field:</span>
+            <span class="px-2 py-0.5 rounded bg-neutral-100 border border-neutral-200 text-neutral-700 text-[10px] font-black uppercase">
+              {{ item.field_name.replace('_', ' ') }}
+            </span>
+          </div>
+
+          <!-- Bureau Values Side-by-Side Strip -->
+          <div class="grid grid-cols-3 gap-1.5 bg-neutral-50 rounded-xl p-2.5 border border-neutral-100 text-center">
+            <div>
+              <span class="text-[9px] uppercase font-black text-neutral-400 block">TR</span>
+              <span class="text-[10px] font-bold text-red-600 truncate block mt-0.5">{{ item.value_1 || '---' }}</span>
+            </div>
+            <div class="border-x border-neutral-200 px-1">
+              <span class="text-[9px] uppercase font-black text-neutral-400 block">EX</span>
+              <span class="text-[10px] font-bold text-red-600 truncate block mt-0.5">{{ item.value_2 || '---' }}</span>
+            </div>
+            <div>
+              <span class="text-[9px] uppercase font-black text-neutral-400 block">EQ</span>
+              <span class="text-[10px] font-bold text-red-600 truncate block mt-0.5">{{ item.value_3 || '---' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop View (DataTable - Hidden on Mobile) -->
+      <div class="hidden sm:block bg-white border border-neutral-200 rounded-3xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto w-full">
           <DataTable 
             v-model:selection="selectedDiscrepancies" 
@@ -170,6 +233,7 @@
             </Column>
           </DataTable>
         </div>
+      </div>
     </div>
   </div>
 </template>
@@ -181,6 +245,32 @@ const selectedDiscrepancies = ref([]);
 const selectedTone = ref('legal');
 const selectedPhase = ref(1);
 const letterLoading = ref(false);
+
+function isSelected(item) {
+  return selectedDiscrepancies.value.some(d => d.id === item.id);
+}
+
+function toggleSelect(item) {
+  const index = selectedDiscrepancies.value.findIndex(d => d.id === item.id);
+  if (index >= 0) {
+    selectedDiscrepancies.value.splice(index, 1);
+  } else {
+    selectedDiscrepancies.value.push(item);
+  }
+}
+
+const isAllSelected = computed(() => {
+  if (!discrepancies.value || discrepancies.value.length === 0) return false;
+  return selectedDiscrepancies.value.length === discrepancies.value.length;
+});
+
+function toggleSelectAll() {
+  if (isAllSelected.value) {
+    selectedDiscrepancies.value = [];
+  } else {
+    selectedDiscrepancies.value = [...(discrepancies.value || [])];
+  }
+}
 
 function getSeverityClass(severity) {
   if (severity === 'high') return 'bg-red-50 text-red-600 border border-red-100';

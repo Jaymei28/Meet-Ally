@@ -1,14 +1,5 @@
 <template>
   <div class="min-h-screen bg-neutral-50 text-neutral-800 font-sans flex flex-col md:flex-row">
-    <!-- Splash Screen Loader Overlay -->
-    <Transition name="fade-loader">
-      <div v-if="showLoader" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center space-y-4">
-        <div class="flex flex-col items-center justify-center">
-          <img src="/Meet-ally-logo.png" alt="Meet Ally Logo" class="h-16 object-contain animate-pulse-logo" />
-          <div class="mt-8 w-8 h-8 border-2 border-neutral-100 border-t-[#00A3B0] rounded-full animate-spin"></div>
-        </div>
-      </div>
-    </Transition>
     <!-- 1. DESKTOP SIDEBAR NAVIGATION (hidden on mobile, flex on desktop) -->
     <aside class="hidden md:flex flex-col w-64 bg-white border-r border-neutral-200 shrink-0 h-screen sticky top-0 no-print">
       <!-- Brand Logo / Title -->
@@ -88,17 +79,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { computed } from 'vue';
 
 const route = useRoute();
-const showLoader = ref(true);
 const user = useCookie('auth_user');
-
-onMounted(() => {
-  setTimeout(() => {
-    showLoader.value = false;
-  }, 1200); // 1.2s loading screen
-});
 
 const navItems = computed(() => {
   if (user.value && user.value.role === 'admin') {

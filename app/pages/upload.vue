@@ -2,31 +2,28 @@
   <div class="space-y-8 animate-fade-in pb-12 max-w-5xl mx-auto no-print">
     
     <!-- 1. Meet Ally Coaching Header -->
-    <div class="bg-gradient-to-br from-[#0B0B10] via-[#12121A] to-[#0A1A1C] text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden border border-white/10">
-      <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-[#00D8E6]/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="bg-gradient-to-br from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-3xl p-6 sm:p-8 shadow-[0_10px_30px_rgba(0,95,106,0.25)] relative overflow-hidden border border-white/20">
+      <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
       
       <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
         <!-- Ally Avatar -->
         <div class="relative shrink-0">
-          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/10 border-2 border-[#00D8E6] p-1 shadow-[0_0_25px_rgba(0,216,230,0.35)] flex items-center justify-center backdrop-blur-md">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/15 border-2 border-white/80 p-1 shadow-[0_4px_20px_rgba(0,0,0,0.2)] flex items-center justify-center backdrop-blur-md">
             <img 
               src="/AllyAI.png" 
               alt="Ally AI" 
               class="w-full h-full object-contain drop-shadow-md"
             />
           </div>
-          <span class="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 border-2 border-[#0B0B10] rounded-full"></span>
+          <span class="absolute bottom-0 right-0 w-5 h-5 bg-emerald-400 border-2 border-[#005F6A] rounded-full shadow-sm"></span>
         </div>
 
         <!-- Title & Subtitle -->
         <div class="text-center sm:text-left space-y-1.5 flex-1">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00D8E6]/10 border border-[#00D8E6]/25 text-[#00D8E6] text-[10px] font-extrabold uppercase tracking-widest mb-1">
-            <i class="pi pi-sparkles text-[9px]"></i> AI Credit Strategist
-          </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-sm">
             Meet Ally: Your Credit Game Plan
           </h1>
-          <p class="text-xs sm:text-sm text-neutral-300 font-medium leading-relaxed max-w-2xl">
+          <p class="text-xs sm:text-sm text-teal-50/90 font-medium leading-relaxed max-w-2xl">
             Let's tackle your disputes in rounds to weaken reporting credibility and maximize deletions.
           </p>
         </div>
@@ -35,7 +32,7 @@
         <div v-if="hasReport" class="shrink-0">
           <button 
             @click="showUploadModal = !showUploadModal" 
-            class="px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-xs font-bold text-white transition flex items-center gap-2 backdrop-blur-md cursor-pointer"
+            class="px-4 py-2.5 bg-white/15 hover:bg-white/25 border border-white/30 rounded-xl text-xs font-bold text-white transition flex items-center gap-2 backdrop-blur-md cursor-pointer shadow-sm"
           >
             <i :class="['pi', showUploadModal ? 'pi-list' : 'pi-upload']"></i>
             {{ showUploadModal ? 'View Game Plan' : 'Upload New Report' }}
@@ -44,22 +41,22 @@
       </div>
 
       <!-- Audit Metrics Strip (shown if report exists and not in upload mode) -->
-      <div v-if="hasReport && !showUploadModal" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/10">
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5 backdrop-blur-sm">
-          <span class="text-[10px] uppercase font-bold tracking-wider text-neutral-400 block">Total Accounts</span>
-          <div class="text-xl font-black text-[#00D8E6] mt-0.5">{{ summaryData.totalAccounts || 0 }}</div>
+      <div v-if="hasReport && !showUploadModal" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/20">
+        <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-teal-100/80 block">Total Accounts</span>
+          <div class="text-xl font-black text-white mt-0.5">{{ summaryData.totalAccounts || 0 }}</div>
         </div>
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5 backdrop-blur-sm">
-          <span class="text-[10px] uppercase font-bold tracking-wider text-neutral-400 block">Negative Items</span>
-          <div class="text-xl font-black text-rose-400 mt-0.5">{{ summaryData.negativeAccounts || 0 }}</div>
+        <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-teal-100/80 block">Negative Items</span>
+          <div class="text-xl font-black text-rose-200 mt-0.5">{{ summaryData.negativeAccounts || 0 }}</div>
         </div>
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5 backdrop-blur-sm">
-          <span class="text-[10px] uppercase font-bold tracking-wider text-neutral-400 block">Active Letters</span>
-          <div class="text-xl font-black text-amber-400 mt-0.5">{{ letters.length }}</div>
+        <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-teal-100/80 block">Active Letters</span>
+          <div class="text-xl font-black text-amber-200 mt-0.5">{{ letters.length }}</div>
         </div>
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5 backdrop-blur-sm">
-          <span class="text-[10px] uppercase font-bold tracking-wider text-neutral-400 block">Current Phase</span>
-          <div class="text-xl font-black text-emerald-400 mt-0.5">{{ activePhaseName }}</div>
+        <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-teal-100/80 block">Current Phase</span>
+          <div class="text-xl font-black text-emerald-200 mt-0.5">{{ activePhaseName }}</div>
         </div>
       </div>
     </div>

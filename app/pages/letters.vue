@@ -37,9 +37,14 @@
               <span class="font-extrabold text-xs uppercase tracking-wider" :class="selectedLetter?.id === letter.id ? 'text-[#00828E]' : 'text-neutral-700'">
                 {{ letter.credit_bureau }}
               </span>
-              <span class="text-[9px] bg-neutral-100 border px-1.5 py-0.5 rounded text-neutral-500 font-bold">
-                Rd {{ letter.phase }}
-              </span>
+              <div class="flex items-center gap-1.5">
+                <span v-if="letter.posted_1" class="text-[8px] bg-emerald-50 border border-emerald-250 px-1 py-0.5 rounded-full text-emerald-600 font-black uppercase tracking-wider">
+                  Mailed
+                </span>
+                <span class="text-[9px] bg-neutral-100 border px-1.5 py-0.5 rounded text-neutral-500 font-bold">
+                  Rd {{ letter.phase }}
+                </span>
+              </div>
             </div>
             <span class="text-xs font-bold truncate w-full text-neutral-800">{{ letter.creditor_name }}</span>
             <span class="text-[9px] text-neutral-400 font-semibold">Generated {{ formatDate(letter.created_at) }}</span>
@@ -59,15 +64,25 @@
             <div class="flex items-center gap-2">
               <button 
                 @click="toggleEdit"
-                class="px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-bold text-neutral-700 hover:bg-neutral-100 transition duration-300 flex items-center gap-2"
+                class="px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-bold text-neutral-700 hover:bg-neutral-100 transition duration-300 flex items-center gap-2 cursor-pointer"
               >
                 <i :class="['pi', isEditing ? 'pi-eye' : 'pi-pencil']"></i>
                 {{ isEditing ? 'Preview Letter' : 'Edit Text' }}
               </button>
               
               <button 
+                @click="toggleMailedStatus"
+                :disabled="statusLoading"
+                class="px-4 py-2 border rounded-lg text-xs font-bold transition duration-300 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                :class="selectedLetter.posted_1 ? 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100' : 'bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-100'"
+              >
+                <i :class="['pi', statusLoading ? 'pi-spin pi-spinner' : (selectedLetter.posted_1 ? 'pi-check-circle' : 'pi-envelope')]"></i>
+                {{ selectedLetter.posted_1 ? 'Mailed' : 'Mark as Mailed' }}
+              </button>
+
+              <button 
                 @click="printActiveLetter"
-                class="px-4 py-2 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-lg text-xs hover:bg-[#00A3B0] transition duration-300 flex items-center gap-2 shadow-sm"
+                class="px-4 py-2 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-lg text-xs hover:bg-[#00A3B0] transition duration-300 flex items-center gap-2 shadow-sm cursor-pointer"
               >
                 <i class="pi pi-print"></i> Print / Mail
               </button>
@@ -115,6 +130,35 @@ const selectedLetter = ref(null);
 const isEditing = ref(false);
 const editorContent = ref('');
 const saveLoading = ref(false);
+const statusLoading = ref(false);
+
+async function toggleMailedStatus() {
+  if (!selectedLetter.value) return;
+
+  statusLoading.value = true;
+  const newStatus = selectedLetter.value.posted_1 ? 0 : 1;
+
+  try {
+    const res = await $fetch('/api/letters', {
+      method: 'PUT',
+      body: {
+        id: selectedLetter.value.id,
+        posted_1: newStatus,
+        sent: newStatus
+      }
+    });
+
+    if (res.success) {
+      selectedLetter.value.posted_1 = newStatus;
+      selectedLetter.value.sent = newStatus;
+      refresh();
+    }
+  } catch (err) {
+    alert(err.message || 'Failed to update letter status.');
+  } finally {
+    statusLoading.value = false;
+  }
+}
 
 // Auto-select the first letter when loaded
 watch(letters, (newVal) => {

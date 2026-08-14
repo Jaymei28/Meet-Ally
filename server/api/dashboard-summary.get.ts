@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     return {
       hasReport: false,
       scores: { transunion: 0, experian: 0, equifax: 0 },
-      summary: { totalAccounts: 0, negativeAccounts: 0, inquiries: 0, discrepancies: 0 }
+      summary: { totalAccounts: 0, negativeAccounts: 0, inquiries: 0, discrepancies: 0, lettersCount: 0, mailedLettersCount: 0 }
     };
   }
 
@@ -47,6 +47,17 @@ export default defineEventHandler(async (event) => {
     [userId]
   );
 
+  // Fetch counts of generated and mailed dispute letters
+  const lettersCountRes = await useQuery(
+    `SELECT COUNT(*) as count FROM dispute_letters WHERE user_id = ?`,
+    [userId]
+  );
+
+  const mailedLettersCountRes = await useQuery(
+    `SELECT COUNT(*) as count FROM dispute_letters WHERE user_id = ? AND (posted_1 = 1 OR sent = 1)`,
+    [userId]
+  );
+
   return {
     hasReport: true,
     reportId: report.id,
@@ -58,7 +69,9 @@ export default defineEventHandler(async (event) => {
       totalAccounts: report.total_accounts_count || 0,
       negativeAccounts: report.negative_accounts_count || 0,
       inquiries: report.hard_inquiries_count || 0,
-      discrepancies: discrepanciesCount[0]?.count || 0
+      discrepancies: discrepanciesCount[0]?.count || 0,
+      lettersCount: lettersCountRes[0]?.count || 0,
+      mailedLettersCount: mailedLettersCountRes[0]?.count || 0
     }
   };
 });

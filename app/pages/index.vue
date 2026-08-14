@@ -568,12 +568,65 @@ const clientData = ref({
   personalInfo: null
 });
 
-const disputeTimeline = [
-  { status: 'Auditing & Ingestion', step: 'Step 1: Complete', icon: 'pi pi-check', completed: true, desc: 'AI parsed credit report and mapped inconsistencies.' },
-  { status: 'Drafting Dispute Files', step: 'Step 2: Active', icon: 'pi pi-file-edit', completed: true, desc: 'Select conflicting fields and draft letters.' },
-  { status: 'Bureau Mail Status', step: 'Step 3: Pending', icon: 'pi pi-envelope', completed: false, desc: 'Mail dispute letters to bureaus.' },
-  { status: '30-Day Response Audit', step: 'Step 4: Pending', icon: 'pi pi-calendar', completed: false, desc: 'Track response letters and verify corrections.' }
-];
+const disputeTimeline = computed(() => {
+  const hasReport = clientData.value.hasReport;
+  const lettersCount = clientData.value.summary?.lettersCount || 0;
+  const mailedCount = clientData.value.summary?.mailedLettersCount || 0;
+
+  // Step 1: Auditing & Ingestion
+  const s1Complete = hasReport;
+  const s1Step = s1Complete ? 'Step 1: Complete' : 'Step 1: Active';
+  const s1Icon = s1Complete ? 'pi pi-check' : 'pi pi-spin pi-spinner';
+
+  // Step 2: Drafting Dispute Files
+  const s2Complete = s1Complete && lettersCount > 0;
+  const s2Active = s1Complete && lettersCount === 0;
+  const s2Step = s2Complete ? 'Step 2: Complete' : (s2Active ? 'Step 2: Active' : 'Step 2: Pending');
+  const s2Icon = s2Complete ? 'pi pi-check' : 'pi pi-file-edit';
+
+  // Step 3: Bureau Mail Status
+  const s3Complete = s2Complete && mailedCount > 0 && mailedCount >= lettersCount;
+  const s3Active = s2Complete && mailedCount < lettersCount;
+  const s3Step = s3Complete ? 'Step 3: Complete' : (s3Active ? 'Step 3: Active' : 'Step 3: Pending');
+  const s3Icon = s3Complete ? 'pi pi-check' : 'pi pi-envelope';
+
+  // Step 4: 30-Day Response Audit
+  const s4Complete = false;
+  const s4Active = s3Complete;
+  const s4Step = s4Complete ? 'Step 4: Complete' : (s4Active ? 'Step 4: Active' : 'Step 4: Pending');
+  const s4Icon = s4Active ? 'pi pi-hourglass' : 'pi pi-calendar';
+
+  return [
+    { 
+      status: 'Auditing & Ingestion', 
+      step: s1Step, 
+      icon: s1Icon, 
+      completed: s1Complete, 
+      desc: s1Complete ? 'AI parsed credit report and mapped inconsistencies.' : 'Upload your credit report to start the AI audit.' 
+    },
+    { 
+      status: 'Drafting Dispute Files', 
+      step: s2Step, 
+      icon: s2Icon, 
+      completed: s2Complete, 
+      desc: s2Complete ? `Generated ${lettersCount} dispute letters.` : (s2Active ? 'Select conflicting fields and draft letters.' : 'Upload credit report first.')
+    },
+    { 
+      status: 'Bureau Mail Status', 
+      step: s3Step, 
+      icon: s3Icon, 
+      completed: s3Complete, 
+      desc: s3Complete ? 'All dispute letters have been mailed.' : (s3Active ? `Mailed ${mailedCount} of ${lettersCount} letters. Mark remaining as sent in Letters tab.` : 'Draft your dispute letters first.')
+    },
+    { 
+      status: '30-Day Response Audit', 
+      step: s4Step, 
+      icon: s4Icon, 
+      completed: s4Complete, 
+      desc: s4Active ? 'Awaiting credit bureau responses (FCRA statutory 30-day limit).' : 'Pending bureau mail completion.'
+    }
+  ];
+});
 
 function getScoreRating(score) {
   if (score >= 781) return 'Excellent';

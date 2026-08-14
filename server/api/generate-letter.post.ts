@@ -176,7 +176,8 @@ Follow these constraints:
    - 'moderate': Clear, polite, yet firm investigation request.
 4. Clearly list each disputed account with creditor name, account number, the reporting mismatch, and why it is inaccurate.
 5. Conclude by demanding a full verification or immediate deletion/correction within the statutory 30-day window.
-6. Return ONLY the letter content. Do not include markdown wraps (like \`\`\` or similar), introduction text, or explanations. Just return the letter.`,
+6. Sign off with 'Sincerely,' followed by the user's full name (${user.name}) directly on the line below. Do NOT output a blank line placeholder (like '_____') or '[Signature]'.
+7. Return ONLY the letter content. Do not include markdown wraps (like \`\`\` or similar), introduction text, or explanations. Just return the letter.`,
           messages: [
             {
               role: 'user',
@@ -199,7 +200,7 @@ ROUND/PHASE: ${phase}`
       if (!aiResponse.ok) {
         const errText = await aiResponse.text();
         console.warn(`Anthropic API error for ${bureau} (${aiResponse.status}): ${errText}. Falling back to high-accuracy Mock Letter Writer.`);
-        letterText = getMockDisputeLetter(bureau, userAddressBlock, bureauAddressBlock, accountsDescription, tone);
+        letterText = getMockDisputeLetter(bureau, userAddressBlock, bureauAddressBlock, accountsDescription, tone, user.name);
         letterCost = 0; // Mock letters have no API cost
       } else {
         const resJson = await aiResponse.json();
@@ -279,7 +280,7 @@ ROUND/PHASE: ${phase}`
   };
 });
 
-function getMockDisputeLetter(bureau: string, userAddr: string, bureauAddr: string, accountsText: string, tone: string) {
+function getMockDisputeLetter(bureau: string, userAddr: string, bureauAddr: string, accountsText: string, tone: string, userName: string) {
   const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   
   let headerIntro = `Dear Disputes Department,
@@ -315,6 +316,5 @@ Please send me written confirmation once these corrections have been made. If th
 
 Sincerely,
 
-_______________________________
-[Signature]`;
+${userName || 'Consumer'}`;
 }

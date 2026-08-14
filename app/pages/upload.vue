@@ -209,9 +209,10 @@
         <button 
           @click="uploadReport"
           :disabled="!selectedFile"
-          class="px-6 py-3 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 disabled:opacity-40 disabled:pointer-events-none shadow-sm flex items-center gap-2 text-xs cursor-pointer"
+          class="px-6 py-3 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 disabled:opacity-40 disabled:pointer-events-none shadow-sm flex items-center gap-2.5 text-xs cursor-pointer"
         >
-          <i class="pi pi-bolt"></i> Run Ally AI Extraction
+          <img src="/AllyAI.png" alt="Ally" class="w-5 h-5 object-contain shrink-0" />
+          <span>Let Ally Analyze</span>
         </button>
       </div>
 

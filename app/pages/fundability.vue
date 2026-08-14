@@ -553,7 +553,7 @@ async function calculateScore() {
       lenderMatches.value = res.matches;
     }
   } catch (err) {
-    alert(err.data?.statusMessage || err.message || 'Calculation error occurred.');
+    alert(formatErrorMessage(err, 'Failed to calculate fundability score. Please try again.'));
   } finally {
     loading.value = false;
   }

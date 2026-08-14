@@ -617,7 +617,7 @@ async function uploadReport() {
       error.value = res.message || 'Unknown error occurred while parsing report.';
     }
   } catch (err) {
-    error.value = err.data?.statusMessage || err.message || 'Server error encountered during upload.';
+    error.value = formatErrorMessage(err, 'Server error encountered during credit report parsing. Please try uploading again.');
   } finally {
     loading.value = false;
   }

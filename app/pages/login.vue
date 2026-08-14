@@ -662,7 +662,7 @@ async function handleLogin() {
       navigateTo('/');
     }
   } catch (err) {
-    error.value = err.data?.statusMessage || 'Failed to authenticate. Please check your credentials.';
+    error.value = formatErrorMessage(err, 'Failed to authenticate. Please check your email and password.');
   } finally {
     loading.value = false;
   }
@@ -691,7 +691,7 @@ async function handleRegister() {
       navigateTo('/');
     }
   } catch (err) {
-    error.value = err.data?.statusMessage || 'Registration failed. Please check your information.';
+    error.value = formatErrorMessage(err, 'Registration failed. Please check your information and try again.');
   } finally {
     regLoading.value = false;
   }

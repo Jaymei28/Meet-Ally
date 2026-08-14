@@ -324,39 +324,47 @@
           </div>
 
           <!-- Actionable Recommendations -->
-          <div class="lg:col-span-2 bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-4">
-            <div class="flex justify-between items-center">
-              <h3 class="text-xs font-black text-neutral-400 uppercase tracking-widest">AI Action Roadmap</h3>
+          <div class="lg:col-span-2 bg-white border border-neutral-200 rounded-[32px] p-5 sm:p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between gap-3 pb-3 border-b border-neutral-100">
+              <div class="flex items-center gap-2 min-w-0">
+                <h3 class="text-xs sm:text-sm font-extrabold text-neutral-800 uppercase tracking-wider whitespace-nowrap">
+                  Action Roadmap
+                </h3>
+                <span class="text-[10px] font-bold text-[#00828E] bg-[#00A3B0]/10 border border-[#00A3B0]/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                  {{ scoreData.recommendations?.length || 0 }} Steps
+                </span>
+              </div>
               <button 
                 @click="calculateScore" 
-                class="px-4 py-2 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 rounded-xl text-[10px] font-extrabold text-neutral-600 transition flex items-center gap-1.5 cursor-pointer"
+                class="shrink-0 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 rounded-xl text-[11px] font-bold text-neutral-700 transition flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 whitespace-nowrap"
               >
-                <i class="pi pi-refresh"></i> Re-Calculate
+                <i class="pi pi-refresh text-[10px] text-[#00828E]"></i>
+                <span>Re-Calculate</span>
               </button>
             </div>
 
-            <div class="space-y-3">
+            <div class="grid grid-cols-1 gap-2.5">
               <div 
                 v-for="rec in scoreData.recommendations" 
                 :key="rec.title" 
-                class="flex gap-4 p-4 border border-neutral-150 rounded-2xl bg-neutral-50/30 shadow-sm relative overflow-hidden"
+                class="flex items-start gap-3 p-3.5 border border-neutral-200/80 rounded-2xl bg-neutral-50/70 hover:bg-white hover:border-[#00A3B0]/40 transition duration-200 shadow-xs"
               >
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" :class="rec.priority === 'high' ? 'bg-red-500/10 border border-red-500/25 text-red-500' : 'bg-amber-500/10 border border-amber-500/25 text-amber-500'">
-                  <i :class="rec.icon || 'pi pi-info-circle'" class="text-sm"></i>
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 mt-0.5" :class="rec.priority === 'high' ? 'bg-rose-50 border border-rose-200 text-rose-500' : 'bg-amber-50 border border-amber-200 text-amber-500'">
+                  <i :class="rec.icon || 'pi pi-info-circle'" class="text-xs"></i>
                 </div>
                 
-                <div class="space-y-1 flex-1">
-                  <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-neutral-900">{{ rec.title }}</span>
-                    <span class="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full" :class="rec.priority === 'high' ? 'bg-red-50 text-red-500 border border-red-200' : 'bg-amber-50 text-amber-600 border border-amber-200'">
-                      {{ rec.priority }} Priority
+                <div class="space-y-0.5 flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-bold text-neutral-900 truncate">{{ rec.title }}</span>
+                    <span class="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md shrink-0" :class="rec.priority === 'high' ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-amber-50 text-amber-600 border border-amber-200'">
+                      {{ rec.priority }}
                     </span>
                   </div>
-                  <p class="text-xs text-neutral-500 leading-normal font-semibold">{{ rec.description }}</p>
+                  <p class="text-[11px] text-neutral-500 leading-normal font-medium">{{ rec.description }}</p>
                   
-                  <div v-if="rec.action_url" class="pt-2">
+                  <div v-if="rec.action_url" class="pt-1">
                     <NuxtLink :to="rec.action_url" class="inline-flex items-center gap-1 text-[10px] font-black text-[#00828E] hover:underline">
-                      {{ rec.action_text || 'Fix Item' }} <i class="pi pi-arrow-right text-[8px]"></i>
+                      {{ rec.action_text || 'Take Action' }} <i class="pi pi-arrow-right text-[8px]"></i>
                     </NuxtLink>
                   </div>
                 </div>
@@ -366,47 +374,52 @@
         </div>
 
         <!-- Matching Lenders / Credit Card Offers -->
-        <div class="bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-6">
-          <div class="border-b border-neutral-100 pb-4 flex justify-between items-center">
+        <div class="bg-white border border-neutral-200 rounded-[32px] p-5 sm:p-6 shadow-sm space-y-5">
+          <div class="border-b border-neutral-100 pb-3 flex justify-between items-center">
             <div>
-              <h3 class="font-extrabold text-lg text-neutral-900">Matched Funding Offers</h3>
-              <p class="text-neutral-500 text-xs mt-1 leading-normal font-semibold">
-                Based on your score and bureau profile, here are recommended credit products you have high approval odds for.
+              <div class="flex items-center gap-2">
+                <h3 class="font-extrabold text-base sm:text-lg text-neutral-900">Matched Funding Offers</h3>
+                <span v-if="lenderMatches.length > 0" class="text-[10px] font-bold text-[#00828E] bg-[#00A3B0]/10 border border-[#00A3B0]/20 px-2.5 py-0.5 rounded-full">
+                  {{ lenderMatches.length }} Offers
+                </span>
+              </div>
+              <p class="text-neutral-500 text-xs mt-0.5 leading-normal">
+                Curated credit card and lending recommendations tailored to your profile underwriting status.
               </p>
             </div>
           </div>
 
-          <div v-if="lenderMatches.length > 0" class="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pb-2 md:pb-0 snap-x snap-mandatory scroll-smooth no-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0">
+          <div v-if="lenderMatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div 
               v-for="offer in lenderMatches" 
-              :key="offer.id" 
-              class="w-[82vw] sm:w-[320px] md:w-auto shrink-0 snap-center border border-neutral-200 rounded-3xl p-5 bg-white space-y-4 hover:shadow-md transition duration-300 flex flex-col justify-between"
+              :key="offer.id || offer.lender_name" 
+              class="border border-neutral-200/90 rounded-2xl p-4 bg-gradient-to-b from-white to-neutral-50/50 space-y-3 hover:border-[#00A3B0]/50 hover:shadow-md transition duration-300 flex flex-col justify-between"
             >
               <!-- Card Header -->
               <div class="space-y-2">
-                <div class="flex justify-between items-start">
+                <div class="flex justify-between items-start gap-2">
                   <div class="space-y-1">
-                    <span class="text-xs font-black text-neutral-800">{{ offer.lender_name }}</span>
+                    <span class="text-xs font-black text-neutral-900 leading-tight block">{{ offer.lender_name }}</span>
                     <div class="flex gap-1.5 flex-wrap">
-                      <span class="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200">
+                      <span class="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-600 border border-neutral-200">
                         {{ offer.lender_type }}
                       </span>
-                      <span class="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                      <span class="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
                         Pull: {{ offer.bureau_pull || 'Experian' }}
                       </span>
                     </div>
                   </div>
                   <!-- Approval Badge -->
-                  <span class="text-[9px] uppercase tracking-widest font-black px-2.5 py-1 rounded-full border shadow-sm shrink-0" :class="getLikelihoodClass(offer.approval_likelihood)">
+                  <span class="text-[9px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border shrink-0" :class="getLikelihoodClass(offer.approval_likelihood)">
                     {{ offer.approval_likelihood }} Match
                   </span>
                 </div>
                 
-                <p class="text-xs text-neutral-500 leading-normal font-semibold">{{ offer.notes }}</p>
+                <p class="text-[11px] text-neutral-500 leading-relaxed font-medium">{{ offer.notes }}</p>
               </div>
 
               <!-- Specs Section -->
-              <div class="py-3 border-y border-neutral-100 grid grid-cols-2 gap-3 text-center">
+              <div class="py-2.5 border-y border-neutral-100 grid grid-cols-2 gap-2 text-center bg-white/70 rounded-xl">
                 <div class="space-y-0.5">
                   <span class="text-[9px] font-black text-neutral-400 uppercase tracking-wider block">Est. APR Range</span>
                   <span class="text-xs font-black text-neutral-800">
@@ -414,29 +427,25 @@
                   </span>
                 </div>
                 <div class="space-y-0.5 border-l border-neutral-100">
-                  <span class="text-[9px] font-black text-neutral-400 uppercase tracking-wider block">Recommended Score</span>
+                  <span class="text-[9px] font-black text-neutral-400 uppercase tracking-wider block">Target Score</span>
                   <span class="text-xs font-black text-neutral-800">{{ offer.recommended_score }}</span>
                 </div>
               </div>
 
               <!-- Match Reasons Checklist -->
-              <div class="space-y-2 flex-1 pt-3">
-                <span class="text-[9px] font-black text-neutral-400 uppercase tracking-wider block">Why you matched</span>
+              <div class="space-y-1.5 flex-1 pt-1">
+                <span class="text-[9px] font-black text-neutral-400 uppercase tracking-wider block">Why You Matched</span>
                 <ul class="space-y-1">
                   <li v-for="reason in offer.match_reasons" :key="reason" class="text-[10px] text-neutral-600 font-semibold flex items-center gap-1.5">
-                    <i class="pi pi-check text-emerald-500 font-bold text-[8px]"></i>
-                    <span>{{ reason }}</span>
+                    <i class="pi pi-check text-emerald-500 font-bold text-[8px] shrink-0"></i>
+                    <span class="truncate">{{ reason }}</span>
                   </li>
                 </ul>
               </div>
 
-              <!-- Requirements / Action -->
-              <div class="pt-4 space-y-3">
-                <div v-if="offer.requirements?.length > 0" class="text-[9px] bg-neutral-50 border border-neutral-150 p-2.5 rounded-xl text-neutral-500 font-semibold space-y-1">
-                  <span class="font-extrabold text-neutral-700 block">Critical Requirements:</span>
-                  <p v-for="req in offer.requirements" :key="req" class="leading-normal">• {{ req }}</p>
-                </div>
-                <button class="w-full py-2.5 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition shadow-sm cursor-pointer">
+              <!-- Action Button -->
+              <div class="pt-2">
+                <button class="w-full py-2 bg-neutral-900 text-white rounded-xl text-xs font-extrabold hover:bg-neutral-800 transition shadow-xs cursor-pointer active:scale-[0.98]">
                   Apply Now
                 </button>
               </div>
@@ -444,7 +453,7 @@
             </div>
           </div>
 
-          <div v-else class="py-8 text-center text-neutral-400 font-semibold bg-neutral-50 rounded-3xl border border-neutral-200">
+          <div v-else class="py-8 text-center text-neutral-400 font-semibold bg-neutral-50 rounded-2xl border border-neutral-200">
             No compatible loan/card offers matches found for your score rating.
           </div>
         </div>
@@ -576,9 +585,10 @@ async function upgradeToTurbo() {
 }
 
 function getLikelihoodClass(lvl) {
-  if (lvl === 'high') return 'bg-emerald-50 text-emerald-600 border-emerald-200';
-  if (lvl === 'medium') return 'bg-indigo-50 text-indigo-600 border-indigo-200';
-  return 'bg-rose-50 text-rose-500 border-rose-200';
+  if (lvl === 'high') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+  if (lvl === 'medium') return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+  if (lvl === 'building') return 'bg-amber-50 text-amber-700 border-amber-200';
+  return 'bg-neutral-50 text-neutral-600 border-neutral-200';
 }
 
 onMounted(() => {

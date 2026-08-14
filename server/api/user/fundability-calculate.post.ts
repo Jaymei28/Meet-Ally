@@ -249,149 +249,132 @@ export default defineEventHandler(async (event) => {
 
   // 7. Lender Matching
   const lenders = await useQuery('SELECT * FROM lenders WHERE active = 1');
-  const matchedLenders: any[] = [];
+  const allCalculatedLenders: any[] = [];
 
   for (const lender of lenders) {
     let matchScore = 0;
+    const reqs = lender.requirements ? (typeof lender.requirements === 'string' ? JSON.parse(lender.requirements) : lender.requirements) : {};
+    const minScore = Number(lender.min_credit_score || 640);
+    const maxScore = Number(lender.max_credit_score || 850);
 
-    // Check minimum credit score (with 50pt tolerance check)
-    const tolerance = 50;
-    const effectiveMinScore = lender.min_credit_score - tolerance;
-
-    if (averageCreditScore < effectiveMinScore) {
-      continue; // No match
-    }
-
-    // A. Credit score alignment points (0-50 pts)
-    if (averageCreditScore >= lender.min_credit_score && averageCreditScore <= lender.max_credit_score) {
-      const range = lender.max_credit_score - lender.min_credit_score;
-      const position = averageCreditScore - lender.min_credit_score;
-      if (range > 0) {
-        const scorePercentage = (position / range) * 100;
-        matchScore += Math.min(50, Math.round(scorePercentage / 2));
-      } else {
-        matchScore += 50;
-      }
-    } else if (averageCreditScore > lender.max_credit_score) {
-      matchScore += 50; // Over-qualified
+    // A. Credit score proximity points (0-50 pts)
+    if (averageCreditScore >= minScore) {
+      const range = Math.max(1, maxScore - minScore);
+      const position = Math.min(range, averageCreditScore - minScore);
+      matchScore += Math.min(50, 25 + Math.round((position / range) * 25));
     } else {
-      // Below min, but within 50pt tolerance - penalty applied
-      const pointsBelow = lender.min_credit_score - averageCreditScore;
-      const penaltyPercentage = (pointsBelow / tolerance) * 100;
-      const reducedPoints = 50 - Math.round(penaltyPercentage / 2);
-      matchScore += Math.max(10, reducedPoints);
+      const pointsBelow = minScore - averageCreditScore;
+      // Proximity score: closer gets higher score
+      const proximityScore = Math.max(10, 45 - Math.round(pointsBelow * 0.25));
+      matchScore += proximityScore;
     }
 
-    // B. Fundability score bonus (0-30 pts)
+    // B. Fundability score contribution (0-30 pts)
     matchScore += Math.round((totalScore / 100) * 30);
 
     // C. Account health bonus (0-10 pts)
     if (totalAccounts >= 5) matchScore += 10;
-    else if (totalAccounts >= 3) matchScore += 6;
-    else if (totalAccounts >= 1) matchScore += 3;
+    else if (totalAccounts >= 3) matchScore += 7;
+    else if (totalAccounts >= 1) matchScore += 4;
 
-    // D. Inquiries penalty (up to -5 pts)
-    if (hardInquiries > 6) matchScore -= 5;
-    else if (hardInquiries > 4) matchScore -= 3;
-    else if (hardInquiries > 2) matchScore -= 1;
+    // D. Inquiries penalty / bonus (up to +/- 5 pts)
+    if (hardInquiries <= 2) matchScore += 5;
+    else if (hardInquiries > 5) matchScore -= 5;
 
-    // E. Negative items penalty (up to -5 pts)
-    if (negativeItems > 10) matchScore -= 5;
-    else if (negativeItems > 5) matchScore -= 3;
-    else if (negativeItems > 2) matchScore -= 1;
+    // E. Negative items penalty
+    if (negativeItems > 5) matchScore -= 5;
+    else if (negativeItems === 0) matchScore += 5;
 
-    matchScore = Math.max(0, Math.min(100, matchScore));
+    matchScore = Math.max(15, Math.min(99, matchScore));
 
     // Approval likelihood tag
     let approvalLikelihood = 'low';
-    if (matchScore >= 70) approvalLikelihood = 'high';
-    else if (matchScore >= 50) approvalLikelihood = 'medium';
+    if (matchScore >= 75 && averageCreditScore >= minScore) approvalLikelihood = 'high';
+    else if (matchScore >= 55) approvalLikelihood = 'medium';
+    else approvalLikelihood = 'building';
 
     // Estimated APR ranges
-    const baseMin = Number(lender.min_apr || 5.99);
-    const baseMax = Number(lender.max_apr || 29.99);
+    const baseMin = Number(lender.min_apr || reqs.min_apr || 12.99);
+    const baseMax = Number(lender.max_apr || reqs.max_apr || 29.99);
     let estMin = baseMin;
     let estMax = baseMax;
 
-    if (averageCreditScore >= 750) {
+    if (averageCreditScore >= 720) {
       estMin = baseMin;
-      estMax = baseMin + ((baseMax - baseMin) * 0.3);
-    } else if (averageCreditScore >= 700) {
-      estMin = baseMin + ((baseMax - baseMin) * 0.2);
-      estMax = baseMin + ((baseMax - baseMin) * 0.5);
-    } else if (averageCreditScore >= 650) {
-      estMin = baseMin + ((baseMax - baseMin) * 0.4);
-      estMax = baseMin + ((baseMax - baseMin) * 0.7);
-    } else if (averageCreditScore >= 600) {
-      estMin = baseMin + ((baseMax - baseMin) * 0.6);
-      estMax = baseMin + ((baseMax - baseMin) * 0.9);
+      estMax = baseMin + ((baseMax - baseMin) * 0.35);
+    } else if (averageCreditScore >= 660) {
+      estMin = baseMin + ((baseMax - baseMin) * 0.25);
+      estMax = baseMin + ((baseMax - baseMin) * 0.65);
     } else {
-      estMin = baseMin + ((baseMax - baseMin) * 0.7);
+      estMin = baseMin + ((baseMax - baseMin) * 0.45);
       estMax = baseMax;
     }
 
-    // Reasons array
+    // Match Reasons
     const matchReasons: string[] = [];
-    if (averageCreditScore >= lender.min_credit_score) {
-      matchReasons.push('Your credit score meets their requirements');
+    if (averageCreditScore >= minScore) {
+      matchReasons.push('Your credit score meets their underwriting baseline');
     } else {
-      matchReasons.push(`You're ${lender.min_credit_score - averageCreditScore} points below preferred score`);
+      matchReasons.push(`Target goal: ${minScore} recommended score (${minScore - averageCreditScore} pts away)`);
     }
 
-    if (lender.type === 'bank') matchReasons.push('Traditional bank with premium benefits');
-    else if (lender.type === 'credit_union') matchReasons.push('Member-owned with lower APR potential');
-    else matchReasons.push('Fast online validation & setup');
+    if (lender.type === 'bank') matchReasons.push('Major national bank with cash-back perks');
+    else if (lender.type === 'credit_union') matchReasons.push('Credit union with competitive rate ceiling');
+    else matchReasons.push('Fintech / online issuer with flexible approval paths');
 
-    if (totalScore >= 70) matchReasons.push('Strong overall fundability profile');
-    else if (totalScore < 50) matchReasons.push('Improve fundability to increase odds');
+    if (totalScore >= 65) matchReasons.push('Solid overall fundability profile');
+    if (hardInquiries <= 2) matchReasons.push('Low hard inquiry load');
 
-    if (hardInquiries <= 2) matchReasons.push('Good inquiry profile');
+    const bureauPull = lender.bureau_pull || reqs.bureau_pull || 'Experian';
+    const notes = lender.notes || reqs.notes || lender.description || 'Pre-qualified offer';
+    const recommendedScore = lender.recommended_score || `${minScore}+`;
+    const introAprMonths = lender.intro_apr_months || reqs.apr_months || '0% Promo';
 
-    // Create the Lender Match row
-    const [matchResult] = await useTransaction(async (conn) => {
+    allCalculatedLenders.push({
+      lender_id: lender.id,
+      lender_name: lender.name,
+      lender_type: lender.type,
+      bureau_pull: bureauPull,
+      recommended_score: recommendedScore,
+      score_model: lender.score_model || reqs.score_model || 'FICO Score',
+      intro_apr_months: introAprMonths,
+      min_apr: estMin.toFixed(2),
+      max_apr: estMax.toFixed(2),
+      requirements: reqs,
+      notes: notes,
+      match_score: matchScore,
+      approval_likelihood: approvalLikelihood,
+      estimated_apr_min: estMin.toFixed(2),
+      estimated_apr_max: estMax.toFixed(2),
+      match_reasons: matchReasons
+    });
+  }
+
+  // Sort highest match score first and take top recommendations
+  allCalculatedLenders.sort((a, b) => b.match_score - a.match_score);
+  const matchedLenders = allCalculatedLenders.slice(0, 9);
+
+  // Save top matched lenders to database
+  for (const m of matchedLenders) {
+    await useTransaction(async (conn) => {
       const [res] = await conn.execute(
         `INSERT INTO lender_matches (user_id, lender_id, fundability_score_id, match_score, approval_likelihood, estimated_apr_min, estimated_apr_max, match_reasons, created_at, updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           user.id,
-          lender.id,
+          m.lender_id,
           fundabilityScoreId,
-          matchScore,
-          approvalLikelihood,
-          estMin,
-          estMax,
-          JSON.stringify(matchReasons)
+          m.match_score,
+          m.approval_likelihood,
+          m.estimated_apr_min,
+          m.estimated_apr_max,
+          JSON.stringify(m.match_reasons)
         ]
       );
+      m.id = (res as any).insertId;
       return [res];
     });
-
-    const matchId = (matchResult as any).insertId;
-
-    // Push details for direct response mapping
-    matchedLenders.push({
-      id: matchId,
-      lender_id: lender.id,
-      lender_name: lender.name,
-      lender_type: lender.type,
-      bureau_pull: lender.bureau_pull,
-      recommended_score: lender.recommended_score,
-      score_model: lender.score_model,
-      intro_apr_months: lender.intro_apr_months,
-      min_apr: lender.min_apr,
-      max_apr: lender.max_apr,
-      requirements: lender.requirements ? JSON.parse(lender.requirements) : null,
-      notes: lender.notes,
-      match_score: matchScore,
-      approval_likelihood: approvalLikelihood,
-      estimated_apr_min: estMin,
-      estimated_apr_max: estMax,
-      match_reasons: matchReasons
-    });
   }
-
-  // Sort matched lenders highest score first
-  matchedLenders.sort((a, b) => b.match_score - a.match_score);
 
   return {
     success: true,

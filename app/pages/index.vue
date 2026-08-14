@@ -337,51 +337,104 @@
 
         <!-- Personal Info & Dispute Timeline -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 bg-white border border-neutral-200 rounded-3xl p-6 space-y-6 shadow-sm">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center border border-red-500/20">
-                <i class="pi pi-user text-red-500"></i>
+          <div class="lg:col-span-2 bg-white border border-neutral-200 rounded-3xl p-5 sm:p-6 space-y-5 shadow-sm">
+            <!-- Header -->
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20 shrink-0">
+                  <i class="pi pi-user text-rose-500 text-sm"></i>
+                </div>
+                <div>
+                  <h3 class="font-extrabold text-base sm:text-lg text-neutral-900 leading-tight">Personal Information Audit</h3>
+                  <p class="text-neutral-500 text-xs mt-0.5">Flagged spelling and data variances reported across bureaus.</p>
+                </div>
               </div>
-              <div>
-                <h3 class="font-bold text-lg text-neutral-900">Personal Information Audit</h3>
-                <p class="text-neutral-500 text-xs">Flagged spelling and data variances reported across bureaus.</p>
+              
+              <div v-if="clientData.personalInfo" class="shrink-0 hidden sm:block">
+                <span class="text-[10px] uppercase tracking-wider font-extrabold px-3 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-200">
+                  {{ (clientData.personalInfo.names?.length || 0) + (clientData.personalInfo.addresses?.length || 0) }} Variances
+                </span>
               </div>
             </div>
 
+            <!-- Content Grid -->
             <div v-if="clientData.personalInfo" class="space-y-4">
-              <div class="space-y-2">
-                <span class="text-xs font-bold text-neutral-400 uppercase tracking-wide">Name Variations ({{ clientData.personalInfo.names?.length || 0 }})</span>
-                <div class="flex flex-wrap gap-2">
-                  <span v-for="name in clientData.personalInfo.names" :key="name" class="text-xs px-3 py-1.5 rounded-lg bg-neutral-50 border border-neutral-200 text-neutral-700 font-semibold">
-                    {{ name }}
-                  </span>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- 1. Name Variations Box -->
+                <div class="bg-neutral-50/80 border border-neutral-200 rounded-2xl p-4 space-y-2.5 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                        Name Variations ({{ clientData.personalInfo.names?.length || 0 }})
+                      </span>
+                      <span class="text-[9px] font-extrabold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md sm:hidden">
+                        {{ clientData.personalInfo.names?.length || 0 }} names
+                      </span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-1.5">
+                      <span 
+                        v-for="(name, idx) in clientData.personalInfo.names" 
+                        :key="name" 
+                        class="text-[11px] px-2.5 py-1 rounded-lg font-semibold border shadow-xs transition"
+                        :class="idx === 0 ? 'bg-white border-[#00A3B0]/40 text-[#005F6A] font-bold' : 'bg-white border-neutral-200 text-neutral-700'"
+                      >
+                        <i v-if="idx === 0" class="pi pi-check text-[9px] text-[#00828E] mr-1"></i>
+                        {{ name }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <p v-if="clientData.personalInfo.names?.length > 1" class="text-[11px] text-rose-600 flex items-center gap-1.5 pt-1 font-semibold border-t border-neutral-200/60">
+                    <i class="pi pi-exclamation-circle text-xs shrink-0"></i>
+                    <span>Multiple spellings detected. Can cause mixed files.</span>
+                  </p>
                 </div>
-                <p v-if="clientData.personalInfo.names?.length > 1" class="text-xs text-red-500 flex items-center gap-1.5 mt-1 font-semibold">
-                  <i class="pi pi-exclamation-circle text-[10px]"></i>
-                  Multiple spellings detected. Can cause mixed credit files.
-                </p>
+
+                <!-- 2. Addresses Reported Box -->
+                <div class="bg-neutral-50/80 border border-neutral-200 rounded-2xl p-4 space-y-2.5 flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                        Addresses Reported ({{ clientData.personalInfo.addresses?.length || 0 }})
+                      </span>
+                      <span class="text-[9px] font-extrabold text-rose-600 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md sm:hidden">
+                        {{ clientData.personalInfo.addresses?.length || 0 }} reported
+                      </span>
+                    </div>
+
+                    <!-- Compact Scrollable Address List -->
+                    <ul class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                      <li 
+                        v-for="(addr, idx) in clientData.personalInfo.addresses" 
+                        :key="addr" 
+                        class="text-[11px] px-2.5 py-1.5 rounded-lg bg-white border border-neutral-200 text-neutral-700 flex items-start gap-2 leading-tight shadow-xs"
+                      >
+                        <i class="pi pi-map-marker text-[10px] text-[#00828E] mt-0.5 shrink-0"></i>
+                        <span class="font-medium truncate flex-1" :title="addr">{{ addr }}</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <p v-if="clientData.personalInfo.addresses?.length > 1" class="text-[11px] text-rose-600 flex items-center gap-1.5 pt-1 font-semibold border-t border-neutral-200/60">
+                    <i class="pi pi-exclamation-circle text-xs shrink-0"></i>
+                    <span>Address mismatches found. Recommend unifying.</span>
+                  </p>
+                </div>
+
               </div>
 
-              <div class="space-y-2 border-t border-neutral-200 pt-4">
-                <span class="text-xs font-bold text-neutral-400 uppercase tracking-wide">Addresses Reported ({{ clientData.personalInfo.addresses?.length || 0 }})</span>
-                <ul class="space-y-2">
-                  <li v-for="addr in clientData.personalInfo.addresses" :key="addr" class="text-xs p-3 rounded-lg bg-neutral-50 border border-neutral-200 text-neutral-700">
-                    {{ addr }}
-                  </li>
-                </ul>
-                <p v-if="clientData.personalInfo.addresses?.length > 1" class="text-xs text-red-500 flex items-center gap-1.5 mt-1 font-semibold">
-                  <i class="pi pi-exclamation-circle text-[10px]"></i>
-                  Address formatting/spelling mismatches found. Should be unified.
-                </p>
-              </div>
-
-              <div class="space-y-2 border-t border-neutral-200 pt-4">
-                <span class="text-xs font-bold text-neutral-400 uppercase tracking-wide">Employers List</span>
-                <div class="flex flex-wrap gap-2">
-                  <span v-for="emp in clientData.personalInfo.employers" :key="emp" class="text-xs px-3 py-1.5 rounded-lg bg-neutral-50 border border-neutral-200 text-neutral-700">
-                    {{ emp }}
-                  </span>
-                </div>
+              <!-- 3. Employers List (if present) -->
+              <div v-if="clientData.personalInfo.employers?.length > 0" class="pt-2 flex items-center gap-2 flex-wrap text-xs text-neutral-500">
+                <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest shrink-0">Employers:</span>
+                <span 
+                  v-for="emp in clientData.personalInfo.employers" 
+                  :key="emp" 
+                  class="text-[11px] px-2.5 py-0.5 rounded-md bg-neutral-100 border border-neutral-200 text-neutral-700 font-semibold"
+                >
+                  {{ emp }}
+                </span>
               </div>
             </div>
           </div>

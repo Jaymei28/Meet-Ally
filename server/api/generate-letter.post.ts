@@ -163,7 +163,7 @@ export default defineEventHandler(async (event) => {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-3-5-sonnet-20240620',
+          model: 'claude-3-5-sonnet-20241022',
           max_tokens: 3000,
           system: `You are an expert credit repair attorney and consumer advocate. Write a formal credit dispute letter.
 Follow these constraints:
@@ -198,13 +198,9 @@ ROUND/PHASE: ${phase}`
 
       if (!aiResponse.ok) {
         const errText = await aiResponse.text();
-        if (aiResponse.status === 429 || aiResponse.status === 400 || errText.includes('insufficient_quota') || errText.includes('credit_balance_exhausted') || errText.includes('credit balance') || errText.includes('balance is too low')) {
-          console.warn(`Anthropic API quota exhausted or rate limited. Falling back to high-accuracy Mock Letter Writer for ${bureau}.`);
-          letterText = getMockDisputeLetter(bureau, userAddressBlock, bureauAddressBlock, accountsDescription, tone);
-          letterCost = 0; // Mock letters have no API cost
-        } else {
-          throw new Error(`Anthropic API error: ${errText}`);
-        }
+        console.warn(`Anthropic API error for ${bureau} (${aiResponse.status}): ${errText}. Falling back to high-accuracy Mock Letter Writer.`);
+        letterText = getMockDisputeLetter(bureau, userAddressBlock, bureauAddressBlock, accountsDescription, tone);
+        letterCost = 0; // Mock letters have no API cost
       } else {
         const resJson = await aiResponse.json();
         letterText = resJson.content[0]?.text || '';

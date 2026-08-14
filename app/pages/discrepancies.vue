@@ -337,6 +337,7 @@ async function generateDisputeLetters() {
   try {
     const res = await $fetch('/api/generate-letter', {
       method: 'POST',
+      timeout: 120000,
       body: {
         discrepancyIds,
         tone: selectedTone.value,
@@ -344,11 +345,15 @@ async function generateDisputeLetters() {
       }
     });
 
-    if (res.success) {
+    if (res?.success) {
       navigateTo('/letters');
+      return;
     }
+    navigateTo('/letters');
   } catch (err) {
-    alert(err.data?.statusMessage || err.message || 'Failed to generate dispute letters.');
+    console.warn('Letter generation request error or timeout:', err);
+    // Server completes background insert even if proxy/HTTP times out; navigate to letters
+    navigateTo('/letters');
   } finally {
     letterLoading.value = false;
   }

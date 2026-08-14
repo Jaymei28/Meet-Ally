@@ -113,11 +113,19 @@
 
       <!-- B. RESULTS VIEW -->
       <div v-else class="space-y-6">
-        <!-- Top Summary Row: Radial Dial & Highlights -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Mobile Swipe Hint -->
+        <div class="flex items-center justify-between lg:hidden text-[11px] font-bold text-neutral-400 px-1">
+          <span class="flex items-center gap-1.5 text-[#00828E]">
+            <i class="pi pi-arrows-h animate-pulse"></i> Swipe cards sideways
+          </span>
+          <span class="text-[10px] text-neutral-400 font-medium">3 cards</span>
+        </div>
+
+        <!-- Top Analysis Cards: Horizontally Scrollable on Mobile, Grid on Desktop -->
+        <div class="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-4 lg:gap-6 pb-2 lg:pb-0 snap-x snap-mandatory scroll-smooth no-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0">
           
-          <!-- Score Gauge Card with Brand Styling -->
-          <div class="bg-gradient-to-br from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-[32px] p-6 shadow-[0_10px_30px_rgba(0,95,106,0.22)] border border-white/20 relative overflow-hidden flex flex-col items-center justify-center text-center space-y-4">
+          <!-- 1. Score Gauge Card with Brand Styling -->
+          <div class="w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-center bg-gradient-to-br from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-[32px] p-6 shadow-[0_10px_30px_rgba(0,95,106,0.22)] border border-white/20 relative overflow-hidden flex flex-col items-center justify-center text-center space-y-4">
             <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
 
             <h3 class="text-xs font-black text-teal-100 uppercase tracking-widest relative z-10">Fundability Index</h3>
@@ -148,8 +156,8 @@
             </div>
           </div>
 
-          <!-- Factors Weight Breakdown -->
-          <div class="md:col-span-2 bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-4">
+          <!-- 2. Factors Weight Breakdown -->
+          <div class="w-[85vw] sm:w-[480px] lg:w-auto lg:col-span-2 shrink-0 snap-center bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-4">
             <h3 class="text-xs font-black text-neutral-400 uppercase tracking-widest">Score Factor Breakdown</h3>
             
             <div class="space-y-3.5">
@@ -209,12 +217,41 @@
               </div>
             </div>
           </div>
+
+          <!-- 3. Profile Strengths & Weaknesses (Included in mobile horizontal swipe) -->
+          <div class="w-[85vw] sm:w-[380px] shrink-0 snap-center lg:hidden bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-6">
+            <!-- Strengths -->
+            <div class="space-y-3">
+              <h4 class="text-xs font-black text-emerald-600 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="pi pi-check-circle"></i> Profile Strengths
+              </h4>
+              <ul v-if="scoreData.strengths?.length > 0" class="space-y-2">
+                <li v-for="s in scoreData.strengths" :key="s" class="text-xs font-semibold text-neutral-700 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2 leading-relaxed">
+                  {{ s }}
+                </li>
+              </ul>
+              <p v-else class="text-xs text-neutral-400 font-semibold italic">No significant strengths identified yet.</p>
+            </div>
+
+            <!-- Weaknesses -->
+            <div class="space-y-3">
+              <h4 class="text-xs font-black text-rose-600 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="pi pi-exclamation-circle"></i> Profile Weaknesses
+              </h4>
+              <ul v-if="scoreData.weaknesses?.length > 0" class="space-y-2">
+                <li v-for="w in scoreData.weaknesses" :key="w" class="text-xs font-semibold text-neutral-700 bg-rose-50 border border-rose-100 rounded-xl px-3 py-2 leading-relaxed">
+                  {{ w }}
+                </li>
+              </ul>
+              <p v-else class="text-xs text-emerald-600 font-bold bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2">✓ No critical profile weaknesses flagged.</p>
+            </div>
+          </div>
         </div>
 
-        <!-- Strengths, Weaknesses, and Recommendations -->
+        <!-- Strengths, Weaknesses, and Recommendations (Desktop layout) -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Strengths / Weaknesses Columns -->
-          <div class="lg:col-span-1 bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-6">
+          <!-- Strengths / Weaknesses Column (Desktop only) -->
+          <div class="hidden lg:block lg:col-span-1 bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-6">
             <!-- Strengths -->
             <div class="space-y-3">
               <h4 class="text-xs font-black text-emerald-600 uppercase tracking-wider flex items-center gap-1.5">
@@ -286,18 +323,20 @@
 
         <!-- Matching Lenders / Credit Card Offers -->
         <div class="bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-6">
-          <div class="border-b border-neutral-100 pb-4">
-            <h3 class="font-extrabold text-lg text-neutral-900">Matched Funding Offers</h3>
-            <p class="text-neutral-500 text-xs mt-1 leading-normal font-semibold">
-              Based on your score and bureau profile, here are recommended credit products you have high approval odds for.
-            </p>
+          <div class="border-b border-neutral-100 pb-4 flex justify-between items-center">
+            <div>
+              <h3 class="font-extrabold text-lg text-neutral-900">Matched Funding Offers</h3>
+              <p class="text-neutral-500 text-xs mt-1 leading-normal font-semibold">
+                Based on your score and bureau profile, here are recommended credit products you have high approval odds for.
+              </p>
+            </div>
           </div>
 
-          <div v-if="lenderMatches.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div v-if="lenderMatches.length > 0" class="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pb-2 md:pb-0 snap-x snap-mandatory scroll-smooth no-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0">
             <div 
               v-for="offer in lenderMatches" 
               :key="offer.id" 
-              class="border border-neutral-200 rounded-3xl p-5 bg-white space-y-4 hover:shadow-md transition duration-300 flex flex-col justify-between"
+              class="w-[82vw] sm:w-[320px] md:w-auto shrink-0 snap-center border border-neutral-200 rounded-3xl p-5 bg-white space-y-4 hover:shadow-md transition duration-300 flex flex-col justify-between"
             >
               <!-- Card Header -->
               <div class="space-y-2">

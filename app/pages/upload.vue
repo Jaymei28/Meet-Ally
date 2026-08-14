@@ -237,7 +237,6 @@
         <div class="bg-[#0FA99C] text-white p-5 sm:px-6 flex items-center justify-between flex-wrap gap-3">
           <div class="space-y-0.5">
             <div class="flex items-center gap-2">
-              <span class="text-base">⚡</span>
               <h3 class="text-base font-extrabold">Phase 1: Clean & Challenge</h3>
             </div>
             <p class="text-xs text-white/90 font-medium">Personal Information audits, Unverified Inquiries, and Initial Collections.</p>
@@ -319,7 +318,6 @@
         <div class="bg-[#15141C] text-white p-5 sm:px-6 flex items-center justify-between flex-wrap gap-3">
           <div class="space-y-0.5">
             <div class="flex items-center gap-2">
-              <span class="text-base">🛠️</span>
               <h3 class="text-base font-extrabold">Phase 2: Core Battle</h3>
             </div>
             <p class="text-xs text-white/80 font-medium">Charge-offs, Collections verification, and Repossession accounts.</p>
@@ -411,7 +409,6 @@
         <div class="bg-[#15141C] text-white p-5 sm:px-6 flex items-center justify-between flex-wrap gap-3">
           <div class="space-y-0.5">
             <div class="flex items-center gap-2">
-              <span class="text-base">✨</span>
               <h3 class="text-base font-extrabold">Phase 3: Goodwill & Polish</h3>
             </div>
             <p class="text-xs text-white/80 font-medium">Late Payment history adjustments and Goodwill creditor outreach.</p>

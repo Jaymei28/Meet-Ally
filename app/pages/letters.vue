@@ -56,35 +56,43 @@
       <div class="lg:col-span-3 space-y-4">
         <div v-if="selectedLetter" class="bg-white border border-neutral-200 rounded-3xl p-6 space-y-6 shadow-sm">
           <!-- Editor Title & Status Actions -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
-            <div>
-              <h2 class="text-lg font-bold uppercase tracking-wider text-[#00828E]">{{ selectedLetter.credit_bureau }} Dispute Form</h2>
-              <p class="text-neutral-500 text-xs font-semibold">Round {{ selectedLetter.phase }} • Dispute for: {{ selectedLetter.creditor_name }}</p>
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 pb-4">
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-base sm:text-lg font-black uppercase tracking-wider text-[#005F6A]">{{ selectedLetter.credit_bureau }} Dispute Form</h2>
+                <span class="text-[10px] bg-neutral-100 border border-neutral-200 text-neutral-600 font-extrabold px-2.5 py-0.5 rounded-full">
+                  Round {{ selectedLetter.phase }}
+                </span>
+              </div>
+              <p class="text-neutral-500 text-xs font-semibold">Creditor Target: {{ selectedLetter.creditor_name }}</p>
             </div>
-            <div class="flex items-center gap-2">
+            
+            <!-- Sleek, Responsive Action Buttons -->
+            <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
               <button 
                 @click="toggleEdit"
-                class="px-4 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-xs font-bold text-neutral-700 hover:bg-neutral-100 transition duration-300 flex items-center gap-2 cursor-pointer"
+                class="flex-1 sm:flex-initial px-3.5 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-bold text-neutral-700 hover:bg-neutral-100 transition duration-200 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs whitespace-nowrap active:scale-95"
               >
-                <i :class="['pi', isEditing ? 'pi-eye' : 'pi-pencil']"></i>
-                {{ isEditing ? 'Preview Letter' : 'Edit Text' }}
+                <i :class="['pi', isEditing ? 'pi-eye text-[#00828E]' : 'pi-pencil text-neutral-500', 'text-[11px]']"></i>
+                <span>{{ isEditing ? 'Preview' : 'Edit Text' }}</span>
               </button>
               
               <button 
                 @click="toggleMailedStatus"
                 :disabled="statusLoading"
-                class="px-4 py-2 border rounded-lg text-xs font-bold transition duration-300 flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                :class="selectedLetter.posted_1 ? 'bg-emerald-50 border-emerald-200 text-emerald-600 hover:bg-emerald-100' : 'bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-100'"
+                class="flex-1 sm:flex-initial px-3.5 py-2 border rounded-xl text-xs font-bold transition duration-200 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50 whitespace-nowrap active:scale-95"
+                :class="selectedLetter.posted_1 ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100' : 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100'"
               >
-                <i :class="['pi', statusLoading ? 'pi-spin pi-spinner' : (selectedLetter.posted_1 ? 'pi-check-circle' : 'pi-envelope')]"></i>
-                {{ selectedLetter.posted_1 ? 'Mailed' : 'Mark as Mailed' }}
+                <i :class="['pi', statusLoading ? 'pi-spin pi-spinner' : (selectedLetter.posted_1 ? 'pi-check-circle' : 'pi-send'), 'text-[11px]']"></i>
+                <span>{{ selectedLetter.posted_1 ? 'Mailed' : 'Mark as Mailed' }}</span>
               </button>
 
               <button 
                 @click="printActiveLetter"
-                class="px-4 py-2 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-lg text-xs hover:bg-[#00A3B0] transition duration-300 flex items-center gap-2 shadow-sm cursor-pointer"
+                class="flex-1 sm:flex-initial px-4 py-2 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl text-xs hover:bg-[#00A3B0] transition duration-200 flex items-center justify-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap active:scale-95"
               >
-                <i class="pi pi-print"></i> Print / Mail
+                <i class="pi pi-print text-[11px]"></i>
+                <span>Print / Mail</span>
               </button>
             </div>
           </div>

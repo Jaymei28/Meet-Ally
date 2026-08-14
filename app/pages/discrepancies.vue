@@ -1,28 +1,28 @@
 <template>
-  <div class="space-y-8 animate-fade-in">
+  <div class="space-y-8 animate-fade-in pb-28 max-w-6xl mx-auto">
     <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 pb-6">
       <div>
-        <h1 class="text-3xl font-extrabold tracking-tight text-neutral-900">Bureau Discrepancies</h1>
-        <p class="text-neutral-500 mt-1">Cross-reference conflicts discovered across reporting credit bureaus.</p>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900">Bureau Discrepancies</h1>
+        <p class="text-xs sm:text-sm text-neutral-500 mt-1 font-medium">Cross-reference conflicts discovered across reporting credit bureaus.</p>
       </div>
       <div v-if="discrepancies && discrepancies.length > 0" class="flex items-center gap-2">
-        <span class="text-xs px-3 py-1.5 rounded-lg bg-white border border-neutral-200 text-neutral-600 font-bold shadow-sm">
-          {{ selectedDiscrepancies.length }} / {{ discrepancies.length }} Selected
+        <span class="text-xs px-3.5 py-1.5 rounded-xl bg-white border border-neutral-200 text-neutral-700 font-extrabold shadow-sm">
+          <span class="text-[#00828E]">{{ selectedDiscrepancies.length }}</span> / {{ discrepancies.length }} Selected
         </span>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="!discrepancies || discrepancies.length === 0" class="flex flex-col items-center justify-center p-16 bg-white border border-neutral-200 rounded-3xl text-center space-y-4 shadow-sm">
+    <div v-if="!discrepancies || discrepancies.length === 0" class="flex flex-col items-center justify-center p-12 sm:p-16 bg-white border border-neutral-200 rounded-3xl text-center space-y-4 shadow-sm">
       <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
         <i class="pi pi-check text-2xl text-emerald-600"></i>
       </div>
       <div class="max-w-md">
         <h2 class="text-xl font-bold text-neutral-900">No Discrepancies Logged</h2>
-        <p class="text-neutral-500 mt-1">Great! No conflicting reporting or spelling mismatches were discovered in the database. Ensure a report is uploaded first.</p>
+        <p class="text-neutral-500 text-xs sm:text-sm mt-1">Great! No conflicting reporting or spelling mismatches were discovered in the database. Ensure a report is uploaded first.</p>
       </div>
-      <NuxtLink to="/upload" class="px-5 py-2.5 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 shadow-sm">
+      <NuxtLink to="/upload" class="px-6 py-3 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 shadow-sm text-xs">
         Upload Credit Report
       </NuxtLink>
     </div>
@@ -30,12 +30,12 @@
     <!-- Data Loaded State -->
     <div v-else class="space-y-6">
       <!-- Actions Bar -->
-      <div class="bg-white border border-neutral-200 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
-        <div class="grid grid-cols-2 gap-4 flex-1 max-w-lg">
+      <div class="bg-white border border-neutral-200 rounded-3xl p-5 sm:p-6 shadow-sm space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- Tone Selector -->
           <div class="flex flex-col gap-1.5">
-            <label class="text-[10px] uppercase tracking-widest text-neutral-400 font-bold">Dispute Tone</label>
-            <select v-model="selectedTone" class="bg-neutral-50 border border-neutral-200 text-neutral-800 rounded-lg p-2.5 text-xs focus:border-[#00A3B0] focus:outline-none font-semibold">
+            <label class="text-[10px] uppercase tracking-widest text-neutral-400 font-extrabold">Dispute Tone</label>
+            <select v-model="selectedTone" class="bg-neutral-50 border border-neutral-200 text-neutral-800 rounded-xl p-2.5 text-xs focus:border-[#00A3B0] focus:outline-none font-bold">
               <option value="factual">Factual (Polite list of facts)</option>
               <option value="legal">Legal (FCRA violations & codes)</option>
               <option value="aggressive">Aggressive (Demand immediate deletion)</option>
@@ -45,20 +45,27 @@
 
           <!-- Phase Input -->
           <div class="flex flex-col gap-1.5">
-            <label class="text-[10px] uppercase tracking-widest text-neutral-400 font-bold">Dispute Round</label>
-            <input type="number" v-model="selectedPhase" min="1" max="5" class="bg-neutral-50 border border-neutral-200 text-neutral-800 rounded-lg p-2 text-xs focus:border-[#00A3B0] focus:outline-none font-semibold" />
+            <label class="text-[10px] uppercase tracking-widest text-neutral-400 font-extrabold">Dispute Round</label>
+            <input type="number" v-model="selectedPhase" min="1" max="5" class="bg-neutral-50 border border-neutral-200 text-neutral-800 rounded-xl p-2.5 text-xs focus:border-[#00A3B0] focus:outline-none font-bold" />
           </div>
         </div>
 
-        <button 
-          @click="generateDisputeLetters"
-          :disabled="selectedDiscrepancies.length === 0 || letterLoading"
-          class="px-6 py-3 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 disabled:opacity-40 disabled:pointer-events-none shadow-sm flex items-center gap-2 h-fit"
-        >
-          <i v-if="letterLoading" class="pi pi-spin pi-spinner"></i>
-          <i v-else class="pi pi-file-edit"></i>
-          {{ letterLoading ? 'Writing Letters...' : 'Draft Dispute Letters' }}
-        </button>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2 border-t border-neutral-100">
+          <div class="text-[11px] text-neutral-400 font-bold hidden sm:flex items-center gap-1.5">
+            <i class="pi pi-arrows-h text-[#00828E]"></i>
+            <span>Scroll horizontally on smaller screens to view all bureau columns</span>
+          </div>
+
+          <button 
+            @click="generateDisputeLetters"
+            :disabled="selectedDiscrepancies.length === 0 || letterLoading"
+            class="w-full sm:w-auto px-6 py-3 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 disabled:opacity-40 disabled:pointer-events-none shadow-sm flex items-center justify-center gap-2 text-xs cursor-pointer"
+          >
+            <i v-if="letterLoading" class="pi pi-spin pi-spinner text-sm"></i>
+            <i v-else class="pi pi-file-edit text-sm"></i>
+            <span>{{ letterLoading ? 'Writing Letters...' : 'Draft Dispute Letters' }}</span>
+          </button>
+        </div>
       </div>
 
       <!-- Strategy Generation Loader -->
@@ -72,88 +79,97 @@
         </p>
       </div>
 
-      <!-- PrimeVue DataTable -->
+      <!-- PrimeVue DataTable Container -->
       <div class="bg-white border border-neutral-200 rounded-3xl overflow-hidden shadow-sm">
-        <DataTable 
-          v-model:selection="selectedDiscrepancies" 
-          :value="discrepancies" 
-          dataKey="id" 
-          responsiveLayout="scroll"
-          class="p-datatable-sm"
-        >
-          <Column selectionMode="multiple" headerStyle="width: 3rem; background: #f8fafc; border-color: #e2e8f0;"></Column>
-          
-          <Column field="creditor_name" header="Creditor" sortable headerStyle="background: #f8fafc; border-color: #e2e8f0; color: #475569;">
-            <template #body="{ data }">
-              <span class="font-extrabold text-neutral-900 block">{{ data.creditor_name }}</span>
-              <span class="text-[10px] text-[#00828E] font-bold uppercase tracking-wider">{{ data.account_type }}</span>
-            </template>
-          </Column>
-          
-          <Column field="account_number" header="Account No." headerStyle="background: #f8fafc; border-color: #e2e8f0; color: #475569;">
-            <template #body="{ data }">
-              <span class="font-mono text-xs text-neutral-700 font-semibold">{{ data.account_number || '---' }}</span>
-            </template>
-          </Column>
+        <!-- Mobile scroll hint banner -->
+        <div class="sm:hidden bg-neutral-50 border-b border-neutral-200 px-4 py-2 text-[10px] font-bold text-neutral-500 flex items-center justify-between">
+          <span class="flex items-center gap-1.5">
+            <i class="pi pi-arrows-h text-[#00828E]"></i> Swipe horizontally to view full table
+          </span>
+          <span class="text-neutral-400 font-semibold">{{ discrepancies.length }} items</span>
+        </div>
 
-          <Column field="field_name" header="Field" headerStyle="background: #f8fafc; border-color: #e2e8f0; color: #475569;">
-            <template #body="{ data }">
-              <span class="px-2.5 py-0.5 rounded bg-neutral-100 border border-neutral-200 text-neutral-700 text-[10px] font-extrabold uppercase tracking-wide">
-                {{ data.field_name.replace('_', ' ') }}
-              </span>
-            </template>
-          </Column>
+        <div class="overflow-x-auto w-full">
+          <DataTable 
+            v-model:selection="selectedDiscrepancies" 
+            :value="discrepancies" 
+            dataKey="id" 
+            tableStyle="min-width: 860px;"
+            class="p-datatable-sm"
+          >
+            <Column selectionMode="multiple" headerStyle="width: 3.5rem; background: #f8fafc; border-color: #e2e8f0; text-align: center;"></Column>
+            
+            <Column field="creditor_name" header="Creditor" sortable headerStyle="min-width: 160px; background: #f8fafc; border-color: #e2e8f0; color: #475569; font-weight: 800;">
+              <template #body="{ data }">
+                <span class="font-extrabold text-neutral-900 block text-xs">{{ data.creditor_name }}</span>
+                <span class="text-[10px] text-[#00828E] font-bold uppercase tracking-wider block mt-0.5">{{ data.account_type }}</span>
+              </template>
+            </Column>
+            
+            <Column field="account_number" header="Account No." headerStyle="min-width: 130px; background: #f8fafc; border-color: #e2e8f0; color: #475569; font-weight: 800;">
+              <template #body="{ data }">
+                <span class="font-mono text-xs text-neutral-700 font-bold">{{ data.account_number || '---' }}</span>
+              </template>
+            </Column>
 
-          <!-- Bureau columns displaying values side-by-side -->
-          <Column field="value_1" header="Reporting Values" headerStyle="background: #f8fafc; border-color: #e2e8f0; color: #475569;">
-            <template #body="{ data }">
-              <div class="flex flex-col gap-1">
-                <div v-if="data.bureau_1" class="flex items-center gap-1.5 text-xs">
-                  <span class="text-[9px] uppercase font-black text-neutral-400 w-6">{{ data.bureau_1.slice(0, 2) }}:</span>
-                  <span class="text-red-600 font-bold bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-[11px]">{{ data.value_1 }}</span>
-                </div>
-                <div v-if="data.bureau_2" class="flex items-center gap-1.5 text-xs">
-                  <span class="text-[9px] uppercase font-black text-neutral-400 w-6">{{ data.bureau_2.slice(0, 2) }}:</span>
-                  <span class="text-red-600 font-bold bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-[11px]">{{ data.value_2 }}</span>
-                </div>
-                <div v-if="data.bureau_3" class="flex items-center gap-1.5 text-xs">
-                  <span class="text-[9px] uppercase font-black text-neutral-400 w-6">{{ data.bureau_3.slice(0, 2) }}:</span>
-                  <span class="text-red-600 font-bold bg-red-50 px-1.5 py-0.5 rounded border border-red-100 text-[11px]">{{ data.value_3 }}</span>
-                </div>
-              </div>
-            </template>
-          </Column>
-
-          <Column field="severity" header="Severity" sortable headerStyle="background: #f8fafc; border-color: #e2e8f0; color: #475569;">
-            <template #body="{ data }">
-              <span class="text-[10px] px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-wider" :class="getSeverityClass(data.severity)">
-                {{ data.severity }}
-              </span>
-            </template>
-          </Column>
-
-          <Column field="dispute_priority" header="Priority" sortable headerStyle="background: #f8fafc; border-color: #e2e8f0; color: #475569;">
-            <template #body="{ data }">
-              <div class="flex items-center gap-2">
-                <span class="font-extrabold text-xs text-neutral-700">
-                  {{ data.dispute_priority }}
+            <Column field="field_name" header="Field" headerStyle="min-width: 120px; background: #f8fafc; border-color: #e2e8f0; color: #475569; font-weight: 800;">
+              <template #body="{ data }">
+                <span class="px-2.5 py-1 rounded-md bg-neutral-100 border border-neutral-200 text-neutral-700 text-[10px] font-extrabold uppercase tracking-wide inline-block">
+                  {{ data.field_name.replace('_', ' ') }}
                 </span>
-                <div class="w-12 bg-neutral-100 h-1.5 rounded-full overflow-hidden border border-neutral-200">
-                  <div class="h-full rounded-full" :class="data.dispute_priority >= 80 ? 'bg-[#00A3B0]' : 'bg-neutral-400'" :style="{ width: data.dispute_priority + '%' }"></div>
-                </div>
-              </div>
-            </template>
-          </Column>
+              </template>
+            </Column>
 
-          <Column field="dispute_status" header="Status" headerStyle="background: #f8fafc; border-color: #e2e8f0; color: #475569;">
-            <template #body="{ data }">
-              <span class="text-[10px] px-2.5 py-0.5 rounded border font-extrabold uppercase tracking-wide" :class="getStatusClass(data.dispute_status)">
-                {{ data.dispute_status }}
-              </span>
-            </template>
-          </Column>
-        </DataTable>
-      </div>
+            <!-- Bureau columns displaying values side-by-side -->
+            <Column field="value_1" header="Reporting Values" headerStyle="min-width: 180px; background: #f8fafc; border-color: #e2e8f0; color: #475569; font-weight: 800;">
+              <template #body="{ data }">
+                <div class="flex flex-col gap-1.5 py-1">
+                  <div v-if="data.bureau_1" class="flex items-center gap-1.5 text-xs">
+                    <span class="text-[9px] uppercase font-black text-neutral-400 w-6 shrink-0">{{ data.bureau_1.slice(0, 2) }}:</span>
+                    <span class="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-100 text-[11px]">{{ data.value_1 }}</span>
+                  </div>
+                  <div v-if="data.bureau_2" class="flex items-center gap-1.5 text-xs">
+                    <span class="text-[9px] uppercase font-black text-neutral-400 w-6 shrink-0">{{ data.bureau_2.slice(0, 2) }}:</span>
+                    <span class="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-100 text-[11px]">{{ data.value_2 }}</span>
+                  </div>
+                  <div v-if="data.bureau_3" class="flex items-center gap-1.5 text-xs">
+                    <span class="text-[9px] uppercase font-black text-neutral-400 w-6 shrink-0">{{ data.bureau_3.slice(0, 2) }}:</span>
+                    <span class="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-100 text-[11px]">{{ data.value_3 }}</span>
+                  </div>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="severity" header="Severity" sortable headerStyle="min-width: 100px; background: #f8fafc; border-color: #e2e8f0; color: #475569; font-weight: 800;">
+              <template #body="{ data }">
+                <span class="text-[10px] px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-wider inline-block" :class="getSeverityClass(data.severity)">
+                  {{ data.severity }}
+                </span>
+              </template>
+            </Column>
+
+            <Column field="dispute_priority" header="Priority" sortable headerStyle="min-width: 110px; background: #f8fafc; border-color: #e2e8f0; color: #475569; font-weight: 800;">
+              <template #body="{ data }">
+                <div class="flex items-center gap-2">
+                  <span class="font-extrabold text-xs text-neutral-700">
+                    {{ data.dispute_priority }}
+                  </span>
+                  <div class="w-12 bg-neutral-100 h-1.5 rounded-full overflow-hidden border border-neutral-200">
+                    <div class="h-full rounded-full" :class="data.dispute_priority >= 80 ? 'bg-[#00A3B0]' : 'bg-neutral-400'" :style="{ width: data.dispute_priority + '%' }"></div>
+                  </div>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="dispute_status" header="Status" headerStyle="min-width: 100px; background: #f8fafc; border-color: #e2e8f0; color: #475569; font-weight: 800;">
+              <template #body="{ data }">
+                <span class="text-[10px] px-2.5 py-0.5 rounded border font-extrabold uppercase tracking-wide inline-block" :class="getStatusClass(data.dispute_status)">
+                  {{ data.dispute_status }}
+                </span>
+              </template>
+            </Column>
+          </DataTable>
+        </div>
     </div>
   </div>
 </template>

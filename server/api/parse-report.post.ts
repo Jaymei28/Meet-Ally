@@ -192,7 +192,7 @@ ${schemaDescription}`
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-5-20250929',
         max_tokens: 4000,
         system: 'You are an advanced credit reporting data parser. Extract personal information, credit scores, inquiries, and accounts with bureau-specific detailed fields. Return ONLY a valid JSON object matching the requested schema. Do not output any markdown formatting wrappers, conversational text, or explanation. Begin your response with { and end it with }.',
         messages: [

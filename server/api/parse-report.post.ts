@@ -211,6 +211,30 @@ ${schemaDescription}`
     } else {
       const resJson = await aiResponse.json();
       let rawContent = resJson.content[0]?.text || '';
+
+      // Track real token cost and deduct from local balance
+      // Claude Sonnet 4.5: $3.00/1M input tokens, $15.00/1M output tokens
+      const usage = resJson.usage;
+      if (usage) {
+        const inputCost = (usage.input_tokens / 1_000_000) * 3.00;
+        const outputCost = (usage.output_tokens / 1_000_000) * 15.00;
+        const totalCost = inputCost + outputCost;
+        console.log(`[parse-report] Token usage — Input: ${usage.input_tokens}, Output: ${usage.output_tokens}, Cost: $${totalCost.toFixed(4)}`);
+
+        // Deduct from local Claude API balance
+        if (totalCost > 0) {
+          try {
+            await useQuery(
+              `UPDATE system_settings 
+               SET setting_value = CAST(GREATEST(0.00, CAST(setting_value AS DECIMAL(10,4)) - ?) AS CHAR) 
+               WHERE setting_key = 'claude_api_balance'`,
+              [totalCost.toFixed(4)]
+            );
+          } catch (deductErr: any) {
+            console.warn(`Failed to deduct API cost: ${deductErr.message}`);
+          }
+        }
+      }
       
       // Clean markdown wraps
       rawContent = rawContent.replace(/```json/g, '').replace(/```/g, '').trim();

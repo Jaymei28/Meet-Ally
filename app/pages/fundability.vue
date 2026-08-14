@@ -113,16 +113,60 @@
 
       <!-- B. RESULTS VIEW -->
       <div v-else class="space-y-6">
-        <!-- Mobile Swipe Hint -->
-        <div class="flex items-center justify-between lg:hidden text-[11px] font-bold text-neutral-400 px-1">
-          <span class="flex items-center gap-1.5 text-[#00828E]">
-            <i class="pi pi-arrows-h animate-pulse"></i> Swipe cards sideways
-          </span>
-          <span class="text-[10px] text-neutral-400 font-medium">3 cards</span>
+        <!-- Mobile Card Swap Controller -->
+        <div class="lg:hidden bg-white border border-neutral-200 rounded-2xl p-2.5 shadow-sm flex items-center justify-between gap-2">
+          <!-- Card Tab Buttons -->
+          <div class="flex items-center gap-1">
+            <button 
+              @click="setMobileCard(0)"
+              class="px-2.5 py-1 rounded-xl text-[11px] font-extrabold transition cursor-pointer"
+              :class="activeMobileCard === 0 ? 'bg-[#00A3B0] text-white shadow-sm' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'"
+            >
+              Index
+            </button>
+            <button 
+              @click="setMobileCard(1)"
+              class="px-2.5 py-1 rounded-xl text-[11px] font-extrabold transition cursor-pointer"
+              :class="activeMobileCard === 1 ? 'bg-[#00A3B0] text-white shadow-sm' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'"
+            >
+              Factors
+            </button>
+            <button 
+              @click="setMobileCard(2)"
+              class="px-2.5 py-1 rounded-xl text-[11px] font-extrabold transition cursor-pointer"
+              :class="activeMobileCard === 2 ? 'bg-[#00A3B0] text-white shadow-sm' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'"
+            >
+              Health
+            </button>
+          </div>
+
+          <!-- Swap Navigation Buttons -->
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button 
+              @click="prevMobileCard" 
+              class="w-7 h-7 rounded-xl border border-neutral-200 bg-neutral-50 hover:bg-neutral-100 active:scale-95 text-neutral-700 flex items-center justify-center transition shadow-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+              :disabled="activeMobileCard === 0"
+              title="Previous Card"
+            >
+              <i class="pi pi-chevron-left text-xs"></i>
+            </button>
+            <button 
+              @click="nextMobileCard" 
+              class="w-7 h-7 rounded-xl border border-neutral-200 bg-[#00A3B0] hover:bg-[#00828E] active:scale-95 text-white flex items-center justify-center transition shadow-sm cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+              :disabled="activeMobileCard === 2"
+              title="Next Card"
+            >
+              <i class="pi pi-chevron-right text-xs"></i>
+            </button>
+          </div>
         </div>
 
         <!-- Top Analysis Cards: Horizontally Scrollable on Mobile, Grid on Desktop -->
-        <div class="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-4 lg:gap-6 pb-2 lg:pb-0 snap-x snap-mandatory scroll-smooth no-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0">
+        <div 
+          ref="cardsContainer"
+          @scroll.passive="onCardsScroll"
+          class="flex overflow-x-auto lg:grid lg:grid-cols-3 gap-4 lg:gap-6 pb-2 lg:pb-0 snap-x snap-mandatory scroll-smooth no-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0"
+        >
           
           <!-- 1. Score Gauge Card with Brand Styling -->
           <div class="w-[85vw] sm:w-[320px] lg:w-auto shrink-0 snap-center bg-gradient-to-br from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-[32px] p-6 shadow-[0_10px_30px_rgba(0,95,106,0.22)] border border-white/20 relative overflow-hidden flex flex-col items-center justify-center text-center space-y-4">
@@ -426,6 +470,42 @@ const upgrading = ref(false);
 const hasScore = ref(false);
 const scoreData = ref({});
 const lenderMatches = ref([]);
+
+const activeMobileCard = ref(0);
+const cardsContainer = ref(null);
+
+function setMobileCard(index) {
+  activeMobileCard.value = index;
+  if (cardsContainer.value) {
+    const children = cardsContainer.value.children;
+    if (children && children[index]) {
+      children[index].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+    }
+  }
+}
+
+function prevMobileCard() {
+  if (activeMobileCard.value > 0) {
+    setMobileCard(activeMobileCard.value - 1);
+  }
+}
+
+function nextMobileCard() {
+  if (activeMobileCard.value < 2) {
+    setMobileCard(activeMobileCard.value + 1);
+  }
+}
+
+function onCardsScroll(e) {
+  const el = e.target;
+  if (!el) return;
+  const scrollLeft = el.scrollLeft;
+  const cardWidth = el.offsetWidth * 0.85;
+  const newIndex = Math.round(scrollLeft / cardWidth);
+  if (newIndex >= 0 && newIndex <= 2) {
+    activeMobileCard.value = newIndex;
+  }
+}
 
 // Retrieve existing score and matches
 async function loadFundabilityData() {

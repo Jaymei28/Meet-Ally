@@ -116,30 +116,33 @@
         <!-- Top Summary Row: Radial Dial & Highlights -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          <!-- Score Gauge Card -->
-          <div class="bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm flex flex-col items-center justify-center text-center space-y-4">
-            <h3 class="text-xs font-black text-neutral-400 uppercase tracking-widest">Fundability Index</h3>
+          <!-- Score Gauge Card with Brand Styling -->
+          <div class="bg-gradient-to-br from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-[32px] p-6 shadow-[0_10px_30px_rgba(0,95,106,0.22)] border border-white/20 relative overflow-hidden flex flex-col items-center justify-center text-center space-y-4">
+            <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            <h3 class="text-xs font-black text-teal-100 uppercase tracking-widest relative z-10">Fundability Index</h3>
             
-            <div class="relative flex items-center justify-center">
+            <div class="relative flex items-center justify-center z-10">
               <Knob 
                 v-model="scoreData.score" 
                 :min="0" 
                 :max="100" 
                 :size="150" 
                 :strokeWidth="10" 
-                valueColor="#00A3B0" 
-                rangeColor="#F1F5F9"
+                :showValue="false"
+                valueColor="#00D8E6" 
+                rangeColor="rgba(255, 255, 255, 0.2)"
                 readonly
               />
-              <div class="absolute flex flex-col items-center justify-center">
-                <span class="text-4xl font-black text-neutral-900">{{ scoreData.score }}</span>
-                <span class="text-[10px] font-extrabold text-[#00828E] uppercase tracking-wider">Score</span>
+              <div class="absolute flex flex-col items-center justify-center pointer-events-none">
+                <span class="text-4xl font-black text-white drop-shadow-sm">{{ scoreData.score }}</span>
+                <span class="text-[10px] font-extrabold text-[#00D8E6] uppercase tracking-wider">Score</span>
               </div>
             </div>
 
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-neutral-500">Eligibility Class:</span>
-              <span class="px-3 py-1 bg-[#00A3B0]/10 border border-[#00A3B0]/20 rounded-full text-xs font-black text-[#00828E] uppercase">
+            <div class="flex items-center gap-2 relative z-10">
+              <span class="text-xs font-bold text-teal-100">Eligibility Class:</span>
+              <span class="px-3.5 py-1 bg-black/20 border border-white/25 rounded-full text-xs font-black text-white uppercase backdrop-blur-sm shadow-sm">
                 Grade {{ scoreData.grade }}
               </span>
             </div>

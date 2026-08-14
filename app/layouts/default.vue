@@ -60,9 +60,9 @@
     </main>
 
     <!-- 4. MOBILE BOTTOM NAVIGATION (hidden on desktop, fixed at bottom on mobile) -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-neutral-200 py-2 px-6 flex justify-around items-center z-40 no-print shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-neutral-200 py-2 px-4 flex justify-around items-center z-40 no-print shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
       <NuxtLink
-        v-for="item in navItems"
+        v-for="item in mobileNavItems"
         :key="item.path"
         :to="item.path"
         class="flex-1 flex flex-col items-center gap-1 py-1 px-1 rounded-lg transition-all duration-300 min-w-0"
@@ -84,6 +84,7 @@ import { computed } from 'vue';
 const route = useRoute();
 const user = useCookie('auth_user');
 
+// Sidebar nav (desktop) — full list
 const navItems = computed(() => {
   if (user.value && user.value.role === 'admin') {
     return [
@@ -102,6 +103,26 @@ const navItems = computed(() => {
     { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
     { name: 'Fundability', path: '/fundability', icon: 'pi pi-verified' },
     { name: 'Resources', path: '/resources', icon: 'pi pi-book' },
+    { name: 'Profile', path: '/profile', icon: 'pi pi-user' }
+  ];
+});
+
+// Mobile bottom bar — compact 5 items with short labels
+const mobileNavItems = computed(() => {
+  if (user.value && user.value.role === 'admin') {
+    return [
+      { name: 'Home', path: '/', icon: 'pi pi-home' },
+      { name: 'Ally', path: '/credits', icon: '/AllyAI.png' },
+      { name: 'Users', path: '/users', icon: 'pi pi-users' },
+      { name: 'Resources', path: '/resources', icon: 'pi pi-book' },
+      { name: 'Profile', path: '/profile', icon: 'pi pi-user' }
+    ];
+  }
+  return [
+    { name: 'Home', path: '/', icon: 'pi pi-home' },
+    { name: 'Ally', path: '/upload', icon: '/AllyAI.png' },
+    { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
+    { name: 'Funding', path: '/fundability', icon: 'pi pi-verified' },
     { name: 'Profile', path: '/profile', icon: 'pi pi-user' }
   ];
 });

@@ -159,9 +159,9 @@ const mobileNavItems = computed(() => {
   return [
     { name: 'Home', path: '/', icon: 'pi pi-home' },
     { name: 'Ally', path: '/upload', icon: '/AllyAI.png' },
+    { name: 'Conflicts', path: '/discrepancies', icon: 'pi pi-table' },
     { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
-    { name: 'Funding', path: '/fundability', icon: 'pi pi-verified' },
-    { name: 'Profile', path: '/profile', icon: 'pi pi-user' }
+    { name: 'Funding', path: '/fundability', icon: 'pi pi-verified' }
   ];
 });
 
@@ -173,8 +173,8 @@ const moreMenuItems = computed(() => {
     ];
   }
   return [
-    { name: 'Conflicts', path: '/discrepancies', icon: 'pi pi-table' },
     { name: 'Resources', path: '/resources', icon: 'pi pi-book' },
+    { name: 'Profile', path: '/profile', icon: 'pi pi-user' },
   ];
 });
 

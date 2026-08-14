@@ -256,6 +256,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
+const user = useCookie('auth_user');
+
 const form = ref({
   name: '',
   email: '',
@@ -317,8 +319,7 @@ async function updateProfile() {
       form.value.password = '';
       
       // Reactive reload page data
-      const userCookie = useCookie('auth_user');
-      userCookie.value = res.user;
+      user.value = res.user;
     }
   } catch (err) {
     alertSuccess.value = false;
@@ -365,8 +366,7 @@ async function uploadAvatar() {
       profilePicturePreview.value = null;
 
       // Update cookie reactively
-      const userCookie = useCookie('auth_user');
-      userCookie.value = res.user;
+      user.value = res.user;
     }
   } catch (err) {
     alertSuccess.value = false;

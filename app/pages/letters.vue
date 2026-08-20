@@ -37,7 +37,7 @@
       </div>
       <div class="max-w-md">
         <h2 class="text-xl font-bold text-neutral-900">No Letters Drafted</h2>
-        <p class="text-neutral-500 mt-1">You haven't generated any dispute letters yet. Select conflicts from the table to begin writing.</p>
+        <p class="text-neutral-500 mt-1">You haven't generated any dispute letters yet. Select credit findings from the table to begin writing.</p>
       </div>
       <NuxtLink to="/discrepancies" class="px-5 py-2.5 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl hover:bg-[#00A3B0] transition duration-300 shadow-sm">
         Review Discrepancies Table

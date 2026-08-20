@@ -159,7 +159,7 @@ const mobileNavItems = computed(() => {
   return [
     { name: 'Home', path: '/', icon: 'pi pi-home' },
     { name: 'Ally', path: '/upload', icon: '/AllyAI.png' },
-    { name: 'Credit Findings', path: '/discrepancies', icon: 'pi pi-table' },
+    { name: 'Findings', path: '/discrepancies', icon: 'pi pi-table' },
     { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
     { name: 'Funding', path: '/fundability', icon: 'pi pi-verified' }
   ];

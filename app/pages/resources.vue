@@ -133,7 +133,7 @@
     <div v-if="activeTab === 'strategy' || activeTab === 'all'" class="space-y-4 pt-2">
       <div>
         <h2 class="text-lg font-black text-neutral-900 tracking-tight">Dispute Strategy Playbook</h2>
-        <p class="text-xs text-neutral-500 font-semibold">Step-by-step 3-phase methodology executed by Ally AI.</p>
+        <p class="text-xs text-neutral-500 font-semibold">Step-by-step 3-phase methodology executed by AI Credit Strategist.</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

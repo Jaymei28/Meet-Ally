@@ -189,7 +189,7 @@
       <div v-if="loading" class="bg-neutral-50 border border-neutral-200 rounded-2xl p-6 text-center space-y-4 shadow-sm animate-fade-in">
         <div class="flex items-center justify-center gap-3">
           <i class="pi pi-spin pi-spinner text-xl text-[#00828E]"></i>
-          <span class="font-extrabold text-sm text-neutral-800">Ally AI Parsing Credit Report...</span>
+          <span class="font-extrabold text-sm text-neutral-800">AI Credit Strategist Parsing Credit Report...</span>
         </div>
         <p class="text-neutral-500 text-xs max-w-md mx-auto leading-relaxed">
           Ingesting document structure, reading 3-bureau trade lines, cross-validating inquiries, and building your personalized dispute game plan.

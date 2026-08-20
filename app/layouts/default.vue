@@ -137,7 +137,7 @@ const navItems = computed(() => {
   return [
     { name: 'Dashboard', path: '/', icon: 'pi pi-home' },
     { name: 'Ally', path: '/upload', icon: '/AllyAI.png' },
-    { name: 'Conflicts', path: '/discrepancies', icon: 'pi pi-table' },
+    { name: 'Credit Findings', path: '/discrepancies', icon: 'pi pi-table' },
     { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
     { name: 'Fundability', path: '/fundability', icon: 'pi pi-verified' },
     { name: 'Resources', path: '/resources', icon: 'pi pi-book' },
@@ -159,7 +159,7 @@ const mobileNavItems = computed(() => {
   return [
     { name: 'Home', path: '/', icon: 'pi pi-home' },
     { name: 'Ally', path: '/upload', icon: '/AllyAI.png' },
-    { name: 'Conflicts', path: '/discrepancies', icon: 'pi pi-table' },
+    { name: 'Credit Findings', path: '/discrepancies', icon: 'pi pi-table' },
     { name: 'Letters', path: '/letters', icon: 'pi pi-file-pdf' },
     { name: 'Funding', path: '/fundability', icon: 'pi pi-verified' }
   ];

@@ -8,30 +8,38 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
         <div class="flex items-center gap-3.5">
           <div class="w-12 h-12 rounded-2xl bg-white/15 border border-white/30 p-1 flex items-center justify-center shrink-0 backdrop-blur-md shadow-sm">
-            <img src="/AllyAI.png" alt="Ally" class="w-full h-full object-contain" />
+            <img src="/AllyAI.png" alt="AI Credit Strategist" class="w-full h-full object-contain" />
           </div>
           <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-sm">Bureau Discrepancies</h1>
-            <p class="text-xs sm:text-sm text-teal-50/90 font-medium mt-0.5">Cross-reference conflicts discovered across reporting credit bureaus.</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-sm">Credit Findings</h1>
+            <p class="text-xs sm:text-sm text-teal-50/90 font-medium mt-0.5">Here are the discrepancies Ally found across your credit reports with all three bureaus.</p>
           </div>
         </div>
 
         <div v-if="discrepancies && discrepancies.length > 0" class="flex items-center gap-2 self-start sm:self-auto">
           <span class="text-xs px-3.5 py-1.5 rounded-xl bg-black/20 border border-white/20 text-white font-extrabold shadow-sm backdrop-blur-sm">
-            <span class="text-[#00D8E6]">{{ selectedDiscrepancies.length }}</span> / {{ discrepancies.length }} Selected
+            <span class="text-[#00D8E6]">{{ selectedDiscrepancies.length }}</span> / {{ filteredPhaseDiscrepancies.length }} Selected
           </span>
         </div>
       </div>
 
+      <!-- Phase 1 Guidance Notice Banner -->
+      <div class="mt-4 p-3.5 rounded-2xl bg-white/10 border border-white/20 text-xs font-semibold text-teal-50 flex items-start gap-2.5 backdrop-blur-md">
+        <i class="pi pi-info-circle text-sm text-[#00D8E6] mt-0.5 shrink-0"></i>
+        <span>
+          <strong class="text-white font-bold">AI Credit Strategist Phase 1 Scope:</strong> Phase 1 focuses exclusively on disputing personal info, collections, inquiries, and outdated information. Active charge-off accounts are automatically scheduled for Phase 2+.
+        </span>
+      </div>
+
       <!-- 3-Step Instruction Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 pt-6 border-t border-white/15 relative z-10">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/15 relative z-10">
         <div class="bg-black/15 border border-white/15 rounded-2xl p-3.5 backdrop-blur-sm space-y-1">
           <div class="flex items-center gap-2">
             <span class="w-5 h-5 rounded-full bg-white/20 text-white font-black text-[10px] flex items-center justify-center">1</span>
             <span class="text-xs font-black text-white">Select Accounts</span>
           </div>
           <p class="text-[11px] text-teal-100/90 leading-normal font-medium">
-            Check the conflicting accounts or payment history discrepancies you want to dispute below.
+            Check the conflicting accounts or reporting variances identified by AI Credit Strategist below.
           </p>
         </div>
 
@@ -41,7 +49,7 @@
             <span class="text-xs font-black text-white">Choose Tone & Round</span>
           </div>
           <p class="text-[11px] text-teal-100/90 leading-normal font-medium">
-            Select <strong>Legal (FCRA)</strong> for statutory violations, <strong>Factual</strong>, or <strong>Aggressive</strong>, and set Round 1.
+            Select <strong>Legal (FCRA)</strong> for statutory violations, <strong>Factual</strong>, or <strong>Aggressive</strong>.
           </p>
         </div>
 
@@ -51,7 +59,7 @@
             <span class="text-xs font-black text-white">Draft & Mail Letters</span>
           </div>
           <p class="text-[11px] text-teal-100/90 leading-normal font-medium">
-            Click <strong>"Draft Dispute Letters"</strong> to write and send dispute letters directly from your Letters hub.
+            Click <strong>"Draft Dispute Letters"</strong> to write customized letters for your active Phase.
           </p>
         </div>
       </div>
@@ -134,11 +142,11 @@
             <i :class="['pi', isAllSelected ? 'pi-check-square' : 'pi-stop', 'text-xs text-[#00828E]']"></i>
             <span>{{ isAllSelected ? 'Deselect All' : 'Select All Items' }}</span>
           </button>
-          <span class="text-[10px] text-neutral-500 font-extrabold uppercase tracking-wider">{{ selectedDiscrepancies.length }}/{{ discrepancies.length }} selected</span>
+          <span class="text-[10px] text-neutral-500 font-extrabold uppercase tracking-wider">{{ selectedDiscrepancies.length }}/{{ filteredPhaseDiscrepancies.length }} selected</span>
         </div>
 
         <div 
-          v-for="item in discrepancies" 
+          v-for="item in filteredPhaseDiscrepancies" 
           :key="item.id"
           @click="toggleSelect(item)"
           class="bg-white border rounded-2xl p-4 shadow-sm transition duration-200 cursor-pointer space-y-3"
@@ -199,7 +207,7 @@
         <div class="overflow-x-auto w-full">
           <DataTable 
             v-model:selection="selectedDiscrepancies" 
-            :value="discrepancies" 
+            :value="filteredPhaseDiscrepancies" 
             dataKey="id" 
             tableStyle="min-width: 860px;"
             class="p-datatable-sm"
@@ -290,6 +298,31 @@ const selectedTone = ref('legal');
 const selectedPhase = ref(1);
 const letterLoading = ref(false);
 
+const route = useRoute();
+
+onMounted(() => {
+  if (route.query.phase) {
+    const phaseNum = parseInt(route.query.phase);
+    if ([1, 2, 3].includes(phaseNum)) {
+      selectedPhase.value = phaseNum;
+    }
+  }
+});
+
+const filteredPhaseDiscrepancies = computed(() => {
+  if (!discrepancies.value) return [];
+  if (selectedPhase.value === 1) {
+    // Phase 1: Exclude charge-off accounts, focusing on personal info, collections, inquiries, and outdated data
+    return discrepancies.value.filter(item => {
+      const type = (item.account_type || '').toLowerCase();
+      const name = (item.creditor_name || '').toLowerCase();
+      const isChargeOff = type.includes('charge') || type.includes('write-off') || name.includes('charge off');
+      return !isChargeOff;
+    });
+  }
+  return discrepancies.value;
+});
+
 function isSelected(item) {
   return selectedDiscrepancies.value.some(d => d.id === item.id);
 }
@@ -304,15 +337,15 @@ function toggleSelect(item) {
 }
 
 const isAllSelected = computed(() => {
-  if (!discrepancies.value || discrepancies.value.length === 0) return false;
-  return selectedDiscrepancies.value.length === discrepancies.value.length;
+  if (!filteredPhaseDiscrepancies.value || filteredPhaseDiscrepancies.value.length === 0) return false;
+  return selectedDiscrepancies.value.length === filteredPhaseDiscrepancies.value.length;
 });
 
 function toggleSelectAll() {
   if (isAllSelected.value) {
     selectedDiscrepancies.value = [];
   } else {
-    selectedDiscrepancies.value = [...(discrepancies.value || [])];
+    selectedDiscrepancies.value = [...(filteredPhaseDiscrepancies.value || [])];
   }
 }
 

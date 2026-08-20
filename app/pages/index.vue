@@ -252,13 +252,13 @@
         <div class="flex items-center justify-between gap-4 mt-6 w-full max-w-lg mx-auto">
           <!-- Welcome Chat Bubble -->
           <div class="flex-1 bg-white/10 backdrop-blur-md border border-white/25 rounded-2xl px-4 py-3 text-[11px] md:text-xs font-semibold leading-relaxed shadow-sm text-left">
-            "Hi! I've audited your credit reports and identified <span class="text-[#00D8E6] font-extrabold">3 reporting mismatches</span> across the bureaus. Let's start correcting them!"
+            "Hi! As your <span class="text-[#00D8E6] font-extrabold">AI Credit Strategist</span>, I've audited your credit reports and mapped your discrepancies. You are currently active in <span class="text-[#00D8E6] font-extrabold">Phase {{ currentPhase }}</span>."
           </div>
 
           <!-- Display AllyAI Character -->
           <img 
             src="/AllyAI.png" 
-            alt="Ally AI Assistant" 
+            alt="AI Credit Strategist" 
             class="h-28 w-auto object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.25)] animate-bounce-slow shrink-0"
           />
         </div>
@@ -463,10 +463,10 @@
             </div>
 
             <NuxtLink 
-              to="/discrepancies" 
-              class="mt-4 w-full py-3 bg-[#00D8E6] text-neutral-900 font-extrabold rounded-xl text-center hover:bg-[#00A3B0] transition duration-300 block shadow-sm text-xs"
+              :to="`/discrepancies?phase=${currentPhase}`" 
+              class="mt-4 w-full py-3.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white font-black rounded-xl text-center hover:from-[#005F6A] hover:to-[#00828E] transition duration-300 block shadow-sm text-xs"
             >
-              Inspect Conflicts Table
+              Go to Current Phase (Phase {{ currentPhase }}: Credit Findings) →
             </NuxtLink>
           </div>
         </section>
@@ -619,6 +619,14 @@ const clientData = ref({
   scores: { transunion: null, experian: null, equifax: null },
   summary: { totalAccounts: 0, negativeAccounts: 0, inquiries: 0, discrepancies: 0 },
   personalInfo: null
+});
+
+const currentPhase = computed(() => {
+  const lettersCount = clientData.value.summary?.lettersCount || 0;
+  const mailedCount = clientData.value.summary?.mailedLettersCount || 0;
+  if (mailedCount >= 3) return 3;
+  if (lettersCount >= 1 || mailedCount >= 1) return 2;
+  return 1;
 });
 
 const disputeTimeline = computed(() => {

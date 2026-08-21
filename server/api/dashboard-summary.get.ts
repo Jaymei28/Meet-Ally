@@ -11,16 +11,27 @@ export default defineEventHandler(async (event) => {
   const loggedInUser = JSON.parse(userCookie);
   const userId = loggedInUser.id;
 
-  // Fetch the latest credit report
-  const reports = await useQuery(
-    `SELECT * FROM credit_reports WHERE user_id = ? ORDER BY id DESC LIMIT 1`,
+  // Fetch latest saved user assessment
+  const userAssessments = await useQuery(
+    `SELECT * FROM user_assessments WHERE user_id = ? ORDER BY id DESC LIMIT 1`,
     [userId]
   );
-  
+  const latestAssessment = userAssessments.length > 0 ? userAssessments[0] : null;
+
   if (reports.length === 0) {
     return {
       hasReport: false,
       scores: { transunion: 0, experian: 0, equifax: 0 },
+      assessment: latestAssessment ? {
+        scoreRange: latestAssessment.score_range,
+        primaryGoal: latestAssessment.primary_goal,
+        hasCollections: !!latestAssessment.has_collections,
+        hasLatePayments: !!latestAssessment.has_late_payments,
+        hasInquiries: !!latestAssessment.has_inquiries,
+        hasChargeoffs: !!latestAssessment.has_chargeoffs,
+        gamePlan: latestAssessment.game_plan ? JSON.parse(latestAssessment.game_plan) : null,
+        createdAt: latestAssessment.created_at
+      } : null,
       summary: { totalAccounts: 0, negativeAccounts: 0, inquiries: 0, discrepancies: 0, lettersCount: 0, mailedLettersCount: 0 }
     };
   }
@@ -75,6 +86,16 @@ export default defineEventHandler(async (event) => {
     personalInfo: report.personal_info ? JSON.parse(report.personal_info) : null,
     scores: scoresMap,
     negativeItems: negativeItems || [],
+    assessment: latestAssessment ? {
+      scoreRange: latestAssessment.score_range,
+      primaryGoal: latestAssessment.primary_goal,
+      hasCollections: !!latestAssessment.has_collections,
+      hasLatePayments: !!latestAssessment.has_late_payments,
+      hasInquiries: !!latestAssessment.has_inquiries,
+      hasChargeoffs: !!latestAssessment.has_chargeoffs,
+      gamePlan: latestAssessment.game_plan ? JSON.parse(latestAssessment.game_plan) : null,
+      createdAt: latestAssessment.created_at
+    } : null,
     summary: {
       totalAccounts: report.total_accounts_count || 0,
       negativeAccounts: negativeItems.length || report.negative_accounts_count || 0,

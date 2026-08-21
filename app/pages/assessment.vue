@@ -206,19 +206,11 @@
           </p>
 
           <div class="pt-2 flex flex-wrap gap-2">
-            <button 
-              @click="downloadPDF" 
-              class="px-4 py-2 bg-white text-[#005F6A] font-extrabold rounded-xl text-xs shadow-md hover:bg-teal-50 transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <i class="pi pi-download text-xs"></i>
-              <span>Download Game Plan (PDF)</span>
-            </button>
-            
             <NuxtLink 
               to="/" 
-              class="px-5 py-2 bg-[#00D8E6] text-neutral-900 font-black rounded-xl text-xs shadow-md hover:bg-[#00A3B0] transition flex items-center gap-1.5"
+              class="px-6 py-3 bg-gradient-to-r from-[#00828E] via-[#00A3B0] to-[#00D8E6] text-neutral-900 font-black rounded-xl text-xs shadow-lg hover:brightness-110 transition flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Enter My Free Ally Dashboard →</span>
+              <span>Go Directly to My Free Dashboard →</span>
             </NuxtLink>
           </div>
         </div>
@@ -262,31 +254,49 @@
           </div>
         </div>
 
-        <!-- Ecosystem Nurturing Options (Upgrade / Consultation / DIY) -->
+        <!-- Ecosystem Nurturing Options (The 3 Core Upgrade Links) -->
         <div class="p-6 rounded-3xl bg-neutral-900 text-white space-y-4">
           <h3 class="text-sm font-extrabold text-white">Next Steps to Accelerate Your Credit Recovery</h3>
           
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <!-- 1. DIY Ally Engine -->
             <NuxtLink 
               to="/upload" 
-              class="p-4 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 transition space-y-1 text-left block"
+              class="p-4 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 transition space-y-1 text-left block group"
             >
               <div class="flex justify-between items-center">
-                <span class="font-extrabold text-xs text-[#00D8E6]">Option A: DIY Ally Engine</span>
-                <i class="pi pi-arrow-right text-xs text-[#00D8E6]"></i>
+                <span class="font-extrabold text-xs text-[#00D8E6]">1. Use DIY Ally Engine</span>
+                <i class="pi pi-arrow-right text-xs text-[#00D8E6] group-hover:translate-x-1 transition"></i>
               </div>
-              <p class="text-[11px] text-neutral-300">Upload your 3-bureau report to generate automated dispute letters instantly.</p>
+              <p class="text-[11px] text-neutral-300">Upload your 3-bureau report to generate automated dispute letters ($29.99 Turbo).</p>
             </NuxtLink>
 
+            <!-- 2. 1-on-1 Strategy Call -->
             <a 
-              href="mailto:help@creditremedi.com?subject=Done-For-You%20Credit%20Repair%20Inquiry"
-              class="p-4 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 transition space-y-1 text-left block"
+              href="https://pci.jotform.com/form/240096301428046"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="p-4 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 transition space-y-1 text-left block group"
             >
               <div class="flex justify-between items-center">
-                <span class="font-extrabold text-xs text-teal-200">Option B: Strategy & DFY Service</span>
-                <i class="pi pi-envelope text-xs text-teal-200"></i>
+                <span class="font-extrabold text-xs text-amber-300">2. Book 1-on-1 Strategy Call</span>
+                <i class="pi pi-calendar text-xs text-amber-300 group-hover:translate-x-1 transition"></i>
               </div>
-              <p class="text-[11px] text-neutral-300">Book a strategy consultation or request Done-For-You credit restoration.</p>
+              <p class="text-[11px] text-neutral-300">Schedule a personal consultation call with a credit strategist.</p>
+            </a>
+
+            <!-- 3. Work with Credit Remedi -->
+            <a 
+              href="https://www.creditremedi.store"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="p-4 rounded-2xl bg-white/10 border border-white/15 hover:bg-white/20 transition space-y-1 text-left block group"
+            >
+              <div class="flex justify-between items-center">
+                <span class="font-extrabold text-xs text-emerald-400">3. Work with Credit Remedi</span>
+                <i class="pi pi-external-link text-xs text-emerald-400 group-hover:translate-x-1 transition"></i>
+              </div>
+              <p class="text-[11px] text-neutral-300">Explore full-service credit repair & done-for-you dispute services.</p>
             </a>
           </div>
         </div>

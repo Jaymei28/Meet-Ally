@@ -232,14 +232,76 @@
 
     <!-- 2. CLIENT DASHBOARD VIEW -->
     <div v-else class="space-y-6 -mx-4 md:-mx-8">
-      <!-- Subscription Warning (if free/unsubscribed) -->
-      <div v-if="!user?.plan_type" class="mx-6 px-6 py-4 bg-amber-500/10 border border-amber-500/20 text-amber-800 rounded-3xl flex items-start gap-3 shadow-sm">
-        <i class="pi pi-exclamation-triangle text-lg mt-0.5 shrink-0 text-amber-600"></i>
-        <div>
-          <h4 class="font-extrabold text-sm text-amber-900">Active Subscription Required</h4>
-          <p class="text-xs text-neutral-600 mt-1 font-semibold leading-relaxed">
-            You are currently on the Free plan. To upload credit reports, run AI audits, and generate dispute letters, please upgrade to standard or turbo. You can check your account details on the Profile tab.
-          </p>
+      <!-- Prominent Immediate Upgrade Banner (for Free Users) -->
+      <div v-if="!user?.plan_type" class="mx-6 p-6 bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-900 text-white rounded-3xl shadow-xl border border-amber-500/30 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                Free Ally Account — Upgrade Recommended
+              </span>
+            </div>
+            <h3 class="text-xl font-black text-white tracking-tight">Unlock Full AI Credit Restoration & Dispute Engine</h3>
+            <p class="text-xs text-neutral-300 font-medium max-w-2xl leading-relaxed">
+              You are currently on the Free plan. Upgrade to DIY Ally (Turbo at <strong class="text-amber-300 font-black">$29.99</strong>), book a 1-on-1 strategy call, or work directly with Credit Remedi.
+            </p>
+          </div>
+
+          <NuxtLink 
+            to="/profile" 
+            class="px-6 py-3.5 bg-gradient-to-r from-[#00828E] via-[#00A3B0] to-[#00D8E6] text-neutral-900 font-black rounded-2xl text-xs transition duration-200 shadow-lg hover:brightness-110 shrink-0 text-center cursor-pointer"
+          >
+            Upgrade Account Now ($29.99 Turbo) →
+          </NuxtLink>
+        </div>
+
+        <!-- The 3 Core Upgrade Options Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-white/10">
+          <!-- 1. DIY Ally Engine -->
+          <NuxtLink 
+            to="/upload" 
+            class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition group text-left block"
+          >
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-[#00D8E6]">1. Use DIY Ally Engine</span>
+              <i class="pi pi-bolt text-xs text-[#00D8E6] group-hover:translate-x-1 transition"></i>
+            </div>
+            <p class="text-[10px] text-neutral-400 mt-1 font-medium leading-normal">
+              Upload 3-bureau report & generate FCRA deletion letters ($29.99 Turbo).
+            </p>
+          </NuxtLink>
+
+          <!-- 2. 1-on-1 Strategy Call -->
+          <a 
+            href="https://pci.jotform.com/form/240096301428046" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition group text-left block"
+          >
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-amber-300">2. Book 1-on-1 Strategy Call</span>
+              <i class="pi pi-calendar text-xs text-amber-300 group-hover:translate-x-1 transition"></i>
+            </div>
+            <p class="text-[10px] text-neutral-400 mt-1 font-medium leading-normal">
+              Book a personal credit review consultation with an expert strategist.
+            </p>
+          </a>
+
+          <!-- 3. Work with Credit Remedi -->
+          <a 
+            href="https://www.creditremedi.store" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            class="p-3.5 rounded-2xl bg-white/10 border border-emerald-500/30 hover:bg-emerald-500/10 transition group text-left block"
+          >
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-emerald-400">3. Work with Credit Remedi</span>
+              <i class="pi pi-external-link text-xs text-emerald-400 group-hover:translate-x-1 transition"></i>
+            </div>
+            <p class="text-[10px] text-neutral-300 mt-1 font-medium leading-normal">
+              Done-For-You credit repair services & full dispute management.
+            </p>
+          </a>
         </div>
       </div>
 
@@ -349,13 +411,9 @@
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
-              <button 
-                @click="downloadPDF"
-                class="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white font-extrabold rounded-xl text-xs transition duration-200 flex items-center gap-1.5 shadow-sm cursor-pointer"
-              >
-                <i class="pi pi-download text-xs"></i>
-                <span>Download Game Plan (PDF)</span>
-              </button>
+              <span class="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-teal-50 text-[#00828E] border border-teal-200">
+                AI Roadmap Active
+              </span>
             </div>
           </div>
 
@@ -393,16 +451,38 @@
             </div>
           </div>
 
-          <!-- Ecosystem CTAs for Free Accounts -->
-          <div class="p-4 rounded-2xl bg-gradient-to-r from-teal-50 via-neutral-50 to-teal-50/50 border border-teal-200/60 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="space-y-0.5 text-center sm:text-left">
-              <h4 class="text-xs font-black text-neutral-900">Ready to execute your dispute strategy?</h4>
-              <p class="text-xs text-neutral-600 font-medium">Upload your 3-bureau credit report to generate FCRA-compliant dispute letters with DIY Ally.</p>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-              <NuxtLink to="/upload" class="px-4 py-2 bg-[#00828E] hover:bg-[#005F6A] text-white font-extrabold rounded-xl text-xs transition shadow-sm">
-                Start DIY Ally Engine →
+          <!-- The 3 Core Upgrade Options Strip for Free Accounts -->
+          <div class="p-5 rounded-2xl bg-neutral-900 text-white space-y-3">
+            <h4 class="text-xs font-extrabold text-white">Upgrade & Dispute Options:</h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <NuxtLink 
+                to="/upload" 
+                class="p-3 rounded-xl bg-white/10 hover:bg-white/15 transition flex flex-col justify-between space-y-1 group"
+              >
+                <span class="text-xs font-black text-[#00D8E6]">1. Use DIY Ally Engine</span>
+                <span class="text-[10px] text-neutral-300 font-medium">Upload report & draft FCRA deletion letters ($29.99 Turbo).</span>
               </NuxtLink>
+
+              <a 
+                href="https://pci.jotform.com/form/240096301428046" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="p-3 rounded-xl bg-white/10 hover:bg-white/15 transition flex flex-col justify-between space-y-1 group"
+              >
+                <span class="text-xs font-black text-amber-300">2. Book 1-on-1 Strategy Call</span>
+                <span class="text-[10px] text-neutral-300 font-medium">Book a personal consultation call with an expert.</span>
+              </a>
+
+              <a 
+                href="https://www.creditremedi.store" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="p-3 rounded-xl bg-white/10 hover:bg-white/15 transition flex flex-col justify-between space-y-1 group"
+              >
+                <span class="text-xs font-black text-emerald-400">3. Work with Credit Remedi</span>
+                <span class="text-[10px] text-neutral-300 font-medium">Full-service credit repair & done-for-you dispute services.</span>
+              </a>
             </div>
           </div>
         </section>

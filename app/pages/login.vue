@@ -248,7 +248,7 @@
             <div class="text-center space-y-1 pt-1">
               <h3 class="text-lg font-black text-[#005F6A]">Pro Plan (Turbo)</h3>
               <div class="flex items-baseline justify-center gap-1">
-                <span class="text-3xl sm:text-4xl font-black text-neutral-900">$69.99</span>
+                <span class="text-3xl sm:text-4xl font-black text-neutral-900">$29.99</span>
                 <span class="text-xs font-bold text-neutral-400">/month</span>
               </div>
             </div>
@@ -306,7 +306,7 @@
             @click="selectPlan('turbo')"
             class="w-full py-3.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] hover:from-[#005F6A] hover:to-[#00828E] text-white font-black rounded-2xl transition duration-200 shadow-lg cursor-pointer text-xs active:scale-[0.98]"
           >
-            Choose Premium Turbo ($69.99/mo)
+            Choose Premium Turbo ($29.99/mo)
           </button>
         </div>
 

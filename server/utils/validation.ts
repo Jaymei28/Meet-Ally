@@ -73,14 +73,15 @@ export function runCrossBureauValidation(
 
   const bureaus = ['TransUnion', 'Experian', 'Equifax'];
 
-  // 1. Check Balance Mismatches
+  // 1. Check Balance Mismatches (Only flag significant balance variances >= $100 to avoid minor date reporting noise)
   const balances = bureaus.map(b => ({ bureau: b, val: getVal(b, 'balance') as number | undefined }));
   const activeBalances = balances.filter(b => b.val !== undefined);
   if (activeBalances.length >= 2) {
     const firstVal = activeBalances[0].val!;
-    const hasMismatch = activeBalances.some(b => b.val! !== firstVal);
-    if (hasMismatch) {
-      const diff = Math.max(...activeBalances.map(b => b.val!)) - Math.min(...activeBalances.map(b => b.val!));
+    const diff = Math.max(...activeBalances.map(b => b.val!)) - Math.min(...activeBalances.map(b => b.val!));
+    
+    // Ignore minor balance fluctuations under $100
+    if (diff >= 100) {
       const severity = diff >= 500 ? 'high' : 'medium';
       const priority = diff >= 500 ? 90 : 70;
       
@@ -94,34 +95,12 @@ export function runCrossBureauValidation(
         value_3: activeBalances[2] ? `$${activeBalances[2].val}` : undefined,
         dispute_priority: priority,
         severity,
-        auto_generated_reason: `The balance for ${creditorName} is reported inconsistently across credit bureaus. The discrepancy of $${diff.toFixed(2)} violating FCRA guidelines requiring absolute accuracy in reporting.`
+        auto_generated_reason: `Significant balance inconsistency detected for ${creditorName} across credit bureaus (discrepancy of $${diff.toFixed(2)}). FCRA regulations require exact reporting accuracy across all bureaus.`
       });
     }
   }
 
-  // 2. Check Date Opened Mismatches
-  const dates = bureaus.map(b => ({ bureau: b, val: getVal(b, 'date_opened') as string | undefined }));
-  const activeDates = dates.filter(d => d.val !== undefined && d.val !== '');
-  if (activeDates.length >= 2) {
-    const firstVal = activeDates[0].val!;
-    const hasMismatch = activeDates.some(d => d.val! !== firstVal);
-    if (hasMismatch) {
-      discrepancies.push({
-        field_name: 'date_opened',
-        bureau_1: activeDates[0].bureau,
-        value_1: activeDates[0].val!,
-        bureau_2: activeDates[1].bureau,
-        value_2: activeDates[1].val!,
-        bureau_3: activeDates[2]?.bureau,
-        value_3: activeDates[2]?.val,
-        dispute_priority: 85,
-        severity: 'high',
-        auto_generated_reason: `The open date for ${creditorName} is reported inconsistently. One bureau reports ${activeDates[0].val} while another reports ${activeDates[1].val}. This inaccurate date reporting is a clear violation of FCRA compliance.`
-      });
-    }
-  }
-
-  // 3. Check Account Status Mismatches
+  // 2. Check Account Status Mismatches (High Impact: Open vs Closed vs Collection vs Charge-Off)
   const statuses = bureaus.map(b => ({ bureau: b, val: getVal(b, 'account_status') as string | undefined }));
   const activeStatuses = statuses.filter(s => s.val !== undefined && s.val !== '');
   if (activeStatuses.length >= 2) {
@@ -136,36 +115,14 @@ export function runCrossBureauValidation(
         value_2: activeStatuses[1].val!,
         bureau_3: activeStatuses[2]?.bureau,
         value_3: activeStatuses[2]?.val,
-        dispute_priority: 80,
+        dispute_priority: 95,
         severity: 'high',
-        auto_generated_reason: `Account status conflict for ${creditorName}. It is reported as '${activeStatuses[0].val}' on ${activeStatuses[0].bureau} and '${activeStatuses[1].val}' on ${activeStatuses[1].bureau}. Standardized credit standards require bureaus to match account status.`
+        auto_generated_reason: `Critical account status conflict for ${creditorName}. Reported as '${activeStatuses[0].val}' on ${activeStatuses[0].bureau} vs '${activeStatuses[1].val}' on ${activeStatuses[1].bureau}. Standard FCRA rules mandate identical status reporting.`
       });
     }
   }
 
-  // 4. Check Credit Limit Mismatches
-  const limits = bureaus.map(b => ({ bureau: b, val: getVal(b, 'credit_limit') as number | undefined }));
-  const activeLimits = limits.filter(l => l.val !== undefined);
-  if (activeLimits.length >= 2) {
-    const firstVal = activeLimits[0].val!;
-    const hasMismatch = activeLimits.some(l => l.val! !== firstVal);
-    if (hasMismatch) {
-      discrepancies.push({
-        field_name: 'credit_limit',
-        bureau_1: activeLimits[0].bureau,
-        value_1: `$${activeLimits[0].val}`,
-        bureau_2: activeLimits[1].bureau,
-        value_2: `$${activeLimits[1].val}`,
-        bureau_3: activeLimits[2]?.bureau,
-        value_3: activeLimits[2] ? `$${activeLimits[2].val}` : undefined,
-        dispute_priority: 70,
-        severity: 'medium',
-        auto_generated_reason: `Inconsistent credit limit reporting for ${creditorName} across bureaus. This variance directly impacts credit utilization and scoring formulas incorrectly.`
-      });
-    }
-  }
-
-  // 5. Check Payment Status (e.g. Current vs Late)
+  // 3. Check Payment Status Mismatches (Highest Priority: Late vs Current, Collection vs Paid)
   const paymentStatuses = bureaus.map(b => ({ bureau: b, val: getVal(b, 'payment_status') as string | undefined }));
   const activePaymentStatuses = paymentStatuses.filter(p => p.val !== undefined && p.val !== '');
   if (activePaymentStatuses.length >= 2) {
@@ -180,9 +137,31 @@ export function runCrossBureauValidation(
         value_2: activePaymentStatuses[1].val!,
         bureau_3: activePaymentStatuses[2]?.bureau,
         value_3: activePaymentStatuses[2]?.val,
-        dispute_priority: 90,
+        dispute_priority: 99,
         severity: 'high',
-        auto_generated_reason: `Highly damaging discrepancy: Payment history status for ${creditorName} reports '${activePaymentStatuses[0].val}' vs '${activePaymentStatuses[1].val}'. Payment status must be reported accurately and identically across all reporting bureaus.`
+        auto_generated_reason: `Critical derogatory payment status discrepancy for ${creditorName}: Payment history reports '${activePaymentStatuses[0].val}' on ${activePaymentStatuses[0].bureau} vs '${activePaymentStatuses[1].val}' on ${activePaymentStatuses[1].bureau}. This directly harms credit scoring.`
+      });
+    }
+  }
+
+  // 4. Check Credit Limit Mismatches (Medium Impact on Utilization)
+  const limits = bureaus.map(b => ({ bureau: b, val: getVal(b, 'credit_limit') as number | undefined }));
+  const activeLimits = limits.filter(l => l.val !== undefined && l.val > 0);
+  if (activeLimits.length >= 2) {
+    const firstVal = activeLimits[0].val!;
+    const hasMismatch = activeLimits.some(l => l.val! !== firstVal);
+    if (hasMismatch) {
+      discrepancies.push({
+        field_name: 'credit_limit',
+        bureau_1: activeLimits[0].bureau,
+        value_1: `$${activeLimits[0].val}`,
+        bureau_2: activeLimits[1].bureau,
+        value_2: `$${activeLimits[1].val}`,
+        bureau_3: activeLimits[2]?.bureau,
+        value_3: activeLimits[2] ? `$${activeLimits[2].val}` : undefined,
+        dispute_priority: 65,
+        severity: 'medium',
+        auto_generated_reason: `Inconsistent credit limit reporting for ${creditorName} across reporting bureaus, distorting credit utilization ratios.`
       });
     }
   }

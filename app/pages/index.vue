@@ -335,6 +335,88 @@
           </div>
         </section>
 
+        <!-- Negative Accounts & Flagged Collections Section -->
+        <section class="bg-white border border-neutral-200 rounded-3xl p-5 sm:p-6 space-y-4 shadow-sm">
+          <div class="flex items-center justify-between gap-3 border-b border-neutral-100 pb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center shrink-0 text-red-600">
+                <i class="pi pi-exclamation-triangle text-base"></i>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-base sm:text-lg text-neutral-900 leading-tight">Flagged Negative & Collection Accounts</h3>
+                <p class="text-neutral-500 text-xs mt-0.5">Identified derogatory tradelines, collections, late payments, and charge-offs requiring dispute action.</p>
+              </div>
+            </div>
+            <span v-if="clientData.negativeItems?.length > 0" class="text-xs px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 font-extrabold shrink-0">
+              {{ clientData.negativeItems.length }} Derogatory Items Found
+            </span>
+          </div>
+
+          <!-- Negative Accounts Grid -->
+          <div v-if="clientData.negativeItems && clientData.negativeItems.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div 
+              v-for="item in clientData.negativeItems" 
+              :key="item.id"
+              class="p-4 rounded-2xl bg-neutral-50/90 border border-red-100 space-y-3 relative overflow-hidden"
+            >
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0">
+                  <span class="font-extrabold text-xs text-neutral-900 block truncate">{{ item.creditor_name }}</span>
+                  <span class="font-mono text-[10px] text-neutral-400 font-semibold block">{{ item.account_number || 'XXXX-XXXX' }}</span>
+                </div>
+                <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200 shrink-0">
+                  {{ item.account_status || 'Derogatory' }}
+                </span>
+              </div>
+
+              <div class="pt-2 border-t border-neutral-200/60 flex items-center justify-between text-xs">
+                <div class="space-y-0.5">
+                  <span class="text-[9px] font-black uppercase text-neutral-400 block">Payment Status</span>
+                  <span class="font-bold text-red-600 text-[11px] block">{{ item.payment_status }}</span>
+                </div>
+                <div class="text-right space-y-0.5">
+                  <span class="text-[9px] font-black uppercase text-neutral-400 block">Balance</span>
+                  <span class="font-extrabold text-neutral-900 text-[11px] block">${{ item.current_balance || 0 }}</span>
+                </div>
+              </div>
+
+              <div v-if="item.bureau" class="pt-1.5 flex items-center gap-1.5 text-[9px] text-neutral-500 font-bold">
+                <i class="pi pi-building text-[10px] text-[#00828E]"></i>
+                <span>Reported on: {{ item.bureau }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty Clean State -->
+          <div v-else class="p-6 bg-emerald-50/50 border border-emerald-200/60 rounded-2xl text-center space-y-2">
+            <i class="pi pi-check-circle text-2xl text-emerald-600"></i>
+            <h4 class="text-xs font-black text-emerald-950 uppercase tracking-wide">No Active Collections Found</h4>
+            <p class="text-xs text-emerald-800 font-medium">Your credit report contains zero flagged collection or charge-off records.</p>
+          </div>
+        </section>
+
+        <!-- Credit Building Recommendation Banner (Shown when positive history is needed) -->
+        <section v-if="needsCreditBuilding" class="bg-gradient-to-r from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white rounded-3xl p-6 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-white/20">
+          <div class="space-y-1 max-w-xl">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-white/20 text-[#00D8E6] border border-white/20">
+                Action Roadmap Recommendation
+              </span>
+            </div>
+            <h3 class="text-lg font-black tracking-tight text-white">Build Positive Credit History</h3>
+            <p class="text-xs text-teal-100/90 font-medium leading-relaxed">
+              Your AI Credit Strategist determined that your credit profile needs additional positive revolving trade lines to boost your credit mix and accelerate score recovery.
+            </p>
+          </div>
+
+          <NuxtLink 
+            to="/resources#strategy" 
+            class="px-5 py-3 bg-white hover:bg-teal-50 text-[#005F6A] font-black rounded-2xl transition duration-200 text-xs shadow-md shrink-0 active:scale-[0.98] text-center"
+          >
+            View Credit-Building Options →
+          </NuxtLink>
+        </section>
+
         <!-- Personal Info & Dispute Timeline -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-2 bg-white border border-neutral-200 rounded-3xl p-5 sm:p-6 space-y-5 shadow-sm">
@@ -627,6 +709,15 @@ const currentPhase = computed(() => {
   if (mailedCount >= 3) return 3;
   if (lettersCount >= 1 || mailedCount >= 1) return 2;
   return 1;
+});
+
+const needsCreditBuilding = computed(() => {
+  if (!clientData.value?.hasReport) return false;
+  const total = clientData.value.summary?.totalAccounts || 0;
+  const negatives = clientData.value.summary?.negativeAccounts || 0;
+  const scores = clientData.value.scores || {};
+  const avgScore = ((scores.transunion || 600) + (scores.experian || 600) + (scores.equifax || 600)) / 3;
+  return total < 4 || negatives > 0 || avgScore < 680;
 });
 
 const disputeTimeline = computed(() => {

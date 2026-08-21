@@ -58,6 +58,15 @@ export default defineEventHandler(async (event) => {
     [userId]
   );
 
+  // Fetch detailed list of negative / collection / derogatory accounts
+  const negativeItems = await useQuery(
+    `SELECT id, creditor_name, account_number, account_type, account_status, payment_status, current_balance, is_negative, bureau
+     FROM credit_accounts
+     WHERE user_id = ? AND credit_report_id = ? AND (is_negative = 1 OR LOWER(payment_status) LIKE '%late%' OR LOWER(account_status) LIKE '%collection%' OR LOWER(account_status) LIKE '%charge%')
+     ORDER BY id DESC`,
+    [userId, report.id]
+  );
+
   return {
     hasReport: true,
     reportId: report.id,
@@ -65,9 +74,10 @@ export default defineEventHandler(async (event) => {
     uploadedAt: report.created_at,
     personalInfo: report.personal_info ? JSON.parse(report.personal_info) : null,
     scores: scoresMap,
+    negativeItems: negativeItems || [],
     summary: {
       totalAccounts: report.total_accounts_count || 0,
-      negativeAccounts: report.negative_accounts_count || 0,
+      negativeAccounts: negativeItems.length || report.negative_accounts_count || 0,
       inquiries: report.hard_inquiries_count || 0,
       discrepancies: discrepanciesCount[0]?.count || 0,
       lettersCount: lettersCountRes[0]?.count || 0,

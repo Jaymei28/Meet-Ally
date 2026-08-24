@@ -120,13 +120,6 @@
           </a>
         </span>
       </div>
-
-      <!-- Demo logins hint -->
-      <div class="mt-6 p-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-[10px] text-neutral-400 font-semibold space-y-1">
-        <p class="text-neutral-600 font-extrabold">Demo logins:</p>
-        <p>Admin: <span class="font-mono text-neutral-500">admin@remedicredit.com</span> / <span class="font-mono text-neutral-500">password</span></p>
-        <p>Client: <span class="font-mono text-neutral-500">rmillscompany@gmail.com</span> / <span class="font-mono text-neutral-500">password</span></p>
-      </div>
     </div>
 
 

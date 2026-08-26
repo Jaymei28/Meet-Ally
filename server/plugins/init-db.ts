@@ -11,11 +11,43 @@ export default defineNitroPlugin(async () => {
         password VARCHAR(255) NOT NULL,
         role VARCHAR(50) NOT NULL DEFAULT 'client',
         plan_type VARCHAR(50) NULL DEFAULT NULL,
+        has_paid TINYINT(1) DEFAULT 0,
+        paid_amount DECIMAL(10,2) NULL,
+        contact_number VARCHAR(100) NULL,
+        pm_type VARCHAR(50) NULL,
+        pm_last_four VARCHAR(10) NULL,
+        payment_attempted_at DATETIME NULL,
+        address VARCHAR(255) NULL,
+        city VARCHAR(100) NULL,
+        state VARCHAR(100) NULL,
+        zipcode VARCHAR(20) NULL,
+        profile_picture VARCHAR(255) NULL,
         registration_status VARCHAR(50) NOT NULL DEFAULT 'completed',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    // Ensure columns exist on existing table
+    const safeAddColumn = async (colDef: string) => {
+      try {
+        await useQuery(`ALTER TABLE users ADD COLUMN ${colDef}`);
+      } catch (e) {
+        // Ignore if column already exists
+      }
+    };
+
+    await safeAddColumn(`has_paid TINYINT(1) DEFAULT 0`);
+    await safeAddColumn(`paid_amount DECIMAL(10,2) NULL`);
+    await safeAddColumn(`contact_number VARCHAR(100) NULL`);
+    await safeAddColumn(`pm_type VARCHAR(50) NULL`);
+    await safeAddColumn(`pm_last_four VARCHAR(10) NULL`);
+    await safeAddColumn(`payment_attempted_at DATETIME NULL`);
+    await safeAddColumn(`address VARCHAR(255) NULL`);
+    await safeAddColumn(`city VARCHAR(100) NULL`);
+    await safeAddColumn(`state VARCHAR(100) NULL`);
+    await safeAddColumn(`zipcode VARCHAR(20) NULL`);
+    await safeAddColumn(`profile_picture VARCHAR(255) NULL`);
 
     // Ensure default admin and client exist
     const adminRows = await useQuery(`SELECT id FROM users WHERE email = 'admin@remedicredit.com'`);

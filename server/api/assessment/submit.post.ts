@@ -47,49 +47,11 @@ export default defineEventHandler(async (event) => {
         }
       });
     } catch (e: any) {
-      console.warn('GHL Webhook notification error (non-blocking):', e.message);
+      console.warn('GHL Webhook notification notice:', e.message);
     }
   }
 
-  // 2. Auto-provision Free Meet Ally Account & Login
-  let userRecord: any = null;
-  const existingUsers = await useQuery("SELECT id, name, email, role, plan_type, profile_picture FROM users WHERE email = ? LIMIT 1", [cleanEmail]);
-
-  if (existingUsers.length > 0) {
-    userRecord = existingUsers[0];
-  } else {
-    // Generate default password hash
-    const defaultPassword = 'Password123!';
-    const hashedPassword = bcryptjs.hashSync(defaultPassword, 10);
-
-    const insertRes = await useQuery(
-      `INSERT INTO users (
-        name, email, password, role, plan_type, has_paid, registration_status, 
-        contact_number, created_at, updated_at
-       )
-       VALUES (?, ?, ?, 'user', NULL, 0, 'completed', ?, NOW(), NOW())`,
-      [cleanName, cleanEmail, hashedPassword, phone || null]
-    );
-
-    const newUserId = (insertRes as any).insertId;
-    userRecord = {
-      id: newUserId,
-      name: cleanName,
-      email: cleanEmail,
-      role: 'user',
-      plan_type: null,
-      profile_picture: null
-    };
-  }
-
-  // Set Auth Cookie so user is logged in immediately
-  setCookie(event, 'auth_user', JSON.stringify(userRecord), {
-    httpOnly: false,
-    maxAge: 60 * 60 * 24 * 30,
-    path: '/'
-  });
-
-  // 3. Build Customized AI Action Game Plan
+  // 2. Build Customized AI Action Game Plan
   const gamePlan = {
     generatedAt: new Date().toISOString(),
     scoreRange: score_range || '580-639',
@@ -114,26 +76,74 @@ export default defineEventHandler(async (event) => {
     ]
   };
 
-  // 4. Save Assessment in user_assessments table
-  await useQuery(
-    `INSERT INTO user_assessments (user_id, score_range, primary_goal, has_collections, has_late_payments, has_inquiries, has_chargeoffs, assessment_data, game_plan, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-    [
-      userRecord.id,
-      score_range || null,
-      primary_goal || null,
-      has_collections ? 1 : 0,
-      has_late_payments ? 1 : 0,
-      has_inquiries ? 1 : 0,
-      has_chargeoffs ? 1 : 0,
-      JSON.stringify(assessment_details || {}),
-      JSON.stringify(gamePlan)
-    ]
-  );
+  // 3. Auto-provision Free Meet Ally Account & Login in DB
+  let userRecord: any = null;
 
-  return {
-    success: true,
-    user: userRecord,
-    gamePlan
-  };
+  try {
+    const existingUsers = await useQuery("SELECT id, name, email, role, plan_type, profile_picture FROM users WHERE email = ? LIMIT 1", [cleanEmail]);
+
+    if (existingUsers && existingUsers.length > 0) {
+      userRecord = existingUsers[0];
+    } else {
+      const defaultPassword = 'Password123!';
+      const hashedPassword = bcryptjs.hashSync(defaultPassword, 10);
+
+      // Simple insert compatible with all DB schema states
+      const insertRes = await useQuery(
+        `INSERT INTO users (name, email, password, role, plan_type, registration_status, created_at, updated_at)
+         VALUES (?, ?, ?, 'user', NULL, 'completed', NOW(), NOW())`,
+        [cleanName, cleanEmail, hashedPassword]
+      );
+
+      const newUserId = (insertRes as any).insertId;
+      userRecord = {
+        id: newUserId,
+        name: cleanName,
+        email: cleanEmail,
+        role: 'user',
+        plan_type: null,
+        profile_picture: null
+      };
+    }
+
+    // Set Auth Cookie
+    setCookie(event, 'auth_user', JSON.stringify(userRecord), {
+      httpOnly: false,
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/'
+    });
+
+    // Save Assessment in user_assessments table
+    try {
+      await useQuery(
+        `INSERT INTO user_assessments (user_id, score_range, primary_goal, has_collections, has_late_payments, has_inquiries, has_chargeoffs, assessment_data, game_plan, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+        [
+          userRecord.id,
+          score_range || null,
+          primary_goal || null,
+          has_collections ? 1 : 0,
+          has_late_payments ? 1 : 0,
+          has_inquiries ? 1 : 0,
+          has_chargeoffs ? 1 : 0,
+          JSON.stringify(assessment_details || {}),
+          JSON.stringify(gamePlan)
+        ]
+      );
+    } catch (assErr: any) {
+      console.warn('user_assessments insert warning (non-fatal):', assErr.message);
+    }
+
+    return {
+      success: true,
+      user: userRecord,
+      gamePlan
+    };
+  } catch (err: any) {
+    console.error('Assessment submit DB error:', err.message);
+    throw createError({
+      statusCode: 500,
+      statusMessage: `Assessment submission failed: ${err.message}`
+    });
+  }
 });

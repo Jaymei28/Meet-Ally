@@ -140,79 +140,60 @@
       <!-- 2 Plan Cards Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
         
-        <!-- Starter Plan Card -->
+        <!-- Free Account Card -->
         <div class="bg-white rounded-[32px] p-6 sm:p-8 border border-neutral-200 shadow-xl flex flex-col justify-between space-y-6 relative">
           <div class="space-y-5">
             <!-- Header -->
             <div class="text-center space-y-1">
-              <h3 class="text-lg font-black text-neutral-800">Standard Plan (Starter)</h3>
+              <h3 class="text-lg font-black text-neutral-800">Free Ally Account</h3>
               <div class="flex items-baseline justify-center gap-1">
-                <span class="text-3xl sm:text-4xl font-black text-neutral-900">$49.99</span>
-                <span class="text-xs font-bold text-neutral-400">/month</span>
+                <span class="text-3xl sm:text-4xl font-black text-neutral-900">$0</span>
+                <span class="text-xs font-bold text-neutral-400">/forever</span>
               </div>
             </div>
 
-            <!-- IdentityIQ Requirement Alert -->
+            <!-- Free Features Alert -->
             <div class="bg-[#00828E]/10 border border-[#00828E]/25 rounded-2xl p-3 text-[11px] font-semibold text-[#005F6A] flex items-start gap-2">
               <i class="pi pi-check text-[#00828E] text-xs mt-0.5 shrink-0"></i>
-              <span>IdentityIQ credit monitoring is required for accurate tracking & results</span>
+              <span>Permanent portal access for assessment & AI action game plans</span>
             </div>
 
             <!-- Features Breakdown -->
             <div class="space-y-4 text-xs">
               <!-- Category: Core AI -->
               <div class="space-y-2">
-                <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block border-b border-neutral-100 pb-1">Core AI Tools</span>
+                <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block border-b border-neutral-100 pb-1">Included Free Features</span>
                 <div class="space-y-1.5">
                   <div class="flex items-center gap-2 text-neutral-700 font-medium">
                     <i class="pi pi-check-circle text-emerald-500 text-xs shrink-0"></i>
-                    <span>AI-Powered Dispute Letter Generator</span>
+                    <span>AI Credit Audit & Discrepancy Map</span>
                   </div>
                   <div class="flex items-center gap-2 text-neutral-700 font-medium">
                     <i class="pi pi-check-circle text-emerald-500 text-xs shrink-0"></i>
-                    <span>Consumer Law Citation Assistance</span>
+                    <span>Personalized Resolution Action Roadmap</span>
                   </div>
                   <div class="flex items-center gap-2 text-neutral-700 font-medium">
                     <i class="pi pi-check-circle text-emerald-500 text-xs shrink-0"></i>
-                    <span>Guided Step-by-Step Workflows</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Category: Automation -->
-              <div class="space-y-2">
-                <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block border-b border-neutral-100 pb-1">Automation & Tracking</span>
-                <div class="space-y-1.5">
-                  <div class="flex items-center gap-2 text-neutral-700 font-medium">
-                    <i class="pi pi-check-circle text-emerald-500 text-xs shrink-0"></i>
-                    <span>15-Day Automated Follow-Up Letters</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-neutral-400 line-through">
-                    <i class="pi pi-times-circle text-neutral-300 text-xs shrink-0"></i>
-                    <span>Auto Dispute Timeline Reminders</span>
-                  </div>
-                  <div class="flex items-center gap-2 text-neutral-700 font-medium">
-                    <i class="pi pi-check-circle text-emerald-500 text-xs shrink-0"></i>
-                    <span>Monthly Credit Progress Dashboard</span>
+                    <span>Credit Building & Upgrade Recommendations</span>
                   </div>
                 </div>
               </div>
 
               <!-- Category: Support & Access -->
               <div class="space-y-2">
-                <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block border-b border-neutral-100 pb-1">Support & Additional</span>
+                <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block border-b border-neutral-100 pb-1">Services & Consultation</span>
                 <div class="space-y-1.5">
                   <div class="flex items-center gap-2 text-neutral-700 font-medium">
                     <i class="pi pi-check-circle text-emerald-500 text-xs shrink-0"></i>
-                    <span>AI Chat Assistant (24/7)</span>
+                    <span>Direct Access to 1-on-1 Strategy Calls</span>
                   </div>
                   <div class="flex items-center gap-2 text-neutral-700 font-medium">
                     <i class="pi pi-check-circle text-emerald-500 text-xs shrink-0"></i>
-                    <span>Direct Bureau & Regulator Filing Access</span>
+                    <span>Done-For-You Credit Repair Services Link</span>
                   </div>
                   <div class="flex items-center gap-2 text-neutral-400 line-through">
                     <i class="pi pi-times-circle text-neutral-300 text-xs shrink-0"></i>
-                    <span>Fundability Score & Lender Matching</span>
+                    <span>Automated Deletion Letter Generator</span>
                   </div>
                 </div>
               </div>
@@ -221,10 +202,10 @@
 
           <!-- Select Button -->
           <button 
-            @click="selectPlan('starter')"
+            @click="selectPlan('free')"
             class="w-full py-3.5 bg-neutral-900 hover:bg-neutral-800 text-white font-extrabold rounded-2xl transition duration-200 shadow-md cursor-pointer text-xs active:scale-[0.98]"
           >
-            Choose Starter ($49.99/mo)
+            Create Free Account ($0)
           </button>
         </div>
 

@@ -1,15 +1,16 @@
 export default defineNuxtRouteMiddleware((to, from) => {
   const user = useCookie('auth_user');
 
-  // 1. Handle login route
-  if (to.path === '/login') {
-    if (user.value) {
+  // 1. Allow public routes without authentication
+  const publicRoutes = ['/login', '/assessment'];
+  if (publicRoutes.includes(to.path)) {
+    if (to.path === '/login' && user.value) {
       return navigateTo('/');
     }
     return;
   }
 
-  // 2. Enforce authentication
+  // 2. Enforce authentication for protected app routes
   if (!user.value) {
     return navigateTo('/login');
   }

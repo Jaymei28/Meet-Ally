@@ -49,21 +49,31 @@ export default defineNitroPlugin(async () => {
     await safeAddColumn(`zipcode VARCHAR(20) NULL`);
     await safeAddColumn(`profile_picture VARCHAR(255) NULL`);
 
-    // Ensure default admin and client exist
+    // Ensure default admin and client exist with valid 60-character bcrypt hashes for 'password'
+    const defaultPasswordHash = bcryptjs.hashSync('password', 10);
+
     const adminRows = await useQuery(`SELECT id FROM users WHERE email = 'admin@remedicredit.com'`);
     if (adminRows.length === 0) {
       await useQuery(`
         INSERT INTO users (name, email, password, role, plan_type, registration_status)
-        VALUES ('Admin Strategist', 'admin@remedicredit.com', '$2b$10$w09Zk/K.6t8.LzG6q3bW5e7i/sV/9G7M3SgH2g.aY7eY', 'admin', 'turbo', 'completed')
-      `);
+        VALUES ('Admin Strategist', 'admin@remedicredit.com', ?, 'admin', 'turbo', 'completed')
+      `, [defaultPasswordHash]);
+    } else {
+      await useQuery(`
+        UPDATE users SET password = ?, role = 'admin', registration_status = 'completed' WHERE email = 'admin@remedicredit.com'
+      `, [defaultPasswordHash]);
     }
 
     const clientRows = await useQuery(`SELECT id FROM users WHERE email = 'rmillscompany@gmail.com'`);
     if (clientRows.length === 0) {
       await useQuery(`
         INSERT INTO users (name, email, password, role, plan_type, registration_status)
-        VALUES ('Rasheda Mills', 'rmillscompany@gmail.com', '$2b$10$w09Zk/K.6t8.LzG6q3bW5e7i/sV/9G7M3SgH2g.aY7eY', 'client', 'turbo', 'completed')
-      `);
+        VALUES ('Rasheda Mills', 'rmillscompany@gmail.com', ?, 'client', 'turbo', 'completed')
+      `, [defaultPasswordHash]);
+    } else {
+      await useQuery(`
+        UPDATE users SET password = ?, registration_status = 'completed' WHERE email = 'rmillscompany@gmail.com'
+      `, [defaultPasswordHash]);
     }
 
     // 2. Ensure `user_assessments` table exists

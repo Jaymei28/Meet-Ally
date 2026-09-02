@@ -1020,7 +1020,7 @@ async function saveAnnouncement() {
       saveAlertMsg.value = 'In-app alert banner published successfully!';
       setTimeout(() => { saveAlertMsg.value = ''; }, 3500);
     }
-  } catch (err: any) {
+  } catch (err) {
     alert(err.data?.statusMessage || 'Failed to save announcement.');
   } finally {
     savingAnnouncement.value = false;

@@ -1,4 +1,5 @@
 import { useQuery } from '../utils/db';
+import bcryptjs from 'bcryptjs';
 
 export default defineNitroPlugin(async () => {
   try {

@@ -187,35 +187,91 @@
                   v-model="announcementForm.title"
                   type="text"
                   placeholder="e.g. Special Turbo Offer"
-                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0] transition"
                 />
               </div>
 
-              <!-- Alert Style -->
-              <div class="space-y-1">
+              <!-- Custom Alert Style Dropdown -->
+              <div class="space-y-1 relative">
                 <label class="text-[10px] font-extrabold uppercase text-neutral-500 tracking-wider">Banner Style</label>
-                <select 
-                  v-model="announcementForm.alert_type"
-                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                <button 
+                  type="button"
+                  @click="isStyleDropdownOpen = !isStyleDropdownOpen; isAudienceDropdownOpen = false;"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200 rounded-xl text-xs font-bold text-neutral-900 flex items-center justify-between transition cursor-pointer shadow-2xs focus:outline-none focus:border-[#00A3B0]"
                 >
-                  <option value="promo">Teal Gradient (Promotional / Turbo)</option>
-                  <option value="info">Indigo Blue (Information / Announcement)</option>
-                  <option value="warning">Amber Gold (Urgent / Reminder)</option>
-                  <option value="success">Emerald Green (Success / Milestone)</option>
-                </select>
+                  <div class="flex items-center gap-2 truncate">
+                    <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-r shrink-0" :class="selectedStyleObj.color"></span>
+                    <span class="truncate">{{ selectedStyleObj.label }}</span>
+                  </div>
+                  <i :class="['pi text-[10px] text-neutral-400 transition-transform duration-200', isStyleDropdownOpen ? 'pi-chevron-up' : 'pi-chevron-down']"></i>
+                </button>
+
+                <!-- Floating Custom Menu -->
+                <Transition name="fade">
+                  <div 
+                    v-if="isStyleDropdownOpen" 
+                    class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-neutral-200 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 backdrop-blur-xl animate-scale-up"
+                  >
+                    <button 
+                      v-for="opt in alertStyleOptions" 
+                      :key="opt.value"
+                      type="button"
+                      @click="announcementForm.alert_type = opt.value; isStyleDropdownOpen = false;"
+                      class="w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between text-left transition cursor-pointer"
+                      :class="announcementForm.alert_type === opt.value ? 'bg-[#00828E]/10 text-[#00828E]' : 'text-neutral-700 hover:bg-neutral-50'"
+                    >
+                      <div class="flex items-center gap-2.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-gradient-to-r shadow-2xs shrink-0" :class="opt.color"></span>
+                        <span>{{ opt.label }}</span>
+                      </div>
+                      <i v-if="announcementForm.alert_type === opt.value" class="pi pi-check text-[11px] text-[#00828E]"></i>
+                    </button>
+                  </div>
+                </Transition>
               </div>
 
-              <!-- Target Audience -->
-              <div class="space-y-1">
+              <!-- Custom Target Audience Dropdown -->
+              <div class="space-y-1 relative">
                 <label class="text-[10px] font-extrabold uppercase text-neutral-500 tracking-wider">Target Audience</label>
-                <select 
-                  v-model="announcementForm.target_audience"
-                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                <button 
+                  type="button"
+                  @click="isAudienceDropdownOpen = !isAudienceDropdownOpen; isStyleDropdownOpen = false;"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-neutral-100/70 border border-neutral-200 rounded-xl text-xs font-bold text-neutral-900 flex items-center justify-between transition cursor-pointer shadow-2xs focus:outline-none focus:border-[#00A3B0]"
                 >
-                  <option value="all">All Registered Users</option>
-                  <option value="free_only">Free / Unpaid Leads Only (Upgrade Push)</option>
-                  <option value="paid_only">Paid Subscribers Only</option>
-                </select>
+                  <div class="flex items-center gap-2 truncate">
+                    <i :class="[selectedAudienceObj.icon, 'text-xs text-[#00828E] shrink-0']"></i>
+                    <span class="truncate">{{ selectedAudienceObj.label }}</span>
+                  </div>
+                  <i :class="['pi text-[10px] text-neutral-400 transition-transform duration-200', isAudienceDropdownOpen ? 'pi-chevron-up' : 'pi-chevron-down']"></i>
+                </button>
+
+                <!-- Floating Custom Menu -->
+                <Transition name="fade">
+                  <div 
+                    v-if="isAudienceDropdownOpen" 
+                    class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-neutral-200 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 backdrop-blur-xl animate-scale-up"
+                  >
+                    <button 
+                      v-for="opt in audienceOptions" 
+                      :key="opt.value"
+                      type="button"
+                      @click="announcementForm.target_audience = opt.value; isAudienceDropdownOpen = false;"
+                      class="w-full px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-left transition cursor-pointer"
+                      :class="announcementForm.target_audience === opt.value ? 'bg-[#00828E]/10 text-[#00828E]' : 'text-neutral-700 hover:bg-neutral-50'"
+                    >
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-6 h-6 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
+                          <i :class="[opt.icon, 'text-xs']"></i>
+                        </div>
+                        <div>
+                          <span class="block leading-tight">{{ opt.label }}</span>
+                          <span class="text-[10px] font-normal text-neutral-400 block">{{ opt.desc }}</span>
+                        </div>
+                      </div>
+                      <i v-if="announcementForm.target_audience === opt.value" class="pi pi-check text-[11px] text-[#00828E]"></i>
+                    </button>
+                  </div>
+                </Transition>
               </div>
             </div>
 
@@ -227,7 +283,7 @@
                 required
                 rows="2"
                 placeholder="Enter your announcement text..."
-                class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0] transition"
               ></textarea>
             </div>
 
@@ -238,8 +294,8 @@
                 <input 
                   v-model="announcementForm.cta_label"
                   type="text"
-                  placeholder="e.g. Subscribe with PayPal ($29.99/mo) →"
-                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                  placeholder="e.g. Subscribe with PayPal ($29.99/mo)"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0] transition"
                 />
               </div>
               <div class="space-y-1">
@@ -248,7 +304,7 @@
                   v-model="announcementForm.cta_url"
                   type="text"
                   placeholder="https://..."
-                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0] font-mono text-[11px]"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0] font-mono text-[11px] transition"
                 />
               </div>
             </div>
@@ -266,7 +322,7 @@
               </Transition>
 
               <button 
-                type="submit"
+                type="submit" 
                 :disabled="savingAnnouncement"
                 class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white font-extrabold rounded-xl hover:from-[#005F6A] hover:to-[#00828E] transition shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
@@ -973,6 +1029,31 @@ const announcementForm = ref({
 });
 const savingAnnouncement = ref(false);
 const saveAlertMsg = ref('');
+
+// Custom Dropdowns State
+const isStyleDropdownOpen = ref(false);
+const isAudienceDropdownOpen = ref(false);
+
+const alertStyleOptions = [
+  { value: 'promo', label: 'Teal Gradient (Promotional / Turbo)', color: 'from-[#00828E] to-[#00A3B0]' },
+  { value: 'info', label: 'Indigo Blue (Information / Announcement)', color: 'from-indigo-500 to-indigo-600' },
+  { value: 'warning', label: 'Amber Gold (Urgent / Reminder)', color: 'from-amber-400 to-amber-500' },
+  { value: 'success', label: 'Emerald Green (Success / Milestone)', color: 'from-emerald-500 to-emerald-600' }
+];
+
+const audienceOptions = [
+  { value: 'all', label: 'All Registered Users', desc: 'Broadcast to everyone', icon: 'pi pi-users' },
+  { value: 'free_only', label: 'Free / Unpaid Leads Only (Upgrade Push)', desc: 'Drive PayPal upgrades to unpaid leads', icon: 'pi pi-user-plus' },
+  { value: 'paid_only', label: 'Paid Subscribers Only', desc: 'VIP notifications for active members', icon: 'pi pi-star' }
+];
+
+const selectedStyleObj = computed(() => {
+  return alertStyleOptions.find(o => o.value === announcementForm.value.alert_type) || alertStyleOptions[0];
+});
+
+const selectedAudienceObj = computed(() => {
+  return audienceOptions.find(o => o.value === announcementForm.value.target_audience) || audienceOptions[0];
+});
 
 function cleanCtaLabel(label) {
   if (!label) return '';

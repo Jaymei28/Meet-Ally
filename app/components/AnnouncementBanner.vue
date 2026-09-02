@@ -2,43 +2,44 @@
   <Transition name="slide-down">
     <div 
       v-if="announcement && !dismissed" 
-      class="w-full px-4 py-3 shadow-md transition-all duration-300 relative z-30"
+      class="w-full px-4 sm:px-6 py-2.5 sm:py-3 shadow-md transition-all duration-300 relative z-30 border-b backdrop-blur-md"
       :class="bannerBgClass"
     >
       <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         
-        <!-- Left: Icon + Title & Message -->
-        <div class="flex items-center gap-3 min-w-0 text-center sm:text-left flex-1">
-          <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" :class="iconBgClass">
-            <i :class="[bannerIcon, 'text-xs font-bold']"></i>
+        <!-- Left: Icon + Badge + Message -->
+        <div class="flex items-center gap-2.5 min-w-0 flex-1 w-full sm:w-auto text-left">
+          <div class="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 shadow-xs" :class="iconBgClass">
+            <i :class="[bannerIcon, 'text-[11px] font-bold']"></i>
           </div>
-          <div class="min-w-0">
-            <span v-if="announcement.title" class="font-black uppercase tracking-wider text-[10px] mr-2 px-2 py-0.5 rounded-full" :class="badgeClass">
+
+          <div class="flex flex-wrap items-center gap-2 min-w-0 flex-1">
+            <span v-if="announcement.title" class="font-extrabold uppercase tracking-wider text-[9px] px-2.5 py-0.5 rounded-full shrink-0 shadow-2xs" :class="badgeClass">
               {{ announcement.title }}
             </span>
-            <span class="font-bold leading-tight" :class="textColorClass">
+            <p class="font-semibold text-xs leading-snug truncate sm:whitespace-normal" :class="textColorClass">
               {{ announcement.message }}
-            </span>
+            </p>
           </div>
         </div>
 
         <!-- Right: CTA Button + Dismiss -->
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2.5 shrink-0 w-full sm:w-auto justify-end">
           <a 
             v-if="announcement.cta_label && announcement.cta_url" 
             :href="announcement.cta_url"
             :target="announcement.cta_url.startsWith('http') ? '_blank' : '_self'"
             rel="noopener noreferrer"
-            class="px-4 py-1.5 rounded-xl font-black text-xs transition duration-200 shadow-sm flex items-center gap-1.5 hover:scale-105 active:scale-95"
+            class="px-4 py-1.5 rounded-xl font-extrabold text-xs transition-all duration-200 shadow-sm flex items-center justify-center gap-1.5 hover:scale-[1.02] active:scale-[0.98] cursor-pointer w-full sm:w-auto text-center"
             :class="btnClass"
           >
-            <span>{{ announcement.cta_label }}</span>
+            <span>{{ cleanCtaLabel(announcement.cta_label) }}</span>
             <i class="pi pi-arrow-right text-[10px]"></i>
           </a>
 
           <button 
             @click="dismissBanner" 
-            class="p-1.5 rounded-lg opacity-70 hover:opacity-100 transition cursor-pointer"
+            class="p-1 rounded-lg opacity-70 hover:opacity-100 hover:bg-white/10 transition cursor-pointer shrink-0"
             :class="textColorClass"
             title="Dismiss Announcement"
           >
@@ -78,6 +79,11 @@ function dismissBanner() {
   if (announcement.value) {
     sessionStorage.setItem('dismissed_announcement_id', String(announcement.value.id));
   }
+}
+
+function cleanCtaLabel(label) {
+  if (!label) return '';
+  return label.replace(/\s*(?:→|->|›|>)\s*$/g, '').trim();
 }
 
 const bannerBgClass = computed(() => {

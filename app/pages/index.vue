@@ -144,27 +144,33 @@
 
           <!-- Live Banner Preview -->
           <div class="space-y-2">
-            <span class="text-[10px] font-black uppercase text-neutral-400 tracking-widest block">Live Banner Preview</span>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-black uppercase text-neutral-400 tracking-widest block">Live Banner Preview</span>
+              <span class="text-[10px] font-bold text-neutral-400">Live Client View</span>
+            </div>
             <div 
-              class="rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
+              class="rounded-2xl p-3.5 sm:p-4 shadow-sm border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs transition-all duration-300 backdrop-blur-md"
               :class="previewBgClass"
             >
-              <div class="flex items-center gap-3 min-w-0 text-center sm:text-left flex-1">
-                <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
-                  <i :class="[previewIcon, 'text-xs font-bold']"></i>
+              <!-- Left: Icon + Title Pill + Message -->
+              <div class="flex items-center gap-2.5 min-w-0 flex-1 w-full sm:w-auto text-left">
+                <div class="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center shrink-0 shadow-xs">
+                  <i :class="[previewIcon, 'text-[11px] font-bold']"></i>
                 </div>
-                <div class="min-w-0">
-                  <span v-if="announcementForm.title" class="font-black uppercase tracking-wider text-[10px] mr-2 px-2 py-0.5 rounded-full bg-white/20">
+                <div class="flex flex-wrap items-center gap-2 min-w-0 flex-1">
+                  <span v-if="announcementForm.title" class="font-extrabold uppercase tracking-wider text-[9px] px-2.5 py-0.5 rounded-full bg-white/20 border border-white/20 shrink-0 shadow-2xs">
                     {{ announcementForm.title }}
                   </span>
-                  <span class="font-bold leading-tight">
+                  <p class="font-semibold text-xs leading-snug truncate sm:whitespace-normal">
                     {{ announcementForm.message || 'Your announcement message preview will appear here...' }}
-                  </span>
+                  </p>
                 </div>
               </div>
-              <div v-if="announcementForm.cta_label" class="shrink-0">
-                <span class="px-3.5 py-1.5 rounded-xl font-black text-xs bg-white text-neutral-900 shadow-sm inline-flex items-center gap-1.5">
-                  {{ announcementForm.cta_label }}
+
+              <!-- Right: CTA Button -->
+              <div v-if="announcementForm.cta_label" class="shrink-0 w-full sm:w-auto flex justify-end">
+                <span class="px-4 py-1.5 rounded-xl font-extrabold text-xs bg-white text-neutral-900 shadow-sm inline-flex items-center justify-center gap-1.5 w-full sm:w-auto text-center">
+                  <span>{{ cleanCtaLabel(announcementForm.cta_label) }}</span>
                   <i class="pi pi-arrow-right text-[10px]"></i>
                 </span>
               </div>
@@ -960,13 +966,18 @@ const announcementForm = ref({
   title: 'Special Turbo Offer',
   message: '🔥 Upgrade to Pro Plan (Turbo) today to unlock automated FCRA deletion letters, 3-bureau dispute sync, and lender matching!',
   alert_type: 'promo',
-  cta_label: 'Subscribe with PayPal ($29.99/mo) →',
+  cta_label: 'Subscribe with PayPal ($29.99/mo)',
   cta_url: 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY',
   target_audience: 'free_only',
   is_active: true
 });
 const savingAnnouncement = ref(false);
 const saveAlertMsg = ref('');
+
+function cleanCtaLabel(label) {
+  if (!label) return '';
+  return label.replace(/\s*(?:→|->|›|>)\s*$/g, '').trim();
+}
 
 const previewBgClass = computed(() => {
   switch (announcementForm.value.alert_type) {

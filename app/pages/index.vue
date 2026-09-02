@@ -113,6 +113,165 @@
           </div>
         </section>
 
+        <!-- In-App Banner Broadcast Manager Card -->
+        <div class="bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-100 pb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-[#00828E]/10 border border-[#00828E]/20 flex items-center justify-center text-[#00828E] shrink-0">
+                <i class="pi pi-megaphone text-lg"></i>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-xl text-neutral-900 leading-tight">In-App Banner Broadcast Manager</h3>
+                <p class="text-neutral-500 text-xs mt-0.5">Drive marketing alerts, promotional banners, and upgrade reminders across user dashboards</p>
+              </div>
+            </div>
+
+            <!-- Live Status Toggle -->
+            <div class="flex items-center gap-3 bg-neutral-50 border border-neutral-200 p-1.5 rounded-2xl">
+              <span class="text-xs font-bold px-2" :class="announcementForm.is_active ? 'text-emerald-600' : 'text-neutral-400'">
+                {{ announcementForm.is_active ? '🟢 Broadcast Live' : '⚪ Broadcast Inactive' }}
+              </span>
+              <button 
+                type="button"
+                @click="announcementForm.is_active = !announcementForm.is_active"
+                class="px-3 py-1.5 rounded-xl text-xs font-extrabold transition cursor-pointer"
+                :class="announcementForm.is_active ? 'bg-emerald-500 text-white shadow-xs' : 'bg-neutral-200 text-neutral-600'"
+              >
+                {{ announcementForm.is_active ? 'Turn Off' : 'Activate' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Banner Preview -->
+          <div class="space-y-2">
+            <span class="text-[10px] font-black uppercase text-neutral-400 tracking-widest block">Live Banner Preview</span>
+            <div 
+              class="rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
+              :class="previewBgClass"
+            >
+              <div class="flex items-center gap-3 min-w-0 text-center sm:text-left flex-1">
+                <div class="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                  <i :class="[previewIcon, 'text-xs font-bold']"></i>
+                </div>
+                <div class="min-w-0">
+                  <span v-if="announcementForm.title" class="font-black uppercase tracking-wider text-[10px] mr-2 px-2 py-0.5 rounded-full bg-white/20">
+                    {{ announcementForm.title }}
+                  </span>
+                  <span class="font-bold leading-tight">
+                    {{ announcementForm.message || 'Your announcement message preview will appear here...' }}
+                  </span>
+                </div>
+              </div>
+              <div v-if="announcementForm.cta_label" class="shrink-0">
+                <span class="px-3.5 py-1.5 rounded-xl font-black text-xs bg-white text-neutral-900 shadow-sm inline-flex items-center gap-1.5">
+                  {{ announcementForm.cta_label }}
+                  <i class="pi pi-arrow-right text-[10px]"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Broadcast Form -->
+          <form @submit.prevent="saveAnnouncement" class="space-y-4 pt-2">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Title / Badge -->
+              <div class="space-y-1">
+                <label class="text-[10px] font-extrabold uppercase text-neutral-500 tracking-wider">Badge / Title</label>
+                <input 
+                  v-model="announcementForm.title"
+                  type="text"
+                  placeholder="e.g. Special Turbo Offer"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                />
+              </div>
+
+              <!-- Alert Style -->
+              <div class="space-y-1">
+                <label class="text-[10px] font-extrabold uppercase text-neutral-500 tracking-wider">Banner Style</label>
+                <select 
+                  v-model="announcementForm.alert_type"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                >
+                  <option value="promo">Teal Gradient (Promotional / Turbo)</option>
+                  <option value="info">Indigo Blue (Information / Announcement)</option>
+                  <option value="warning">Amber Gold (Urgent / Reminder)</option>
+                  <option value="success">Emerald Green (Success / Milestone)</option>
+                </select>
+              </div>
+
+              <!-- Target Audience -->
+              <div class="space-y-1">
+                <label class="text-[10px] font-extrabold uppercase text-neutral-500 tracking-wider">Target Audience</label>
+                <select 
+                  v-model="announcementForm.target_audience"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                >
+                  <option value="all">All Registered Users</option>
+                  <option value="free_only">Free / Unpaid Leads Only (Upgrade Push)</option>
+                  <option value="paid_only">Paid Subscribers Only</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Message Text -->
+            <div class="space-y-1">
+              <label class="text-[10px] font-extrabold uppercase text-neutral-500 tracking-wider">Broadcast Message *</label>
+              <textarea 
+                v-model="announcementForm.message"
+                required
+                rows="2"
+                placeholder="Enter your announcement text..."
+                class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+              ></textarea>
+            </div>
+
+            <!-- CTA Label & CTA Link -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-[10px] font-extrabold uppercase text-neutral-500 tracking-wider">Button Label (Optional)</label>
+                <input 
+                  v-model="announcementForm.cta_label"
+                  type="text"
+                  placeholder="e.g. Subscribe with PayPal ($29.99/mo) →"
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0]"
+                />
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] font-extrabold uppercase text-neutral-500 tracking-wider">Button Link (URL)</label>
+                <input 
+                  v-model="announcementForm.cta_url"
+                  type="text"
+                  placeholder="https://..."
+                  class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold text-neutral-900 focus:outline-none focus:border-[#00A3B0] font-mono text-[11px]"
+                />
+              </div>
+            </div>
+
+            <!-- Save Action & Notice -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+              <Transition name="fade">
+                <span v-if="saveAlertMsg" class="text-xs font-bold text-emerald-600 flex items-center gap-1.5">
+                  <i class="pi pi-check-circle"></i>
+                  {{ saveAlertMsg }}
+                </span>
+                <span v-else class="text-[11px] text-neutral-400 font-medium">
+                  Changes take effect immediately across all targeted dashboards.
+                </span>
+              </Transition>
+
+              <button 
+                type="submit"
+                :disabled="savingAnnouncement"
+                class="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white font-extrabold rounded-xl hover:from-[#005F6A] hover:to-[#00828E] transition shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <i v-if="savingAnnouncement" class="pi pi-spin pi-spinner text-xs"></i>
+                <i v-else class="pi pi-send text-xs"></i>
+                <span>{{ savingAnnouncement ? 'Publishing...' : 'Publish Banner Alert' }}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
         <!-- Custom Beautiful Table (Matches example design) -->
         <div class="bg-white border border-neutral-200 rounded-[32px] p-6 shadow-sm space-y-6">
           
@@ -247,12 +406,15 @@
             </p>
           </div>
 
-          <NuxtLink 
-            to="/profile" 
-            class="px-6 py-3.5 bg-gradient-to-r from-[#00828E] via-[#00A3B0] to-[#00D8E6] text-neutral-900 font-black rounded-2xl text-xs transition duration-200 shadow-lg hover:brightness-110 shrink-0 text-center cursor-pointer"
+          <a 
+            href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY" 
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-6 py-3.5 bg-gradient-to-r from-[#00828E] via-[#00A3B0] to-[#00D8E6] text-neutral-900 font-black rounded-2xl text-xs transition duration-200 shadow-lg hover:brightness-110 shrink-0 text-center cursor-pointer flex items-center justify-center gap-1.5"
           >
-            Upgrade Account Now ($29.99 Turbo) →
-          </NuxtLink>
+            <span>Upgrade with PayPal ($29.99 Turbo)</span>
+            <i class="pi pi-external-link text-[10px]"></i>
+          </a>
         </div>
 
         <!-- The 3 Core Upgrade Options Strip -->
@@ -792,6 +954,79 @@ async function refreshAdminData() {
   }
 }
 
+// --- ADMIN IN-APP BANNER BROADCAST MANAGER ---
+const announcementForm = ref({
+  id: null,
+  title: 'Special Turbo Offer',
+  message: '🔥 Upgrade to Pro Plan (Turbo) today to unlock automated FCRA deletion letters, 3-bureau dispute sync, and lender matching!',
+  alert_type: 'promo',
+  cta_label: 'Subscribe with PayPal ($29.99/mo) →',
+  cta_url: 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY',
+  target_audience: 'free_only',
+  is_active: true
+});
+const savingAnnouncement = ref(false);
+const saveAlertMsg = ref('');
+
+const previewBgClass = computed(() => {
+  switch (announcementForm.value.alert_type) {
+    case 'promo': return 'bg-gradient-to-r from-[#005F6A] via-[#00828E] to-[#00A3B0] text-white';
+    case 'warning': return 'bg-amber-500 text-neutral-900';
+    case 'info': return 'bg-indigo-600 text-white';
+    case 'success': return 'bg-emerald-600 text-white';
+    default: return 'bg-neutral-900 text-white';
+  }
+});
+
+const previewIcon = computed(() => {
+  switch (announcementForm.value.alert_type) {
+    case 'promo': return 'pi pi-bolt';
+    case 'warning': return 'pi pi-exclamation-triangle';
+    case 'info': return 'pi pi-megaphone';
+    case 'success': return 'pi pi-check-circle';
+    default: return 'pi pi-bell';
+  }
+});
+
+async function loadAdminAnnouncement() {
+  try {
+    const res = await $fetch('/api/admin/announcements');
+    if (res.success && res.announcement) {
+      announcementForm.value = {
+        id: res.announcement.id,
+        title: res.announcement.title || '',
+        message: res.announcement.message || '',
+        alert_type: res.announcement.alert_type || 'promo',
+        cta_label: res.announcement.cta_label || '',
+        cta_url: res.announcement.cta_url || '',
+        target_audience: res.announcement.target_audience || 'all',
+        is_active: Boolean(res.announcement.is_active)
+      };
+    }
+  } catch (e) {
+    // Non-fatal
+  }
+}
+
+async function saveAnnouncement() {
+  savingAnnouncement.value = true;
+  saveAlertMsg.value = '';
+  try {
+    const res = await $fetch('/api/admin/announcements', {
+      method: 'POST',
+      body: announcementForm.value
+    });
+    if (res.success) {
+      saveAlertMsg.value = 'In-app alert banner published successfully!';
+      setTimeout(() => { saveAlertMsg.value = ''; }, 3500);
+    }
+  } catch (err: any) {
+    alert(err.data?.statusMessage || 'Failed to save announcement.');
+  } finally {
+    savingAnnouncement.value = false;
+  }
+}
+
 // User role pill colors
 function getRoleClass(role) {
   if (role === 'admin') return 'bg-neutral-100 text-neutral-800 border-neutral-300';
@@ -951,6 +1186,7 @@ function getScoreRatingClass(score) {
 onMounted(async () => {
   if (isAdmin.value) {
     await refreshAdminData();
+    await loadAdminAnnouncement();
   } else {
     try {
       const res = await $fetch('/api/dashboard-summary');

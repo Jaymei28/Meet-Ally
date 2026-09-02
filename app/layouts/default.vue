@@ -9,7 +9,7 @@
           <h1 class="font-bold text-base leading-tight tracking-wide text-neutral-900">
             Meet Ally
           </h1>
-          <span class="text-[10px] text-[#00828E] font-extrabold tracking-widest uppercase">Credit Remedi</span>
+          <span class="text-[10px] text-[#00828E] font-extrabold tracking-widest uppercase">AI Credit Engine</span>
         </div>
       </div>
 
@@ -54,6 +54,9 @@
 
     <!-- 3. MAIN PAGE WRAPPER -->
     <main class="flex-1 flex flex-col min-h-0 min-w-0 pb-20 md:pb-0">
+      <!-- In-App Announcement Broadcast Banner -->
+      <AnnouncementBanner />
+      
       <div class="p-4 md:p-8 max-w-7xl w-full mx-auto flex-1">
         <slot />
       </div>

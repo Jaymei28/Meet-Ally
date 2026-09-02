@@ -85,9 +85,10 @@
           <!-- Select Button -->
           <button 
             @click="selectPlan('free')"
-            class="w-full py-3.5 bg-neutral-900 hover:bg-neutral-800 text-white font-extrabold rounded-2xl transition duration-200 shadow-md cursor-pointer text-xs active:scale-[0.98]"
+            class="w-full py-3.5 bg-neutral-900 hover:bg-neutral-800 text-white font-extrabold rounded-2xl transition duration-200 shadow-md cursor-pointer text-xs active:scale-[0.98] flex items-center justify-center gap-2"
           >
-            Create Free Account ($0)
+            <i class="pi pi-user-plus text-xs"></i>
+            <span>Create Free Account ($0)</span>
           </button>
         </div>
 
@@ -158,12 +159,16 @@
           </div>
 
           <!-- Select Button -->
-          <button 
-            @click="selectPlan('turbo')"
-            class="w-full py-3.5 bg-gradient-to-r from-[#00828E] to-[#00D8E6] hover:from-[#005F6A] hover:to-[#00828E] text-white font-black rounded-2xl transition duration-200 shadow-lg cursor-pointer text-xs active:scale-[0.98]"
+          <a 
+            href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full py-3.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] hover:from-[#005F6A] hover:to-[#00828E] text-white font-black rounded-2xl transition duration-200 shadow-lg cursor-pointer text-xs active:scale-[0.98] text-center flex items-center justify-center gap-2"
           >
-            Choose Premium Turbo ($29.99/mo)
-          </button>
+            <i class="pi pi-paypal text-sm"></i>
+            <span>Subscribe with PayPal ($29.99/mo)</span>
+            <i class="pi pi-external-link text-[10px]"></i>
+          </a>
         </div>
 
       </div>
@@ -190,7 +195,7 @@
       <div class="flex flex-col items-center justify-center text-center space-y-2 mb-5">
         <img src="/Meet-ally-logo.png" alt="Meet Ally Logo" class="h-12 object-contain mx-auto drop-shadow-sm" />
         <div>
-          <h2 class="text-2xl font-black text-neutral-900 tracking-tight">Create Account & Checkout</h2>
+          <h2 class="text-2xl font-black text-neutral-900 tracking-tight">Create Account</h2>
           <p class="text-neutral-500 text-xs mt-0.5">Secure registration powered by Meet Ally.</p>
         </div>
       </div>
@@ -204,7 +209,7 @@
               {{ selectedPlan === 'turbo' ? 'Pro Plan (Turbo)' : 'Free Ally Account' }}
             </span>
             <span class="text-xs font-black text-[#00828E]">
-              {{ selectedPlan === 'turbo' ? '$29.99/mo' : '$0/forever' }}
+              {{ selectedPlan === 'turbo' ? '$29.99/mo' : '$0 / forever' }}
             </span>
           </div>
         </div>
@@ -229,7 +234,7 @@
 
         <!-- Section 1: Account Info -->
         <div class="space-y-3">
-          <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block border-b border-neutral-100 pb-1">1. Account Details</span>
+          <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block border-b border-neutral-100 pb-1">Account Details</span>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <!-- Full Name -->
@@ -295,97 +300,26 @@
           </div>
         </div>
 
-        <!-- Section 2: Payment Method Details (Only for paid plans) -->
+        <!-- Section 2: PayPal Details for Paid Plan -->
         <div v-if="selectedPlan === 'turbo'" class="space-y-3 pt-2">
           <div class="flex items-center justify-between border-b border-neutral-100 pb-1">
-            <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block">2. Payment Method (Card)</span>
+            <span class="text-[10px] font-black text-neutral-400 uppercase tracking-widest block">Payment Authorization (PayPal)</span>
             <span class="text-[10px] font-bold text-emerald-600 flex items-center gap-1">
               <i class="pi pi-lock text-[9px]"></i> 256-Bit SSL Encrypted
             </span>
           </div>
 
-          <!-- Cardholder Name -->
-          <div class="space-y-1">
-            <label for="card-name" class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider">Cardholder Name</label>
-            <input 
-              v-model="cardName"
-              type="text" 
-              id="card-name" 
-              :required="selectedPlan === 'turbo'"
-              placeholder="Name on card"
-              class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 text-neutral-900 rounded-xl font-semibold text-xs placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/20 focus:border-[#00A3B0] transition"
-            />
-          </div>
-
-          <!-- Card Number -->
-          <div class="space-y-1">
-            <label for="card-number" class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider">Card Number</label>
-            <div class="relative">
-              <input 
-                v-model="cardNumber"
-                type="text" 
-                id="card-number" 
-                maxlength="19"
-                :required="selectedPlan === 'turbo'"
-                placeholder="4242 •••• •••• ••••"
-                class="w-full pl-3.5 pr-24 py-2.5 bg-neutral-50 border border-neutral-200 text-neutral-900 rounded-xl font-semibold text-xs placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/20 focus:border-[#00A3B0] transition font-mono"
-              />
-              <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-neutral-400 text-xs">
-                <i class="pi pi-credit-card"></i>
-              </div>
+          <div class="p-4 rounded-2xl bg-[#00828E]/10 border border-[#00828E]/20 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-[#005F6A] flex items-center gap-1.5">
+                <i class="pi pi-paypal text-sm text-[#00828E]"></i>
+                PayPal Auto-Billing Subscription
+              </span>
+              <span class="text-xs font-black text-neutral-900">$29.99 / month</span>
             </div>
-          </div>
-
-          <!-- Expiry & CVC -->
-          <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-1">
-              <label for="card-exp" class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider">Expiry Date</label>
-              <input 
-                v-model="cardExp"
-                type="text" 
-                id="card-exp" 
-                maxlength="5"
-                :required="selectedPlan === 'turbo'"
-                placeholder="MM/YY"
-                class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 text-neutral-900 rounded-xl font-semibold text-xs placeholder:text-neutral-400 focus:outline-none focus:border-[#00A3B0] transition font-mono"
-              />
-            </div>
-            <div class="space-y-1">
-              <label for="card-cvc" class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider">CVC</label>
-              <input 
-                v-model="cardCvc"
-                type="text" 
-                id="card-cvc" 
-                maxlength="4"
-                :required="selectedPlan === 'turbo'"
-                placeholder="123"
-                class="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-200 text-neutral-900 rounded-xl font-semibold text-xs placeholder:text-neutral-400 focus:outline-none focus:border-[#00A3B0] transition font-mono"
-              />
-            </div>
-          </div>
-
-          <!-- Billing Info -->
-          <div class="grid grid-cols-2 gap-3">
-            <div class="space-y-1">
-              <label for="bill-city" class="text-[10px] font-extrabold text-neutral-700 uppercase tracking-wider">City</label>
-              <input 
-                v-model="billCity"
-                type="text" 
-                id="bill-city" 
-                placeholder="City"
-                class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 text-neutral-900 rounded-xl font-semibold text-xs placeholder:text-neutral-400 focus:outline-none focus:border-[#00A3B0] transition"
-              />
-            </div>
-            <div class="space-y-1">
-              <label for="bill-zip" class="text-[10px] font-extrabold text-neutral-700 uppercase tracking-wider">ZIP Code</label>
-              <input 
-                v-model="billZip"
-                type="text" 
-                id="bill-zip" 
-                placeholder="ZIP"
-                class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 text-neutral-900 rounded-xl font-semibold text-xs placeholder:text-neutral-400 focus:outline-none focus:border-[#00A3B0] transition"
-              />
-            </div>
+            <p class="text-[11px] text-neutral-600 font-medium leading-relaxed">
+              After creating your credentials, you will be redirected to PayPal to authorize the subscription.
+            </p>
           </div>
         </div>
 
@@ -396,8 +330,9 @@
           class="w-full mt-4 py-3.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white font-black rounded-xl hover:from-[#005F6A] hover:to-[#00828E] transition duration-200 flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-xs active:scale-[0.98]"
         >
           <i v-if="regLoading" class="pi pi-spin pi-spinner text-xs"></i>
-          <i v-else class="pi pi-lock text-xs"></i>
-          <span>{{ regLoading ? 'Processing & Creating Account...' : (selectedPlan === 'turbo' ? 'Pay $29.99 & Start Membership' : 'Create Free Account ($0)') }}</span>
+          <i v-else-if="selectedPlan === 'turbo'" class="pi pi-paypal text-xs"></i>
+          <i v-else class="pi pi-user-plus text-xs"></i>
+          <span>{{ regLoading ? 'Processing & Creating Account...' : (selectedPlan === 'turbo' ? 'Continue to PayPal Subscription ($29.99/mo)' : 'Create Free Account ($0)') }}</span>
         </button>
 
       </form>
@@ -428,18 +363,12 @@ definePageMeta({
 const currentView = ref('plans');
 const selectedPlan = ref('turbo');
 
-// Registration & Payment Form State
+// Registration Form State
 const regName = ref('');
 const regEmail = ref('');
 const regPhone = ref('');
 const regPassword = ref('');
 const showRegPassword = ref(false);
-const cardName = ref('');
-const cardNumber = ref('');
-const cardExp = ref('');
-const cardCvc = ref('');
-const billCity = ref('');
-const billZip = ref('');
 const regLoading = ref(false);
 const error = ref('');
 
@@ -460,16 +389,16 @@ async function handleRegister() {
         email: regEmail.value,
         password: regPassword.value,
         plan_type: selectedPlan.value,
-        contact_number: regPhone.value,
-        cardholder_name: cardName.value,
-        card_number: cardNumber.value,
-        city: billCity.value,
-        zipcode: billZip.value
+        contact_number: regPhone.value
       }
     });
 
     if (res.success) {
-      navigateTo('/');
+      if (selectedPlan.value === 'turbo') {
+        window.location.href = 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY';
+      } else {
+        navigateTo('/');
+      }
     }
   } catch (err) {
     error.value = formatErrorMessage(err, 'Registration failed. Please check your information and try again.');

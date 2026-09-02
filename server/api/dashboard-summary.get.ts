@@ -18,6 +18,12 @@ export default defineEventHandler(async (event) => {
   );
   const latestAssessment = userAssessments.length > 0 ? userAssessments[0] : null;
 
+  // Fetch the latest credit report
+  const reports = await useQuery(
+    `SELECT * FROM credit_reports WHERE user_id = ? ORDER BY id DESC LIMIT 1`,
+    [userId]
+  );
+
   if (reports.length === 0) {
     return {
       hasReport: false,

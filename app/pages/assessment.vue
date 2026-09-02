@@ -285,7 +285,7 @@
 
     <!-- Footer -->
     <footer class="max-w-4xl mx-auto w-full text-center py-4 border-t border-[#E4E1EE] text-[10px] text-[#8B879A] font-semibold no-print">
-      © {{ new Date().getFullYear() }} Credit Remedi · Meet Ally AI Credit Engine. Registered Support: help@creditremedi.com
+      © {{ new Date().getFullYear() }} Meet Ally AI Credit Engine. Registered Support: support@meetallycredit.com
     </footer>
   </div>
 </template>
@@ -301,7 +301,7 @@ const loading = ref(false);
 const error = ref('');
 
 const CTA_LINKS = {
-  diy: "https://remedicredit.com/plans",
+  diy: "/plans",
   powerPlan: "https://pci.jotform.com/form/240096301428046",
   team: "https://www.creditremedi.store"
 };

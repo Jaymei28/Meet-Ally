@@ -225,11 +225,11 @@
         </div>
       </div>
       <a 
-        href="mailto:help@creditremedi.com?subject=Meet%20Ally%20Support%20Inquiry" 
+        href="mailto:support@meetallycredit.com?subject=Meet%20Ally%20Support%20Inquiry" 
         class="px-5 py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white font-extrabold rounded-xl hover:from-[#005F6A] hover:to-[#00828E] transition text-xs flex items-center gap-2 shadow-xs shrink-0 cursor-pointer"
       >
         <i class="pi pi-envelope text-xs"></i>
-        <span>Contact help@creditremedi.com</span>
+        <span>Contact support@meetallycredit.com</span>
       </a>
     </div>
 

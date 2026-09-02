@@ -133,6 +133,38 @@ export default defineNitroPlugin(async () => {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
+    // 6. Ensure `system_announcements` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS system_announcements (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NULL,
+        message TEXT NOT NULL,
+        alert_type VARCHAR(50) NOT NULL DEFAULT 'promo',
+        cta_label VARCHAR(100) NULL,
+        cta_url VARCHAR(500) NULL,
+        target_audience VARCHAR(50) NOT NULL DEFAULT 'all',
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    const announcementRows = await useQuery(`SELECT id FROM system_announcements LIMIT 1`);
+    if (announcementRows.length === 0) {
+      await useQuery(`
+        INSERT INTO system_announcements (title, message, alert_type, cta_label, cta_url, target_audience, is_active)
+        VALUES (
+          'Special Turbo Offer',
+          '🔥 Upgrade to Pro Plan (Turbo) today to unlock automated FCRA deletion letters, 3-bureau dispute sync, and lender matching!',
+          'promo',
+          'Subscribe with PayPal ($29.99/mo) →',
+          'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY',
+          'free_only',
+          1
+        )
+      `);
+    }
+
     console.log('✅ Auto-database initialization completed successfully.');
   } catch (err) {
     console.error('⚠️ DB Auto-Init Warning:', err.message);

@@ -30,7 +30,7 @@ export function formatErrorMessage(err: any, defaultMsg = 'Something went wrong 
     raw.includes('PROTOCOL_CONNECTION_LOST') ||
     raw.includes('ER_CON_COUNT_ERROR')
   ) {
-    return 'Our servers are temporarily undergoing quick maintenance. Please try again in a few moments or contact support at help@creditremedi.com.';
+    return 'Our servers are temporarily undergoing quick maintenance. Please try again in a few moments or contact support at support@meetallycredit.com.';
   }
 
   // 3. Auth / session expiration errors
@@ -45,7 +45,7 @@ export function formatErrorMessage(err: any, defaultMsg = 'Something went wrong 
 
   // 5. Clean up any raw technical strings starting with HTTP method like [POST] "/api/..."
   if (raw.startsWith('[') && raw.includes(']')) {
-    return 'The request could not be completed at this moment. Please refresh the page or contact support at help@creditremedi.com.';
+    return 'The request could not be completed at this moment. Please refresh the page or contact support at support@meetallycredit.com.';
   }
 
   return raw || defaultMsg;

@@ -25,10 +25,20 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const selectedPlan = (plan_type === 'turbo' || plan_type === 'pro') ? 'turbo' : 'starter';
-  const paidAmount = selectedPlan === 'turbo' ? 69.99 : 49.99;
-  const cleanCardNum = (card_number || '4242').replace(/\s+/g, '');
-  const lastFour = cleanCardNum.length >= 4 ? cleanCardNum.slice(-4) : '4242';
+  let selectedPlan: string | null = null;
+  let paidAmount = 0;
+  if (plan_type === 'turbo' || plan_type === 'pro') {
+    selectedPlan = 'turbo';
+    paidAmount = 29.99;
+  } else if (plan_type === 'starter') {
+    selectedPlan = 'starter';
+    paidAmount = 29.99;
+  } else {
+    selectedPlan = null;
+    paidAmount = 0;
+  }
+  const cleanCardNum = (card_number || '').replace(/\s+/g, '');
+  const lastFour = cleanCardNum.length >= 4 ? cleanCardNum.slice(-4) : (selectedPlan ? '4242' : null);
 
   try {
     // Check if email already exists

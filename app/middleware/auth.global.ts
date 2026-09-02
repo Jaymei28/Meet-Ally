@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   // 1. Allow public routes without authentication
   const publicRoutes = ['/login', '/assessment', '/plans'];
   if (publicRoutes.includes(to.path)) {
-    if (to.path === '/login' && user.value) {
+    if ((to.path === '/login' || to.path === '/plans') && user.value) {
       return navigateTo('/');
     }
     return;

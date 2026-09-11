@@ -101,6 +101,16 @@ export default defineNitroPlugin(async () => {
       CREATE TABLE IF NOT EXISTS credit_reports (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         user_id BIGINT UNSIGNED NOT NULL,
+        original_filename VARCHAR(255) NOT NULL DEFAULT '',
+        file_path VARCHAR(255) NOT NULL DEFAULT '',
+        extracted_text LONGTEXT NULL,
+        action_plan LONGTEXT NULL,
+        action_plan_ts TIMESTAMP NULL DEFAULT NULL,
+        personal_info LONGTEXT NULL,
+        total_accounts_count INT NULL,
+        open_accounts_count INT NULL,
+        negative_accounts_count INT NULL,
+        hard_inquiries_count INT NULL,
         raw_text LONGTEXT NULL,
         parsed_data JSON NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -108,6 +118,26 @@ export default defineNitroPlugin(async () => {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    // Ensure all required columns exist on credit_reports (safe migration for live DB)
+    const safeAddCreditReportColumn = async (colDef: string) => {
+      try {
+        await useQuery(`ALTER TABLE credit_reports ADD COLUMN ${colDef}`);
+      } catch (e) {
+        // Ignore if column already exists
+      }
+    };
+
+    await safeAddCreditReportColumn(`original_filename VARCHAR(255) NOT NULL DEFAULT '' AFTER user_id`);
+    await safeAddCreditReportColumn(`file_path VARCHAR(255) NOT NULL DEFAULT '' AFTER original_filename`);
+    await safeAddCreditReportColumn(`extracted_text LONGTEXT NULL`);
+    await safeAddCreditReportColumn(`action_plan LONGTEXT NULL`);
+    await safeAddCreditReportColumn(`action_plan_ts TIMESTAMP NULL DEFAULT NULL`);
+    await safeAddCreditReportColumn(`personal_info LONGTEXT NULL`);
+    await safeAddCreditReportColumn(`total_accounts_count INT NULL`);
+    await safeAddCreditReportColumn(`open_accounts_count INT NULL`);
+    await safeAddCreditReportColumn(`negative_accounts_count INT NULL`);
+    await safeAddCreditReportColumn(`hard_inquiries_count INT NULL`);
 
     // 4. Ensure `discrepancies` table exists
     await useQuery(`

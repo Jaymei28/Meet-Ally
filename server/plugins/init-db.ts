@@ -139,7 +139,111 @@ export default defineNitroPlugin(async () => {
     await safeAddCreditReportColumn(`negative_accounts_count INT NULL`);
     await safeAddCreditReportColumn(`hard_inquiries_count INT NULL`);
 
-    // 4. Ensure `discrepancies` table exists
+    // 4. Ensure `credit_scores` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS credit_scores (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        credit_report_id BIGINT UNSIGNED NOT NULL,
+        bureau VARCHAR(50) NOT NULL,
+        score INT NULL,
+        score_model VARCHAR(100) NULL,
+        score_scale VARCHAR(50) NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (credit_report_id) REFERENCES credit_reports(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 5. Ensure `credit_inquiries` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS credit_inquiries (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        credit_report_id BIGINT UNSIGNED NOT NULL,
+        bureau VARCHAR(50) NOT NULL,
+        creditor_name VARCHAR(255) NULL,
+        business_type VARCHAR(100) NULL,
+        inquiry_type VARCHAR(50) NULL DEFAULT 'Hard',
+        inquiry_date DATE NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (credit_report_id) REFERENCES credit_reports(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 6. Ensure `credit_accounts` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS credit_accounts (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        credit_report_id BIGINT UNSIGNED NOT NULL,
+        bureau VARCHAR(255) NULL,
+        creditor_name VARCHAR(255) NOT NULL,
+        account_number VARCHAR(100) NULL,
+        account_type VARCHAR(100) NULL,
+        account_status VARCHAR(100) NULL,
+        date_opened DATE NULL,
+        date_reported DATE NULL,
+        credit_limit DECIMAL(15,2) DEFAULT 0.00,
+        current_balance DECIMAL(15,2) DEFAULT 0.00,
+        payment_status VARCHAR(255) NULL,
+        is_negative TINYINT(1) DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (credit_report_id) REFERENCES credit_reports(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 7. Ensure `credit_account_bureau_data` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS credit_account_bureau_data (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        credit_account_id BIGINT UNSIGNED NOT NULL,
+        bureau VARCHAR(50) NOT NULL,
+        balance DECIMAL(15,2) DEFAULT 0.00,
+        credit_limit DECIMAL(15,2) DEFAULT 0.00,
+        date_opened DATE NULL,
+        date_reported DATE NULL,
+        payment_status VARCHAR(255) NULL,
+        account_status VARCHAR(255) NULL,
+        comments TEXT NULL,
+        raw_data JSON NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (credit_account_id) REFERENCES credit_accounts(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_account_bureau (credit_account_id, bureau)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 8. Ensure `bureau_discrepancies` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS bureau_discrepancies (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        credit_account_id BIGINT UNSIGNED NULL,
+        field_name VARCHAR(100) NOT NULL,
+        bureau_1 VARCHAR(50) NULL,
+        value_1 TEXT NULL,
+        bureau_2 VARCHAR(50) NULL,
+        value_2 TEXT NULL,
+        bureau_3 VARCHAR(50) NULL,
+        value_3 TEXT NULL,
+        dispute_priority INT DEFAULT 50,
+        severity VARCHAR(50) DEFAULT 'medium',
+        auto_generated_reason TEXT NULL,
+        dispute_status VARCHAR(50) DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (credit_account_id) REFERENCES credit_accounts(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 9. Ensure legacy `discrepancies` table exists (for backward compatibility)
     await useQuery(`
       CREATE TABLE IF NOT EXISTS discrepancies (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

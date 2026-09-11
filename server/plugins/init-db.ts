@@ -332,24 +332,60 @@ export default defineNitroPlugin(async () => {
       CREATE TABLE IF NOT EXISTS lenders (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
-        type VARCHAR(50) NULL,
-        min_credit_score INT DEFAULT 640,
-        max_credit_score INT DEFAULT 850,
+        type VARCHAR(255) NOT NULL DEFAULT 'bank',
+        bureau_pull VARCHAR(255) NULL,
+        description TEXT NULL,
+        min_credit_score INT NOT NULL DEFAULT 0,
+        max_credit_score INT NOT NULL DEFAULT 850,
+        recommended_score VARCHAR(255) NULL,
+        score_model VARCHAR(255) NULL,
+        min_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+        max_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
         min_apr DECIMAL(5,2) NULL,
         max_apr DECIMAL(5,2) NULL,
-        bureau_pull VARCHAR(50) NULL,
-        score_model VARCHAR(100) NULL,
-        recommended_score VARCHAR(50) NULL,
-        intro_apr_months VARCHAR(100) NULL,
-        application_url VARCHAR(500) NULL,
-        requirements JSON NULL,
-        description TEXT NULL,
+        intro_apr_months INT NULL,
+        income_sensitivity VARCHAR(255) NULL,
+        inquiry_sensitivity VARCHAR(255) NULL,
+        application_url VARCHAR(255) NULL,
+        requirements LONGTEXT NULL,
         notes TEXT NULL,
         active TINYINT(1) NOT NULL DEFAULT 1,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        created_at TIMESTAMP NULL DEFAULT NULL,
+        updated_at TIMESTAMP NULL DEFAULT NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    // Seed lenders if table is empty
+    const lenderCount = await useQuery('SELECT COUNT(*) as cnt FROM lenders');
+    if (lenderCount[0].cnt === 0) {
+      await useQuery(`INSERT INTO lenders (id,name,type,bureau_pull,description,min_credit_score,max_credit_score,recommended_score,score_model,min_amount,max_amount,min_apr,max_apr,intro_apr_months,income_sensitivity,inquiry_sensitivity,application_url,requirements,notes,active,created_at,updated_at) VALUES
+(1,'Wells Fargo Reflect','bank','Experian','Strong for long 0% strategies. Up to 21 months 0% intro APR.',680,850,'680-700+','FICO (primary)',0.00,15000.00,0.00,29.99,21,'Medium','Medium','https://www.wellsfargo.com/credit-cards/reflect/','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Strong for long 0% strategies',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(2,'Wells Fargo Active Cash','bank','Experian','Cashback + easier approvals. 15 months 0% intro APR.',670,850,'670+','FICO (primary)',0.00,15000.00,0.00,29.99,15,'Medium','Medium','https://www.wellsfargo.com/credit-cards/active-cash/','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Cashback + easier approvals',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(3,'Wells Fargo Autograph','bank','Experian','Travel & lifestyle card. 12-15 months 0% intro APR.',670,850,'670+','FICO (primary)',0.00,15000.00,0.00,29.99,15,'Medium','Medium','https://www.wellsfargo.com/credit-cards/autograph/','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Travel & lifestyle card',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(4,'Citi Simplicity','bank','Experian / Equifax','BT-focused, no late fees. Up to 21 months 0% intro APR.',680,850,'680+','FICO (primary)',0.00,20000.00,0.00,29.99,21,'Medium','Medium','https://www.citi.com/credit-cards/citi-simplicity-credit-card','{"bureau": "Experian/Equifax", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','BT-focused, no late fees',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(5,'Citi Diamond Preferred','bank','Experian / Equifax','BT-friendly. Up to 21 months 0% intro APR.',680,850,'680+','FICO (primary)',0.00,20000.00,0.00,29.99,21,'Medium','Medium','https://www.citi.com/credit-cards/citi-diamond-preferred-credit-card','{"bureau": "Experian/Equifax", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','BT-friendly',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(6,'Citi Double Cash','bank','Experian / Equifax','Strong BT option. 18 months 0% intro APR.',680,850,'680+','FICO (primary)',0.00,20000.00,0.00,29.99,18,'Medium','Medium','https://www.citi.com/credit-cards/citi-double-cash-credit-card','{"bureau": "Experian/Equifax", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Strong BT option',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(7,'Citi Custom Cash','bank','Experian','Category-based rewards. 15 months 0% intro APR.',680,850,'680+','FICO (primary)',0.00,20000.00,0.00,29.99,15,'Medium','Medium','https://www.citi.com/credit-cards/citi-custom-cash-credit-card','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Category-based rewards',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(8,'Discover it Cash Back','bank','Experian','Rebuild-friendly. 15 months 0% intro APR.',660,850,'660-680+','FICO (primary)',0.00,15000.00,0.00,27.99,15,'Low-Medium','Low-Medium','https://www.discover.com/credit-cards/cash-back/','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Low-Medium", "inquiry_sensitivity": "Low-Medium"}','Rebuild-friendly',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(9,'Discover it Chrome','bank','Experian','Lower barrier to entry. 15 months 0% intro APR.',660,850,'660+','FICO (primary)',0.00,15000.00,0.00,27.99,15,'Low-Medium','Low-Medium','https://www.discover.com/credit-cards/chrome/','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Low-Medium", "inquiry_sensitivity": "Low-Medium"}','Lower barrier',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(10,'Chase Freedom Unlimited','bank','Experian (varies)','5/24 rule applies. 15 months 0% intro APR.',690,850,'690+','FICO (primary)',0.00,25000.00,0.00,29.99,15,'Medium','High','https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited','{"notes": "5/24 rule applies", "bureau": "Experian (varies)", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "High"}','5/24 rule applies',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(11,'Chase Freedom Flex','bank','Experian (varies)','5/24 rule applies. 15 months 0% intro APR.',690,850,'690+','FICO (primary)',0.00,25000.00,0.00,29.99,15,'Medium','High','https://creditcards.chase.com/cash-back-credit-cards/freedom/flex','{"notes": "5/24 rule applies", "bureau": "Experian (varies)", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "High"}','5/24 rule applies',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(12,'Chase Slate Edge','bank','Experian','BT-focused. 18 months 0% intro APR.',680,850,'680+','FICO (primary)',0.00,25000.00,0.00,29.99,18,'Medium','High','https://creditcards.chase.com/balance-transfer-credit-cards/slate-edge','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "High"}','BT-focused',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(13,'Chase Ink Cash (Business)','bank','Experian','Business card. EIN-friendly. 12 months 0% intro APR.',700,850,'700+','FICO (primary)',0.00,30000.00,0.00,29.99,12,'Medium','High','https://creditcards.chase.com/small-business-credit-cards/ink/cash','{"type": "Business", "bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "High"}','Business card, EIN-friendly',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(14,'Chase Ink Unlimited (Business)','bank','Experian','Business card. 12 months 0% intro APR.',700,850,'700+','FICO (primary)',0.00,30000.00,0.00,29.99,12,'Medium','High','https://creditcards.chase.com/small-business-credit-cards/ink/unlimited','{"type": "Business", "bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "High"}','Business card',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(15,'Capital One Quicksilver','bank','All Three','Triple pull common. 15 months 0% intro APR.',670,850,'670+','FICO (primary)',0.00,20000.00,0.00,29.99,15,'Medium-High','High','https://www.capitalone.com/credit-cards/quicksilver/','{"bureau": "All Three", "score_model": "FICO", "income_sensitivity": "Medium-High", "inquiry_sensitivity": "High"}','Triple pull common',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(16,'Capital One SavorOne','bank','All Three','Triple pull common. 15 months 0% intro APR.',680,850,'680+','FICO (primary)',0.00,20000.00,0.00,29.99,15,'Medium-High','High','https://www.capitalone.com/credit-cards/savorone-dining-rewards/','{"bureau": "All Three", "score_model": "FICO", "income_sensitivity": "Medium-High", "inquiry_sensitivity": "High"}','Triple pull common',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(17,'Amex Blue Business Cash','bank','Experian','Soft pulls after relationship. 12 months 0% intro APR.',680,850,'680-700+','FICO (primary)',0.00,25000.00,0.00,29.99,12,'Medium','Low','https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-blue-business-cash-credit-card/','{"type": "Business", "bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Low"}','Soft pulls after relationship',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(18,'Navy Federal Platinum','credit_union','TransUnion','Membership required. 12 months 0% intro APR.',660,850,'660+','FICO (primary)',0.00,15000.00,0.00,18.00,12,'Low-Medium','Low','https://www.navyfederal.org/loans-cards/credit-cards/platinum-credit-card.html','{"bureau": "TransUnion", "membership": "Military affiliation required", "score_model": "FICO", "income_sensitivity": "Low-Medium", "inquiry_sensitivity": "Low"}','Membership required',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(19,'U.S. Bank Visa Platinum','bank','TransUnion (state-based)','State-sensitive pulls. 18 months 0% intro APR.',680,850,'680+','FICO (primary)',0.00,15000.00,0.00,29.99,18,'Medium','Medium','https://www.usbank.com/credit-cards/visa-platinum-credit-card.html','{"bureau": "TransUnion (state-based)", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','State-sensitive pulls',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(20,'PNC Visa Platinum','bank','Experian','Regional bank. 15 months 0% intro APR.',680,850,'680+','FICO (primary)',0.00,15000.00,0.00,24.99,15,'Medium','Medium','https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-points-visa-credit-card.html','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Regional bank',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(21,'Synchrony Premier Mastercard','bank','TransUnion','Lower score approvals.',640,850,'640-660+','FICO (primary)',0.00,10000.00,29.99,29.99,NULL,'Low','Low','https://www.synchrony.com','{"bureau": "TransUnion", "score_model": "FICO", "income_sensitivity": "Low", "inquiry_sensitivity": "Low"}','Lower score approvals',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(22,'PayPal Cashback Mastercard','bank','TransUnion','Issued by Synchrony. 12 months 0% intro APR.',660,850,'660+','FICO (primary)',0.00,15000.00,0.00,29.99,12,'Medium','Medium','https://www.paypal.com/us/digital-wallet/manage-money/paypal-cashback-mastercard','{"bureau": "TransUnion", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Issued by Synchrony',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(23,'Bank of America Customized Cash','bank','Experian','Strong national issuer. 15 months 0% intro APR.',670,850,'670+','FICO (primary)',0.00,20000.00,0.00,29.99,15,'Medium','Medium','https://www.bankofamerica.com/credit-cards/products/customized-cash-rewards-credit-card/','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Strong national issuer',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(24,'Bank of America Unlimited Cash','bank','Experian','Straightforward underwriting. 15 months 0% intro APR.',670,850,'670+','FICO (primary)',0.00,20000.00,0.00,29.99,15,'Medium','Medium','https://www.bankofamerica.com/credit-cards/products/unlimited-cash-back-credit-card/','{"bureau": "Experian", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Straightforward underwriting',1,'2025-12-18 17:47:34','2026-01-04 06:31:46'),
+(25,'Truist Enjoy Cash','bank','Experian / Equifax','Regional variability. 15 months 0% intro APR.',660,850,'660-680+','FICO (primary)',0.00,15000.00,0.00,29.99,15,'Medium','Medium','https://www.truist.com/credit-cards/enjoy-cash','{"bureau": "Experian/Equifax", "score_model": "FICO", "income_sensitivity": "Medium", "inquiry_sensitivity": "Medium"}','Regional variability',1,'2025-12-18 17:47:34','2026-01-04 06:31:46')
+      `);
+    }
 
     // 12. Ensure `fundability_scores` table exists
     await useQuery(`
@@ -387,8 +423,7 @@ export default defineNitroPlugin(async () => {
         match_reasons JSON NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (lender_id) REFERENCES lenders(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 

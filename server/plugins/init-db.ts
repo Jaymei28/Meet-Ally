@@ -310,6 +310,88 @@ export default defineNitroPlugin(async () => {
       `);
     }
 
+    // 10. Ensure `dispute_letters` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS dispute_letters (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        bureau VARCHAR(50) NULL,
+        creditor_name VARCHAR(255) NULL,
+        content LONGTEXT NOT NULL,
+        status VARCHAR(50) NOT NULL DEFAULT 'draft',
+        sent_at TIMESTAMP NULL DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 11. Ensure `lenders` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS lenders (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        type VARCHAR(50) NULL,
+        min_credit_score INT DEFAULT 640,
+        max_credit_score INT DEFAULT 850,
+        min_apr DECIMAL(5,2) NULL,
+        max_apr DECIMAL(5,2) NULL,
+        bureau_pull VARCHAR(50) NULL,
+        score_model VARCHAR(100) NULL,
+        recommended_score VARCHAR(50) NULL,
+        intro_apr_months VARCHAR(100) NULL,
+        application_url VARCHAR(500) NULL,
+        requirements JSON NULL,
+        description TEXT NULL,
+        notes TEXT NULL,
+        active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 12. Ensure `fundability_scores` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS fundability_scores (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        score INT NOT NULL DEFAULT 0,
+        grade VARCHAR(5) NOT NULL DEFAULT 'F',
+        factors JSON NULL,
+        recommendations JSON NULL,
+        strengths JSON NULL,
+        weaknesses JSON NULL,
+        credit_score INT NULL,
+        total_accounts INT NULL,
+        open_accounts INT NULL,
+        hard_inquiries INT NULL,
+        negative_items INT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // 13. Ensure `lender_matches` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS lender_matches (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        user_id BIGINT UNSIGNED NOT NULL,
+        lender_id BIGINT UNSIGNED NOT NULL,
+        fundability_score_id BIGINT UNSIGNED NULL,
+        match_score INT NOT NULL DEFAULT 0,
+        approval_likelihood VARCHAR(50) NULL,
+        estimated_apr_min DECIMAL(5,2) NULL,
+        estimated_apr_max DECIMAL(5,2) NULL,
+        match_reasons JSON NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (lender_id) REFERENCES lenders(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
     console.log('✅ Auto-database initialization completed successfully.');
   } catch (err) {
     console.error('⚠️ DB Auto-Init Warning:', err.message);

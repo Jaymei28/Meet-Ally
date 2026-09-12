@@ -185,17 +185,43 @@
         </div>
       </div>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="bg-neutral-50 border border-neutral-200 rounded-2xl p-6 text-center space-y-4 shadow-sm animate-fade-in">
-        <div class="flex items-center justify-center gap-3">
-          <i class="pi pi-spin pi-spinner text-xl text-[#00828E]"></i>
-          <span class="font-extrabold text-sm text-neutral-800">AI Credit Strategist Parsing Credit Report...</span>
+      <!-- Loading State: Step-by-step progress -->
+      <div v-if="loading" class="bg-neutral-50 border border-neutral-200 rounded-2xl p-5 space-y-4 shadow-sm animate-fade-in">
+        <div class="flex items-center gap-2.5 mb-1">
+          <i class="pi pi-spin pi-spinner text-[#00828E] text-base"></i>
+          <span class="font-extrabold text-sm text-neutral-800">Processing your credit report...</span>
         </div>
-        <p class="text-neutral-500 text-xs max-w-md mx-auto leading-relaxed">
-          Ingesting document structure, reading 3-bureau trade lines, cross-validating inquiries, and building your personalized dispute game plan.
-        </p>
-        <div class="w-full bg-neutral-200 h-1.5 rounded-full overflow-hidden">
-          <div class="bg-gradient-to-r from-[#00D8E6] to-[#00A3B0] h-full animate-loader"></div>
+        <div class="space-y-2">
+          <div
+            v-for="step in uploadSteps"
+            :key="step.id"
+            class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-300"
+            :class="{
+              'bg-[#00D8E6]/10 border border-[#00D8E6]/30': step.status === 'active',
+              'bg-emerald-50 border border-emerald-200': step.status === 'done',
+              'bg-red-50 border border-red-200': step.status === 'error',
+              'bg-neutral-100 border border-transparent opacity-50': step.status === 'pending'
+            }"
+          >
+            <i
+              class="text-sm shrink-0"
+              :class="{
+                'pi pi-spin pi-spinner text-[#00828E]': step.status === 'active',
+                'pi pi-check-circle text-emerald-500': step.status === 'done',
+                'pi pi-times-circle text-red-500': step.status === 'error',
+                'pi pi-circle text-neutral-300': step.status === 'pending'
+              }"
+            ></i>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-bold text-neutral-800 truncate">{{ step.label }}</p>
+              <p v-if="step.status === 'active'" class="text-[11px] text-neutral-500 font-medium">{{ step.detail }}</p>
+              <p v-if="step.status === 'error'" class="text-[11px] text-red-600 font-semibold">{{ step.errorMsg }}</p>
+            </div>
+            <span
+              v-if="step.status === 'done'"
+              class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full shrink-0"
+            >Done</span>
+          </div>
         </div>
       </div>
 
@@ -522,6 +548,22 @@ const error = ref(null);
 const actionLoadingId = ref(null);
 const activePrintingLetter = ref(null);
 
+// Upload progress steps
+const uploadSteps = ref([
+  { id: 'upload',   label: 'Uploading file to server',             detail: 'Sending your credit report securely...',              status: 'pending', errorMsg: '' },
+  { id: 'ai',       label: 'AI parsing 3-bureau data',             detail: 'Claude is reading trade lines, scores & inquiries...',  status: 'pending', errorMsg: '' },
+  { id: 'save',     label: 'Saving records to database',           detail: 'Writing accounts, scores & discrepancies...',           status: 'pending', errorMsg: '' },
+  { id: 'plan',     label: 'Building your dispute game plan',       detail: 'Generating your personalized action roadmap...',        status: 'pending', errorMsg: '' },
+]);
+
+function setStep(id: string, status: 'pending' | 'active' | 'done' | 'error', errorMsg = '') {
+  const step = uploadSteps.value.find(s => s.id === id);
+  if (step) { step.status = status; step.errorMsg = errorMsg; }
+}
+function resetSteps() {
+  uploadSteps.value.forEach(s => { s.status = 'pending'; s.errorMsg = ''; });
+}
+
 // Group letters by Phase
 const phase1Letters = computed(() => letters.value.filter(l => Number(l.phase) === 1 || !l.phase));
 const phase2Letters = computed(() => letters.value.filter(l => Number(l.phase) === 2));
@@ -597,27 +639,80 @@ async function uploadReport() {
 
   loading.value = true;
   error.value = null;
+  resetSteps();
 
   const formData = new FormData();
   formData.append('report', selectedFile.value);
 
   try {
-    const res = await $fetch('/api/parse-report', {
-      method: 'POST',
-      body: formData
-    });
+    // Step 1: Uploading
+    setStep('upload', 'active');
+    await new Promise(r => setTimeout(r, 300)); // brief visual confirmation
+    setStep('upload', 'done');
+
+    // Step 2: AI parsing (long step — mark active while fetch is in-flight)
+    setStep('ai', 'active');
+    setStep('save', 'active'); // will update to done/error after response
+
+    let res: any;
+    try {
+      res = await $fetch('/api/parse-report', {
+        method: 'POST',
+        body: formData
+      });
+    } catch (fetchErr: any) {
+      // Determine which step failed based on error message
+      const msg = fetchErr?.data?.statusMessage || fetchErr?.message || 'Unknown server error';
+      if (
+        msg.includes('Anthropic') ||
+        msg.includes('AI') ||
+        msg.includes('Claude') ||
+        msg.includes('parse') ||
+        msg.includes('model')
+      ) {
+        setStep('ai', 'error', msg);
+        setStep('save', 'pending');
+      } else if (
+        msg.includes('Database') ||
+        msg.includes('Table') ||
+        msg.includes('column') ||
+        msg.includes('SQL') ||
+        msg.includes('Transaction')
+      ) {
+        setStep('ai', 'done');
+        setStep('save', 'error', msg);
+      } else {
+        setStep('ai', 'error', msg);
+        setStep('save', 'pending');
+      }
+      error.value = msg;
+      return;
+    }
+
+    setStep('ai', 'done');
+    setStep('save', 'done');
+
+    // Step 3: Building game plan
+    setStep('plan', 'active');
 
     if (res.success) {
       await refreshDashboard();
       await refreshLetters();
+      setStep('plan', 'done');
+      await new Promise(r => setTimeout(r, 600)); // let user see all green
       showUploadModal.value = false;
       selectedFile.value = null;
       navigateTo('/discrepancies');
     } else {
+      setStep('plan', 'error', res.message || 'Unknown error occurred while parsing report.');
       error.value = res.message || 'Unknown error occurred while parsing report.';
     }
-  } catch (err) {
-    error.value = formatErrorMessage(err, 'Server error encountered during credit report parsing. Please try uploading again.');
+  } catch (err: any) {
+    const msg = formatErrorMessage(err, 'Server error encountered during credit report parsing. Please try uploading again.');
+    error.value = msg;
+    // Mark the first non-done step as error
+    const firstPending = uploadSteps.value.find(s => s.status === 'active' || s.status === 'pending');
+    if (firstPending) { firstPending.status = 'error'; firstPending.errorMsg = msg; }
   } finally {
     loading.value = false;
   }

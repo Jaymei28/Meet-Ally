@@ -170,7 +170,7 @@ export default defineEventHandler(async (event) => {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5-20250929',
+          model: 'claude-sonnet-4-5',
           max_tokens: 3000,
           system: `You are an expert credit repair attorney and consumer advocate. Write a formal credit dispute letter.
 Follow these constraints:

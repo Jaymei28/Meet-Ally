@@ -310,7 +310,24 @@ export default defineNitroPlugin(async () => {
       `);
     }
 
-    // 10. Ensure `dispute_letters` table exists
+    // 10. Ensure `system_settings` table exists
+    await useQuery(`
+      CREATE TABLE IF NOT EXISTS system_settings (
+        id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        setting_key VARCHAR(100) NOT NULL UNIQUE,
+        setting_value TEXT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    // Seed default claude_api_balance setting if not present
+    const balanceSetting = await useQuery(`SELECT id FROM system_settings WHERE setting_key = 'claude_api_balance'`);
+    if (balanceSetting.length === 0) {
+      await useQuery(`INSERT INTO system_settings (setting_key, setting_value) VALUES ('claude_api_balance', '10.0000')`);
+    }
+
+    // 11. Ensure `dispute_letters` table exists
     await useQuery(`
       CREATE TABLE IF NOT EXISTS dispute_letters (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

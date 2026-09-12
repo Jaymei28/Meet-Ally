@@ -315,17 +315,40 @@ export default defineNitroPlugin(async () => {
       CREATE TABLE IF NOT EXISTS dispute_letters (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         user_id BIGINT UNSIGNED NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        bureau VARCHAR(50) NULL,
+        credit_bureau VARCHAR(100) NULL,
+        credit_item_type VARCHAR(100) NULL,
         creditor_name VARCHAR(255) NULL,
-        content LONGTEXT NOT NULL,
-        status VARCHAR(50) NOT NULL DEFAULT 'draft',
-        sent_at TIMESTAMP NULL DEFAULT NULL,
+        account_number VARCHAR(100) NULL,
+        dispute_reason TEXT NULL,
+        desired_resolution TEXT NULL,
+        phase INT NOT NULL DEFAULT 1,
+        letter_content LONGTEXT NOT NULL DEFAULT '',
+        posted_1 TINYINT(1) NOT NULL DEFAULT 0,
+        posted_1_ts TIMESTAMP NULL DEFAULT NULL,
+        sent TINYINT(1) NOT NULL DEFAULT 0,
+        sent_ts TIMESTAMP NULL DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+
+    // Safe-migrate dispute_letters for existing live tables
+    const safeAddDisputeLetterCol = async (colDef: string) => {
+      try { await useQuery(`ALTER TABLE dispute_letters ADD COLUMN ${colDef}`); } catch (e) {}
+    };
+    await safeAddDisputeLetterCol(`credit_bureau VARCHAR(100) NULL`);
+    await safeAddDisputeLetterCol(`credit_item_type VARCHAR(100) NULL`);
+    await safeAddDisputeLetterCol(`creditor_name VARCHAR(255) NULL`);
+    await safeAddDisputeLetterCol(`account_number VARCHAR(100) NULL`);
+    await safeAddDisputeLetterCol(`dispute_reason TEXT NULL`);
+    await safeAddDisputeLetterCol(`desired_resolution TEXT NULL`);
+    await safeAddDisputeLetterCol(`phase INT NOT NULL DEFAULT 1`);
+    await safeAddDisputeLetterCol(`letter_content LONGTEXT NOT NULL DEFAULT ''`);
+    await safeAddDisputeLetterCol(`posted_1 TINYINT(1) NOT NULL DEFAULT 0`);
+    await safeAddDisputeLetterCol(`posted_1_ts TIMESTAMP NULL DEFAULT NULL`);
+    await safeAddDisputeLetterCol(`sent TINYINT(1) NOT NULL DEFAULT 0`);
+    await safeAddDisputeLetterCol(`sent_ts TIMESTAMP NULL DEFAULT NULL`);
 
     // 11. Ensure `lenders` table exists
     await useQuery(`

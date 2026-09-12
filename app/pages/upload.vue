@@ -556,7 +556,8 @@ const uploadSteps = ref([
   { id: 'plan',     label: 'Building your dispute game plan',       detail: 'Generating your personalized action roadmap...',        status: 'pending', errorMsg: '' },
 ]);
 
-function setStep(id: string, status: 'pending' | 'active' | 'done' | 'error', errorMsg = '') {
+function setStep(id, status, errorMsg) {
+  errorMsg = errorMsg || '';
   const step = uploadSteps.value.find(s => s.id === id);
   if (step) { step.status = status; step.errorMsg = errorMsg; }
 }
@@ -654,13 +655,13 @@ async function uploadReport() {
     setStep('ai', 'active');
     setStep('save', 'active'); // will update to done/error after response
 
-    let res: any;
+    let res;
     try {
       res = await $fetch('/api/parse-report', {
         method: 'POST',
         body: formData
       });
-    } catch (fetchErr: any) {
+    } catch (fetchErr) {
       // Determine which step failed based on error message
       const msg = fetchErr?.data?.statusMessage || fetchErr?.message || 'Unknown server error';
       if (
@@ -707,7 +708,7 @@ async function uploadReport() {
       setStep('plan', 'error', res.message || 'Unknown error occurred while parsing report.');
       error.value = res.message || 'Unknown error occurred while parsing report.';
     }
-  } catch (err: any) {
+  } catch (err) {
     const msg = formatErrorMessage(err, 'Server error encountered during credit report parsing. Please try uploading again.');
     error.value = msg;
     // Mark the first non-done step as error

@@ -176,7 +176,7 @@
             
             <div class="relative flex items-center justify-center z-10">
               <Knob 
-                v-model="scoreData.score" 
+                :modelValue="Number(scoreData?.score) || 0" 
                 :min="0" 
                 :max="100" 
                 :size="150" 

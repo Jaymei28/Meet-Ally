@@ -56,7 +56,7 @@
               </span>
             </div>
             <div class="shrink-0">
-              <Knob :modelValue="starterPercentage" :min="0" :max="100" valueColor="#00A3B0" rangeColor="#F1F5F9" :size="85" :strokeWidth="8" :showValue="false" readonly />
+              <Knob :modelValue="Number(starterPercentage) || 0" :min="0" :max="100" valueColor="#00A3B0" rangeColor="#F1F5F9" :size="85" :strokeWidth="8" :showValue="false" readonly />
             </div>
           </div>
 
@@ -73,7 +73,7 @@
               </span>
             </div>
             <div class="shrink-0">
-              <Knob :modelValue="turboPercentage" :min="0" :max="100" valueColor="#6366F1" rangeColor="#F1F5F9" :size="85" :strokeWidth="8" :showValue="false" readonly />
+              <Knob :modelValue="Number(turboPercentage) || 0" :min="0" :max="100" valueColor="#6366F1" rangeColor="#F1F5F9" :size="85" :strokeWidth="8" :showValue="false" readonly />
             </div>
           </div>
         </div>
@@ -572,14 +572,14 @@
             <!-- Mini Knob widget -->
             <div class="shrink-0">
               <Knob 
-                v-model="clientData.scores[bureau]" 
+                :modelValue="score && Number(score) >= 300 ? Math.min(850, Number(score)) : 300" 
                 :min="300" 
                 :max="850" 
-                valueColor="#00A3B0" 
+                :valueColor="score && Number(score) >= 300 ? '#00A3B0' : '#E2E8F0'" 
                 rangeColor="#F1F5F9" 
                 :size="85" 
                 :strokeWidth="8" 
-                :showValue="false"
+                :showValue="false" 
                 readonly 
               />
             </div>

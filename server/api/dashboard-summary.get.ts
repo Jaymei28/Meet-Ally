@@ -1,8 +1,16 @@
 import { useQuery } from '../utils/db';
 import { getCookie, createError } from 'h3';
 
+// Safe query wrapper — returns fallback value instead of throwing
+async function safeQuery<T>(fn: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await fn();
+  } catch (_) {
+    return fallback;
+  }
+}
+
 export default defineEventHandler(async (event) => {
-  // Get authenticated user from cookie
   const userCookie = getCookie(event, 'auth_user');
   if (!userCookie) {
     throw createError({ statusCode: 401, statusMessage: 'Unauthorized' });
@@ -11,17 +19,17 @@ export default defineEventHandler(async (event) => {
   const loggedInUser = JSON.parse(userCookie);
   const userId = loggedInUser.id;
 
-  // Fetch latest saved user assessment
-  const userAssessments = await useQuery(
-    `SELECT * FROM user_assessments WHERE user_id = ? ORDER BY id DESC LIMIT 1`,
-    [userId]
+  // Fetch latest user assessment (non-fatal if table missing)
+  const userAssessments = await safeQuery(
+    () => useQuery(`SELECT * FROM user_assessments WHERE user_id = ? ORDER BY id DESC LIMIT 1`, [userId]),
+    []
   );
   const latestAssessment = userAssessments.length > 0 ? userAssessments[0] : null;
 
   // Fetch the latest credit report
-  const reports = await useQuery(
-    `SELECT * FROM credit_reports WHERE user_id = ? ORDER BY id DESC LIMIT 1`,
-    [userId]
+  const reports = await safeQuery(
+    () => useQuery(`SELECT * FROM credit_reports WHERE user_id = ? ORDER BY id DESC LIMIT 1`, [userId]),
+    []
   );
 
   if (reports.length === 0) {
@@ -44,44 +52,48 @@ export default defineEventHandler(async (event) => {
 
   const report = reports[0];
 
-  // Fetch the scores
-  const scores = await useQuery(
-    `SELECT bureau, score FROM credit_scores WHERE credit_report_id = ?`,
-    [report.id]
+  // Fetch credit scores
+  const scores = await safeQuery(
+    () => useQuery(`SELECT bureau, score FROM credit_scores WHERE credit_report_id = ?`, [report.id]),
+    []
   );
 
   const scoresMap = { transunion: 0, experian: 0, equifax: 0 };
   for (const s of scores) {
-    const key = s.bureau.toLowerCase();
+    const key = s.bureau?.toLowerCase?.() || '';
     if (key === 'transunion') scoresMap.transunion = s.score;
     else if (key === 'experian') scoresMap.experian = s.score;
     else if (key === 'equifax') scoresMap.equifax = s.score;
   }
 
-  // Fetch count of active discrepancies
-  const discrepanciesCount = await useQuery(
-    `SELECT COUNT(*) as count FROM bureau_discrepancies WHERE user_id = ?`,
-    [userId]
+  // Fetch count of active discrepancies (non-fatal)
+  const discrepanciesCount = await safeQuery(
+    () => useQuery(`SELECT COUNT(*) as count FROM bureau_discrepancies WHERE user_id = ?`, [userId]),
+    [{ count: 0 }]
   );
 
-  // Fetch counts of generated and mailed dispute letters
-  const lettersCountRes = await useQuery(
-    `SELECT COUNT(*) as count FROM dispute_letters WHERE user_id = ?`,
-    [userId]
+  // Fetch letter counts (non-fatal — columns may not exist yet)
+  const lettersCountRes = await safeQuery(
+    () => useQuery(`SELECT COUNT(*) as count FROM dispute_letters WHERE user_id = ?`, [userId]),
+    [{ count: 0 }]
   );
 
-  const mailedLettersCountRes = await useQuery(
-    `SELECT COUNT(*) as count FROM dispute_letters WHERE user_id = ? AND (posted_1 = 1 OR sent = 1)`,
-    [userId]
+  // Mailed letters — safe fallback if posted_1/sent columns missing
+  const mailedLettersCountRes = await safeQuery(
+    () => useQuery(`SELECT COUNT(*) as count FROM dispute_letters WHERE user_id = ? AND (posted_1 = 1 OR sent = 1)`, [userId]),
+    [{ count: 0 }]
   );
 
-  // Fetch detailed list of negative / collection / derogatory accounts
-  const negativeItems = await useQuery(
-    `SELECT id, creditor_name, account_number, account_type, account_status, payment_status, current_balance, is_negative, bureau
-     FROM credit_accounts
-     WHERE user_id = ? AND credit_report_id = ? AND (is_negative = 1 OR LOWER(payment_status) LIKE '%late%' OR LOWER(account_status) LIKE '%collection%' OR LOWER(account_status) LIKE '%charge%')
-     ORDER BY id DESC`,
-    [userId, report.id]
+  // Fetch negative accounts
+  const negativeItems = await safeQuery(
+    () => useQuery(
+      `SELECT id, creditor_name, account_number, account_type, account_status, payment_status, current_balance, is_negative, bureau
+       FROM credit_accounts
+       WHERE user_id = ? AND credit_report_id = ? AND (is_negative = 1 OR LOWER(payment_status) LIKE '%late%' OR LOWER(account_status) LIKE '%collection%' OR LOWER(account_status) LIKE '%charge%')
+       ORDER BY id DESC`,
+      [userId, report.id]
+    ),
+    []
   );
 
   return {

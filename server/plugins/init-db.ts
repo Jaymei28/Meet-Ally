@@ -50,6 +50,10 @@ export default defineNitroPlugin(async () => {
     await safeAddColumn(`state VARCHAR(100) NULL`);
     await safeAddColumn(`zipcode VARCHAR(20) NULL`);
     await safeAddColumn(`profile_picture VARCHAR(255) NULL`);
+    await safeAddColumn(`identityiq_username VARCHAR(255) NULL`);
+    await safeAddColumn(`identityiq_password VARCHAR(255) NULL`);
+    await safeAddColumn(`identityiq_secret_answer VARCHAR(255) NULL`);
+    await safeAddColumn(`ai_credits INT NOT NULL DEFAULT 100`);
 
     // Ensure default admin and client exist with valid 60-character bcrypt hashes for 'password'
     const defaultPasswordHash = bcryptjs.hashSync('password', 10);

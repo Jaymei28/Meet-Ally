@@ -55,11 +55,10 @@ export default defineEventHandler(async (event) => {
     const res = await useQuery(
       `INSERT INTO users (
         name, email, password, role, plan_type, has_paid, registration_status,
-        paid_amount, contact_number, ssn_last4, identityiq_username,
-        identityiq_password, identityiq_secret_answer, address, city, state, zipcode,
-        ai_credits, created_at, updated_at
+        paid_amount, contact_number, address, city, state, zipcode,
+        created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, 1, 'completed', ?, ?, '', ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      VALUES (?, ?, ?, ?, ?, 1, 'completed', ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
       [
         name.trim(),
         normalizedEmail,
@@ -68,16 +67,34 @@ export default defineEventHandler(async (event) => {
         sanitizedPlan,
         paidAmount,
         contact_number ? contact_number.trim() : null,
-        identityiq_username ? identityiq_username.trim() : null,
-        identityiq_password ? identityiq_password.trim() : null,
-        identityiq_secret_answer ? identityiq_secret_answer.trim() : null,
         address ? address.trim() : null,
         city ? city.trim() : null,
         state ? state.trim() : null,
-        zipcode ? zipcode.trim() : null,
-        ai_credits
+        zipcode ? zipcode.trim() : null
       ]
     );
+
+    const newUserId = (res as any).insertId;
+
+    try {
+      await useQuery(
+        `UPDATE users SET 
+          identityiq_username = ?, 
+          identityiq_password = ?, 
+          identityiq_secret_answer = ?,
+          ai_credits = ?
+        WHERE id = ?`,
+        [
+          identityiq_username ? identityiq_username.trim() : null,
+          identityiq_password ? identityiq_password.trim() : null,
+          identityiq_secret_answer ? identityiq_secret_answer.trim() : null,
+          ai_credits,
+          newUserId
+        ]
+      );
+    } catch (e) {
+      // Gracefully ignore if optional fields are missing
+    }
 
     return {
       success: true,

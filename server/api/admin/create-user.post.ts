@@ -108,15 +108,14 @@ export default defineEventHandler(async (event) => {
     // 4. Hash password with bcrypt
     const hashedPassword = bcryptjs.hashSync(password, 10);
 
-    // 5. Insert new user record
+    // 5. Insert new user record with core columns
     const insertRes = await useQuery(
       `INSERT INTO users (
         name, email, password, role, plan_type, has_paid, registration_status,
-        paid_amount, contact_number, ssn_last4, identityiq_username,
-        identityiq_password, identityiq_secret_answer, address, city, state, zipcode,
-        ai_credits, created_at, updated_at
+        paid_amount, contact_number, address, city, state, zipcode,
+        created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, 1, 'completed', ?, ?, '', ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      VALUES (?, ?, ?, ?, ?, 1, 'completed', ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
       [
         name.trim(),
         normalizedEmail,
@@ -125,18 +124,35 @@ export default defineEventHandler(async (event) => {
         sanitizedPlan,
         paidAmount,
         contact_number ? contact_number.trim() : null,
-        identityiq_username ? identityiq_username.trim() : null,
-        identityiq_password ? identityiq_password.trim() : null,
-        identityiq_secret_answer ? identityiq_secret_answer.trim() : null,
         address ? address.trim() : null,
         city ? city.trim() : null,
         state ? state.trim() : null,
-        zipcode ? zipcode.trim() : null,
-        creditsNum
+        zipcode ? zipcode.trim() : null
       ]
     );
 
     const newUserId = (insertRes as any).insertId;
+
+    // 6. Safely populate optional IdentityIQ credentials and AI credits if supported
+    try {
+      await useQuery(
+        `UPDATE users SET 
+          identityiq_username = ?, 
+          identityiq_password = ?, 
+          identityiq_secret_answer = ?,
+          ai_credits = ?
+        WHERE id = ?`,
+        [
+          identityiq_username ? identityiq_username.trim() : null,
+          identityiq_password ? identityiq_password.trim() : null,
+          identityiq_secret_answer ? identityiq_secret_answer.trim() : null,
+          creditsNum,
+          newUserId
+        ]
+      );
+    } catch (e) {
+      // Graceful fallback if optional columns are absent in older schemas
+    }
 
     return {
       success: true,

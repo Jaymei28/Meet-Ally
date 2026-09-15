@@ -345,6 +345,13 @@
             </div>
             <div class="flex items-center gap-2.5 flex-wrap">
               <NuxtLink 
+                to="/users?action=create" 
+                class="text-xs text-white bg-gradient-to-r from-[#00828E] to-[#00A3B0] hover:from-[#005F6A] hover:to-[#00828E] px-3.5 py-1.5 rounded-full font-extrabold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+              >
+                <i class="pi pi-user-plus text-xs"></i>
+                <span>Add User</span>
+              </NuxtLink>
+              <NuxtLink 
                 to="/users" 
                 class="text-xs text-[#00828E] hover:text-[#005F6A] bg-[#00A3B0]/10 hover:bg-[#00A3B0]/20 border border-[#00A3B0]/30 px-3.5 py-1.5 rounded-full font-extrabold flex items-center gap-1.5 shadow-2xs transition"
               >

@@ -8,12 +8,21 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 class="font-extrabold text-xl text-neutral-900">User Management</h3>
-            <p class="text-neutral-500 text-xs mt-0.5">Reset passwords, update plans, and manage accounts</p>
+            <p class="text-neutral-500 text-xs mt-0.5">Provision users, reset passwords, update plans, and manage accounts</p>
           </div>
-          <span class="text-xs text-neutral-600 bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            {{ users.length }} Accounts
-          </span>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <span class="text-xs text-neutral-600 bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full font-bold flex items-center gap-1.5 shadow-2xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              {{ users.length }} Accounts
+            </span>
+            <button 
+              @click="openAddUserModal"
+              class="px-4 py-2 bg-gradient-to-r from-[#00828E] to-[#00A3B0] hover:from-[#005F6A] hover:to-[#00828E] text-white rounded-2xl text-xs font-extrabold transition shadow-sm hover:shadow flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <i class="pi pi-user-plus text-xs"></i>
+              <span>Add User</span>
+            </button>
+          </div>
         </div>
 
         <!-- Controls -->
@@ -74,7 +83,12 @@
                     ></span>
                   </div>
                   <div>
-                    <span class="font-extrabold text-neutral-900 block">{{ u.name }}</span>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-extrabold text-neutral-900 block">{{ u.name }}</span>
+                      <span v-if="u.role === 'admin'" class="text-[9px] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded-md">Admin</span>
+                      <span v-else-if="u.plan_type === 'turbo'" class="text-[9px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.5 rounded-md">Turbo</span>
+                      <span v-else-if="u.plan_type === 'starter'" class="text-[9px] font-black uppercase tracking-wider bg-teal-50 text-teal-700 border border-teal-200 px-1.5 py-0.5 rounded-md">Starter</span>
+                    </div>
                     <span class="text-[10px] text-neutral-400 font-semibold block mt-0.5">{{ u.email }}</span>
                   </div>
                 </td>
@@ -158,7 +172,12 @@
                 ></span>
               </div>
               <div class="min-w-0">
-                <span class="font-extrabold text-neutral-900 block truncate">{{ u.name }}</span>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-extrabold text-neutral-900 block truncate">{{ u.name }}</span>
+                  <span v-if="u.role === 'admin'" class="text-[9px] font-black uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.5 rounded-md">Admin</span>
+                  <span v-else-if="u.plan_type === 'turbo'" class="text-[9px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200 px-1.5 py-0.5 rounded-md">Turbo</span>
+                  <span v-else-if="u.plan_type === 'starter'" class="text-[9px] font-black uppercase tracking-wider bg-teal-50 text-teal-700 border border-teal-200 px-1.5 py-0.5 rounded-md">Starter</span>
+                </div>
                 <span class="text-[10px] text-neutral-400 font-semibold block truncate mt-0.5">{{ u.email }}</span>
               </div>
             </div>
@@ -353,11 +372,319 @@
           </div>
         </Transition>
       </Teleport>
+
+      <!-- Add User Modal -->
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="showAddModal" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 overflow-y-auto" @click.self="showAddModal = false">
+            <div class="bg-white rounded-[28px] p-6 sm:p-8 w-full max-w-lg shadow-2xl space-y-5 my-8 animate-scale-up max-h-[90vh] overflow-y-auto">
+              
+              <!-- Modal Header -->
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl bg-[#00A3B0]/10 border border-[#00A3B0]/20 flex items-center justify-center shrink-0">
+                    <i class="pi pi-user-plus text-[#00828E] text-base"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-extrabold text-lg text-neutral-900">Add New User</h4>
+                    <p class="text-[11px] text-neutral-500 font-semibold">Provision an account with custom plan & credentials</p>
+                  </div>
+                </div>
+                <button @click="showAddModal = false" class="text-neutral-400 hover:text-neutral-600 p-1.5 rounded-xl hover:bg-neutral-100 transition cursor-pointer">
+                  <i class="pi pi-times text-xs"></i>
+                </button>
+              </div>
+
+              <!-- Form Fields -->
+              <form @submit.prevent="submitCreateUser" class="space-y-4">
+                
+                <!-- Full Name & Email -->
+                <div class="space-y-3">
+                  <div>
+                    <label class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider block mb-1">Full Name <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                      <i class="pi pi-user absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-xs"></i>
+                      <input 
+                        v-model="newUser.name" 
+                        type="text" 
+                        required
+                        placeholder="e.g. John Doe"
+                        class="w-full pl-9 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/20 focus:border-[#00A3B0] transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider block mb-1">Email Address <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                      <i class="pi pi-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-xs"></i>
+                      <input 
+                        v-model="newUser.email" 
+                        type="email" 
+                        required
+                        placeholder="e.g. john@example.com"
+                        class="w-full pl-9 pr-4 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/20 focus:border-[#00A3B0] transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Password with Generator & Visibility Toggle -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider">Password <span class="text-red-500">*</span></label>
+                    <button 
+                      type="button" 
+                      @click="generateRandomPassword" 
+                      class="text-[10px] text-[#00828E] hover:text-[#005F6A] font-extrabold flex items-center gap-1 cursor-pointer transition hover:underline"
+                    >
+                      <i class="pi pi-sparkles text-[9px]"></i>
+                      <span>Generate Strong PW</span>
+                    </button>
+                  </div>
+                  <div class="relative">
+                    <i class="pi pi-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-xs"></i>
+                    <input 
+                      v-model="newUser.password" 
+                      :type="showAddPassword ? 'text' : 'password'" 
+                      required
+                      placeholder="Min 6 characters"
+                      class="w-full pl-9 pr-10 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/20 focus:border-[#00A3B0] transition"
+                    />
+                    <button 
+                      type="button" 
+                      @click="showAddPassword = !showAddPassword" 
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 p-1 cursor-pointer"
+                    >
+                      <i :class="['pi', showAddPassword ? 'pi-eye-slash' : 'pi-eye', 'text-xs']"></i>
+                    </button>
+                  </div>
+                  <p v-if="passwordCopiedNotice" class="text-[10px] text-emerald-600 font-bold mt-1 flex items-center gap-1">
+                    <i class="pi pi-check text-[9px]"></i> Strong password generated & copied to clipboard!
+                  </p>
+                </div>
+
+                <!-- Role Selection -->
+                <div>
+                  <label class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider block mb-1.5">User Role</label>
+                  <div class="grid grid-cols-2 gap-2.5">
+                    <button 
+                      type="button"
+                      @click="newUser.role = 'regular'" 
+                      class="p-3 border-2 rounded-2xl text-left transition cursor-pointer flex items-center gap-2.5"
+                      :class="newUser.role === 'regular' ? 'border-[#00A3B0] bg-[#00A3B0]/5' : 'border-neutral-200 hover:border-neutral-300 bg-white'"
+                    >
+                      <i class="pi pi-user text-sm" :class="newUser.role === 'regular' ? 'text-[#00828E]' : 'text-neutral-400'"></i>
+                      <div>
+                        <span class="text-xs font-extrabold text-neutral-900 block">Client</span>
+                        <span class="text-[10px] text-neutral-400 font-semibold block">Regular User</span>
+                      </div>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="newUser.role = 'admin'" 
+                      class="p-3 border-2 rounded-2xl text-left transition cursor-pointer flex items-center gap-2.5"
+                      :class="newUser.role === 'admin' ? 'border-purple-500 bg-purple-50/50' : 'border-neutral-200 hover:border-neutral-300 bg-white'"
+                    >
+                      <i class="pi pi-shield text-sm" :class="newUser.role === 'admin' ? 'text-purple-600' : 'text-neutral-400'"></i>
+                      <div>
+                        <span class="text-xs font-extrabold text-neutral-900 block">Admin</span>
+                        <span class="text-[10px] text-neutral-400 font-semibold block">Full Access</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Plan Tier Selection (for regular users) -->
+                <div v-if="newUser.role !== 'admin'">
+                  <label class="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider block mb-1.5">Subscription Plan</label>
+                  <div class="grid grid-cols-3 gap-2">
+                    <button 
+                      type="button"
+                      @click="newUser.plan_type = 'turbo'" 
+                      class="p-2.5 border-2 rounded-2xl text-center transition cursor-pointer"
+                      :class="newUser.plan_type === 'turbo' ? 'border-indigo-500 bg-indigo-50/60' : 'border-neutral-200 hover:border-neutral-300 bg-white'"
+                    >
+                      <span class="text-xs font-extrabold text-neutral-900 block">Turbo Pro</span>
+                      <span class="text-[9px] text-neutral-400 font-semibold">Full Engine</span>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="newUser.plan_type = 'starter'" 
+                      class="p-2.5 border-2 rounded-2xl text-center transition cursor-pointer"
+                      :class="newUser.plan_type === 'starter' ? 'border-[#00A3B0] bg-[#00A3B0]/10' : 'border-neutral-200 hover:border-neutral-300 bg-white'"
+                    >
+                      <span class="text-xs font-extrabold text-neutral-900 block">Starter</span>
+                      <span class="text-[9px] text-neutral-400 font-semibold">Standard</span>
+                    </button>
+                    <button 
+                      type="button"
+                      @click="newUser.plan_type = null" 
+                      class="p-2.5 border-2 rounded-2xl text-center transition cursor-pointer"
+                      :class="newUser.plan_type === null ? 'border-amber-400 bg-amber-50' : 'border-neutral-200 hover:border-neutral-300 bg-white'"
+                    >
+                      <span class="text-xs font-extrabold text-neutral-900 block">None</span>
+                      <span class="text-[9px] text-neutral-400 font-semibold">Unpaid</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Collapsible: IdentityIQ Credentials -->
+                <div class="border border-neutral-200 rounded-2xl overflow-hidden">
+                  <button 
+                    type="button"
+                    @click="showIdentityIQSection = !showIdentityIQSection" 
+                    class="w-full px-4 py-3 bg-neutral-50/70 hover:bg-neutral-100/70 flex items-center justify-between text-xs font-extrabold text-neutral-800 transition cursor-pointer"
+                  >
+                    <div class="flex items-center gap-2">
+                      <i class="pi pi-id-card text-[#00828E]"></i>
+                      <span>IdentityIQ Credentials</span>
+                      <span class="text-[10px] text-neutral-400 font-normal">(Optional)</span>
+                    </div>
+                    <i :class="['pi', showIdentityIQSection ? 'pi-chevron-up' : 'pi-chevron-down', 'text-[10px] text-neutral-400']"></i>
+                  </button>
+
+                  <div v-show="showIdentityIQSection" class="p-4 bg-white space-y-3 border-t border-neutral-200">
+                    <p class="text-[10px] text-neutral-500 font-semibold">
+                      Providing IdentityIQ credentials allows the client to automatically import 3-bureau reports.
+                    </p>
+                    <div>
+                      <label class="text-[10px] font-extrabold text-neutral-600 block mb-1">IdentityIQ Username</label>
+                      <input 
+                        v-model="newUser.identityiq_username" 
+                        type="text" 
+                        placeholder="IdentityIQ Login"
+                        class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#00A3B0]"
+                      />
+                    </div>
+                    <div>
+                      <label class="text-[10px] font-extrabold text-neutral-600 block mb-1">IdentityIQ Password</label>
+                      <input 
+                        v-model="newUser.identityiq_password" 
+                        type="text" 
+                        placeholder="IdentityIQ Password"
+                        class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#00A3B0]"
+                      />
+                    </div>
+                    <div>
+                      <label class="text-[10px] font-extrabold text-neutral-600 block mb-1">Secret Question / Answer</label>
+                      <input 
+                        v-model="newUser.identityiq_secret_answer" 
+                        type="text" 
+                        placeholder="Secret Answer"
+                        class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#00A3B0]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Collapsible: Contact & Address -->
+                <div class="border border-neutral-200 rounded-2xl overflow-hidden">
+                  <button 
+                    type="button"
+                    @click="showContactSection = !showContactSection" 
+                    class="w-full px-4 py-3 bg-neutral-50/70 hover:bg-neutral-100/70 flex items-center justify-between text-xs font-extrabold text-neutral-800 transition cursor-pointer"
+                  >
+                    <div class="flex items-center gap-2">
+                      <i class="pi pi-map-marker text-[#00828E]"></i>
+                      <span>Contact & Address</span>
+                      <span class="text-[10px] text-neutral-400 font-normal">(Optional)</span>
+                    </div>
+                    <i :class="['pi', showContactSection ? 'pi-chevron-up' : 'pi-chevron-down', 'text-[10px] text-neutral-400']"></i>
+                  </button>
+
+                  <div v-show="showContactSection" class="p-4 bg-white space-y-3 border-t border-neutral-200">
+                    <div>
+                      <label class="text-[10px] font-extrabold text-neutral-600 block mb-1">Phone Number</label>
+                      <input 
+                        v-model="newUser.contact_number" 
+                        type="tel" 
+                        placeholder="e.g. +1 555-0199"
+                        class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#00A3B0]"
+                      />
+                    </div>
+                    <div>
+                      <label class="text-[10px] font-extrabold text-neutral-600 block mb-1">Street Address</label>
+                      <input 
+                        v-model="newUser.address" 
+                        type="text" 
+                        placeholder="e.g. 123 Main St"
+                        class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#00A3B0]"
+                      />
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                      <div>
+                        <label class="text-[10px] font-extrabold text-neutral-600 block mb-1">City</label>
+                        <input 
+                          v-model="newUser.city" 
+                          type="text" 
+                          placeholder="City"
+                          class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#00A3B0]"
+                        />
+                      </div>
+                      <div>
+                        <label class="text-[10px] font-extrabold text-neutral-600 block mb-1">State</label>
+                        <input 
+                          v-model="newUser.state" 
+                          type="text" 
+                          placeholder="State"
+                          class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#00A3B0]"
+                        />
+                      </div>
+                      <div>
+                        <label class="text-[10px] font-extrabold text-neutral-600 block mb-1">Zipcode</label>
+                        <input 
+                          v-model="newUser.zipcode" 
+                          type="text" 
+                          placeholder="ZIP"
+                          class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#00A3B0]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Alert Messages -->
+                <Transition name="fade">
+                  <div v-if="addModalMessage" class="text-xs font-bold px-3.5 py-2.5 rounded-xl flex items-center gap-2" :class="addModalSuccess ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'">
+                    <i :class="['pi', addModalSuccess ? 'pi-check-circle' : 'pi-exclamation-circle', 'text-xs shrink-0']"></i>
+                    <span>{{ addModalMessage }}</span>
+                  </div>
+                </Transition>
+
+                <!-- Actions -->
+                <div class="flex gap-3 pt-2">
+                  <button 
+                    type="button"
+                    @click="showAddModal = false" 
+                    class="flex-1 py-2.5 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs font-extrabold text-neutral-600 hover:bg-neutral-100 transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    :disabled="addLoading" 
+                    class="flex-1 py-2.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] text-white rounded-2xl text-xs font-extrabold hover:from-[#005F6A] hover:to-[#00828E] transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <i v-if="addLoading" class="pi pi-spin pi-spinner text-xs"></i>
+                    <i v-else class="pi pi-check text-xs"></i>
+                    <span>Create User</span>
+                  </button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 const users = ref([]);
 const loading = ref(false);
@@ -374,6 +701,35 @@ const selectedPlan = ref('starter');
 const actionLoading = ref(false);
 const modalMessage = ref('');
 const modalSuccess = ref(false);
+
+// Add User Modal State
+const showAddModal = ref(false);
+const showAddPassword = ref(false);
+const showIdentityIQSection = ref(false);
+const showContactSection = ref(false);
+const addLoading = ref(false);
+const addModalMessage = ref('');
+const addModalSuccess = ref(false);
+const passwordCopiedNotice = ref(false);
+
+const initialUserState = () => ({
+  name: '',
+  email: '',
+  password: '',
+  role: 'regular',
+  plan_type: 'turbo',
+  identityiq_username: '',
+  identityiq_password: '',
+  identityiq_secret_answer: '',
+  contact_number: '',
+  address: '',
+  city: '',
+  state: '',
+  zipcode: '',
+  ai_credits: 100
+});
+
+const newUser = ref(initialUserState());
 
 // Load users from admin analytics endpoint
 async function loadUsers() {
@@ -510,7 +866,63 @@ function getAvatarBgClass(name) {
   return colors[sum % colors.length];
 }
 
-onMounted(() => { loadUsers(); });
+// Add user handlers
+function openAddUserModal() {
+  newUser.value = initialUserState();
+  addModalMessage.value = '';
+  addModalSuccess.value = false;
+  passwordCopiedNotice.value = false;
+  showIdentityIQSection.value = false;
+  showContactSection.value = false;
+  showAddPassword.value = false;
+  showAddModal.value = true;
+}
+
+function generateRandomPassword() {
+  const chars = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*';
+  let pass = '';
+  for (let i = 0; i < 12; i++) {
+    pass += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  newUser.value.password = pass;
+  showAddPassword.value = true;
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    navigator.clipboard.writeText(pass).catch(() => {});
+  }
+  passwordCopiedNotice.value = true;
+  setTimeout(() => {
+    passwordCopiedNotice.value = false;
+  }, 4000);
+}
+
+async function submitCreateUser() {
+  addLoading.value = true;
+  addModalMessage.value = '';
+  try {
+    const res = await $fetch('/api/admin/create-user', {
+      method: 'POST',
+      body: newUser.value
+    });
+    addModalSuccess.value = true;
+    addModalMessage.value = res.message || 'User created successfully!';
+    await loadUsers();
+    setTimeout(() => {
+      showAddModal.value = false;
+    }, 1200);
+  } catch (err) {
+    addModalSuccess.value = false;
+    addModalMessage.value = err.data?.statusMessage || err.message || 'Failed to create user.';
+  } finally {
+    addLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  loadUsers();
+  if (route.query.action === 'create' || route.query.add === 'true') {
+    openAddUserModal();
+  }
+});
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 import { useQuery, useTransaction } from '../utils/db';
-import { getCookie } from 'h3';
+import { getCookie, setCookie, createError } from 'h3';
 import { runCrossBureauValidation } from '../utils/validation';
 import { PDFParse } from 'pdf-parse';
 
@@ -101,7 +101,22 @@ export default defineEventHandler(async (event) => {
   const loggedInUser = JSON.parse(userCookie);
   const userId = loggedInUser.id;
 
-  // Enforce active subscription check for parsing reports (Standard or Turbo)
+  // Enforce active subscription check for parsing reports (Standard or Turbo) - verify DB in case cookie is stale
+  if (loggedInUser.role !== 'admin' && !loggedInUser.plan_type) {
+    try {
+      const userRows = await useQuery('SELECT id, name, email, role, plan_type, profile_picture FROM users WHERE id = ? LIMIT 1', [userId]);
+      if (userRows && userRows.length > 0) {
+        loggedInUser.role = userRows[0].role;
+        loggedInUser.plan_type = userRows[0].plan_type;
+        setCookie(event, 'auth_user', JSON.stringify({ ...loggedInUser, ...userRows[0] }), {
+          httpOnly: false,
+          maxAge: 60 * 60 * 24 * 7,
+          path: '/'
+        });
+      }
+    } catch (_) {}
+  }
+
   if (loggedInUser.role !== 'admin' && !loggedInUser.plan_type) {
     throw createError({
       statusCode: 403,

@@ -1,5 +1,5 @@
 import { useQuery } from '../utils/db';
-import { getCookie, createError } from 'h3';
+import { getCookie, setCookie, createError } from 'h3';
 
 export default defineEventHandler(async (event) => {
   const userCookie = getCookie(event, 'auth_user');
@@ -9,6 +9,26 @@ export default defineEventHandler(async (event) => {
 
   const loggedInUser = JSON.parse(userCookie);
   const userId = loggedInUser.id;
+
+  // Always fetch latest user profile from DB to guarantee plan_type & role are up to date
+  let currentUser = loggedInUser;
+  try {
+    const userRows = await useQuery(
+      'SELECT id, name, email, role, plan_type, profile_picture FROM users WHERE id = ? LIMIT 1',
+      [userId]
+    );
+    if (userRows && userRows.length > 0) {
+      currentUser = { ...loggedInUser, ...userRows[0] };
+      // If DB has updated plan_type or role, refresh auth cookie immediately
+      if (currentUser.plan_type !== loggedInUser.plan_type || currentUser.role !== loggedInUser.role) {
+        setCookie(event, 'auth_user', JSON.stringify(currentUser), {
+          httpOnly: false,
+          maxAge: 60 * 60 * 24 * 7,
+          path: '/'
+        });
+      }
+    }
+  } catch (_) {}
 
   // Fetch latest user assessment (non-fatal)
   let latestAssessment = null;
@@ -43,7 +63,8 @@ export default defineEventHandler(async (event) => {
         gamePlan: latestAssessment.game_plan ? JSON.parse(latestAssessment.game_plan) : null,
         createdAt: latestAssessment.created_at
       } : null,
-      summary: { totalAccounts: 0, negativeAccounts: 0, inquiries: 0, discrepancies: 0, lettersCount: 0, mailedLettersCount: 0 }
+      summary: { totalAccounts: 0, negativeAccounts: 0, inquiries: 0, discrepancies: 0, lettersCount: 0, mailedLettersCount: 0 },
+      user: currentUser
     };
   }
 
@@ -131,6 +152,7 @@ export default defineEventHandler(async (event) => {
       discrepancies: discrepanciesCount,
       lettersCount,
       mailedLettersCount
-    }
+    },
+    user: currentUser
   };
 });

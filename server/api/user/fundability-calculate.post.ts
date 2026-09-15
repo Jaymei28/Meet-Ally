@@ -1,5 +1,5 @@
 import { useQuery, useTransaction } from '../../utils/db';
-import { getCookie, createError } from 'h3';
+import { getCookie, setCookie, createError } from 'h3';
 import { matchLendersForProfile, seedLendersTable, CURATED_LENDERS } from '../../utils/lenders-catalog';
 
 export default defineEventHandler(async (event) => {
@@ -16,7 +16,24 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Invalid session. Please log in again.' });
   }
 
-  // 2. Restrict access to Pro (Turbo) plan or Admin only
+  // 2. Restrict access to Pro (Turbo) plan or Admin only (check DB in case cookie is stale)
+  if (user.role !== 'admin' && user.plan_type !== 'turbo') {
+    try {
+      const dbUsers = await useQuery(
+        'SELECT id, name, email, role, plan_type, profile_picture FROM users WHERE id = ? LIMIT 1',
+        [user.id]
+      );
+      if (dbUsers && dbUsers.length > 0) {
+        user = { ...user, ...dbUsers[0] };
+        setCookie(event, 'auth_user', JSON.stringify(user), {
+          httpOnly: false,
+          maxAge: 60 * 60 * 24 * 7,
+          path: '/'
+        });
+      }
+    } catch (_) {}
+  }
+
   if (user.role !== 'admin' && user.plan_type !== 'turbo') {
     throw createError({
       statusCode: 403,

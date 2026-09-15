@@ -341,10 +341,18 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 class="font-extrabold text-xl text-neutral-900">Customers</h3>
-              <p class="text-neutral-500 text-xs mt-0.5">The analysis list here shows all users</p>
+              <p class="text-neutral-500 text-xs mt-0.5">Manage accounts, grant plan access, and monitor client activity</p>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-neutral-600 bg-emerald-50 border border-emerald-100 px-3.5 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <NuxtLink 
+                to="/users" 
+                class="text-xs text-[#00828E] hover:text-[#005F6A] bg-[#00A3B0]/10 hover:bg-[#00A3B0]/20 border border-[#00A3B0]/30 px-3.5 py-1.5 rounded-full font-extrabold flex items-center gap-1.5 shadow-2xs transition"
+              >
+                <i class="pi pi-users text-xs"></i>
+                <span>Open Full User Manager</span>
+                <i class="pi pi-arrow-right text-[10px]"></i>
+              </NuxtLink>
+              <span class="text-xs text-neutral-600 bg-emerald-50 border border-emerald-100 px-3.5 py-1.5 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 {{ adminStats.totalClients }} Active Users
               </span>
@@ -354,14 +362,14 @@
           <!-- Table Controls (Search & Pagination) -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-neutral-100">
             <!-- Search Input Box -->
-            <div class="relative w-full sm:w-64">
+            <div class="relative w-full sm:w-72">
               <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400">
                 <i class="pi pi-search text-xs"></i>
               </span>
               <input 
                 v-model="searchQuery"
                 type="text" 
-                placeholder="Search..." 
+                placeholder="Search by name or email..." 
                 class="w-full pl-9 pr-4 py-2.5 bg-neutral-50/50 border border-neutral-200 rounded-2xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#00A3B0]/10 focus:border-[#00A3B0] transition"
               />
             </div>
@@ -404,8 +412,10 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="border-b border-neutral-100 text-neutral-400 text-[10px] font-extrabold uppercase tracking-wider bg-neutral-50/30">
-                  <th class="py-3 px-4">Name</th>
+                  <th class="py-3 px-4">Client</th>
+                  <th class="py-3 px-4 text-center">Plan Tier</th>
                   <th class="py-3 px-4 text-center">Letters Filed</th>
+                  <th class="py-3 px-4 text-right">Access Action</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-100 text-xs font-semibold">
@@ -425,10 +435,15 @@
                     </div>
                     <div>
                       <span class="font-extrabold text-neutral-900 block">{{ client.name }}</span>
-                      <span class="text-[9px] px-2 py-0.5 rounded-full border font-extrabold uppercase tracking-widest inline-block mt-1" :class="getPlanClass(client.plan_type)">
-                        {{ client.plan_type || 'None' }}
-                      </span>
+                      <span class="text-[10px] text-neutral-400 font-semibold block">{{ client.email }}</span>
                     </div>
+                  </td>
+
+                  <!-- Plan Tier Column -->
+                  <td class="py-4 px-4 text-center">
+                    <span class="text-[10px] px-2.5 py-1 rounded-full border font-extrabold uppercase tracking-widest inline-block" :class="getPlanClass(client.plan_type)">
+                      {{ client.plan_type === 'turbo' ? 'Pro (Turbo)' : client.plan_type === 'starter' ? 'Standard' : 'Free' }}
+                    </span>
                   </td>
 
                   <!-- Letters Filed Badge Column -->
@@ -438,9 +453,24 @@
                       {{ client.letters_filed || 0 }}
                     </span>
                   </td>
+
+                  <!-- Access Action Column -->
+                  <td class="py-4 px-4 text-right">
+                    <button 
+                      v-if="client.role !== 'admin'"
+                      @click="openAdminPlanModal(client)"
+                      type="button"
+                      class="px-3 py-1.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] hover:from-[#005F6A] hover:to-[#00828E] text-white rounded-xl text-[11px] font-black transition cursor-pointer shadow-xs inline-flex items-center gap-1.5"
+                      title="Grant access or change client plan"
+                    >
+                      <i class="pi pi-bolt text-[10px]"></i>
+                      <span>Give Access</span>
+                    </button>
+                    <span v-else class="text-[10px] text-neutral-400 font-semibold italic">Admin</span>
+                  </td>
                 </tr>
                 <tr v-if="filteredClients.length === 0">
-                  <td colspan="2" class="py-8 text-center text-neutral-400 font-semibold">
+                  <td colspan="4" class="py-8 text-center text-neutral-400 font-semibold">
                     No clients found matching the search query.
                   </td>
                 </tr>
@@ -449,6 +479,92 @@
           </div>
         </div>
       </div>
+
+      <!-- Quick Admin Plan Modal -->
+      <Teleport to="body">
+        <Transition name="fade">
+          <div v-if="showAdminPlanModal" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4" @click.self="showAdminPlanModal = false">
+            <div class="bg-white rounded-[28px] p-6 sm:p-8 w-full max-w-md shadow-2xl space-y-5 animate-scale-up border border-neutral-100">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#00828E] to-[#00A3B0] flex items-center justify-center text-white shadow-md">
+                  <i class="pi pi-shield text-xl"></i>
+                </div>
+                <div>
+                  <h4 class="font-black text-lg text-neutral-900">Grant Plan Access</h4>
+                  <p class="text-xs text-neutral-500 font-semibold">{{ selectedAdminClient?.name }} &bull; <span class="font-mono text-neutral-600">{{ selectedAdminClient?.email }}</span></p>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <label class="text-[11px] font-extrabold text-neutral-500 uppercase tracking-wider block">Select Access Tier</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <button 
+                    type="button"
+                    @click="adminSelectedPlan = 'turbo'"
+                    class="p-4 border-2 rounded-2xl text-left transition cursor-pointer relative"
+                    :class="adminSelectedPlan === 'turbo' ? 'border-indigo-600 bg-indigo-50/70 shadow-sm' : 'border-neutral-200 hover:border-neutral-300 bg-white'"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-black text-indigo-900 block">Pro (Turbo)</span>
+                      <i v-if="adminSelectedPlan === 'turbo'" class="pi pi-check-circle text-indigo-600 text-sm"></i>
+                    </div>
+                    <span class="text-[10px] text-indigo-700 font-bold block mt-1">Full AI & Letter Access</span>
+                    <span class="text-[9px] text-neutral-500 block mt-0.5">$29.99/mo tier</span>
+                  </button>
+
+                  <button 
+                    type="button"
+                    @click="adminSelectedPlan = 'starter'"
+                    class="p-4 border-2 rounded-2xl text-left transition cursor-pointer relative"
+                    :class="adminSelectedPlan === 'starter' ? 'border-[#00A3B0] bg-[#00A3B0]/10 shadow-sm' : 'border-neutral-200 hover:border-neutral-300 bg-white'"
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-black text-[#005F6A] block">Standard</span>
+                      <i v-if="adminSelectedPlan === 'starter'" class="pi pi-check-circle text-[#00828E] text-sm"></i>
+                    </div>
+                    <span class="text-[10px] text-[#00828E] font-bold block mt-1">Starter Plan</span>
+                    <span class="text-[9px] text-neutral-500 block mt-0.5">Basic tier</span>
+                  </button>
+                </div>
+
+                <button 
+                  type="button"
+                  @click="adminSelectedPlan = null"
+                  class="w-full p-2.5 border rounded-xl text-center transition cursor-pointer text-xs font-bold"
+                  :class="adminSelectedPlan === null ? 'border-amber-400 bg-amber-50 text-amber-900' : 'border-neutral-200 text-neutral-500 hover:bg-neutral-50'"
+                >
+                  Revert to Free / Unpaid (Revoke Access)
+                </button>
+              </div>
+
+              <div v-if="adminPlanSuccessMsg" class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 flex items-center gap-2">
+                <i class="pi pi-check-circle text-emerald-600"></i>
+                <span>{{ adminPlanSuccessMsg }}</span>
+              </div>
+
+              <div class="flex items-center gap-3 pt-2">
+                <button 
+                  type="button" 
+                  @click="showAdminPlanModal = false"
+                  class="flex-1 py-3 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-2xl text-xs font-black transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  @click="saveAdminClientPlan" 
+                  :disabled="savingAdminPlan"
+                  class="flex-1 py-3 bg-gradient-to-r from-[#00828E] to-[#00A3B0] hover:from-[#005F6A] hover:to-[#00828E] text-white rounded-2xl text-xs font-black transition cursor-pointer shadow-md disabled:opacity-50 flex items-center justify-center gap-1.5"
+                >
+                  <i v-if="savingAdminPlan" class="pi pi-spin pi-spinner text-xs"></i>
+                  <i v-else class="pi pi-check text-xs"></i>
+                  <span>{{ savingAdminPlan ? 'Saving...' : 'Activate Access' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
     </div>
 
     <!-- 2. CLIENT DASHBOARD VIEW -->
@@ -468,15 +584,27 @@
             </p>
           </div>
 
-          <a 
-            href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY" 
-            target="_blank"
-            rel="noopener noreferrer"
-            class="px-6 py-3.5 bg-gradient-to-r from-[#00828E] via-[#00A3B0] to-[#00D8E6] text-neutral-900 font-black rounded-2xl text-xs transition duration-200 shadow-lg hover:brightness-110 shrink-0 text-center cursor-pointer flex items-center justify-center gap-1.5"
-          >
-            <span>Upgrade with PayPal ($29.99 Turbo)</span>
-            <i class="pi pi-external-link text-[10px]"></i>
-          </a>
+          <div class="flex flex-col sm:flex-row items-center gap-2 shrink-0">
+            <a 
+              href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-6 py-3.5 bg-gradient-to-r from-[#00828E] via-[#00A3B0] to-[#00D8E6] text-neutral-900 font-black rounded-2xl text-xs transition duration-200 shadow-lg hover:brightness-110 text-center cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto"
+            >
+              <span>Upgrade with PayPal ($29.99 Turbo)</span>
+              <i class="pi pi-external-link text-[10px]"></i>
+            </a>
+            <button 
+              @click="refreshUserPlan" 
+              :disabled="refreshingPlan"
+              type="button"
+              class="px-4 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl text-xs transition border border-white/20 cursor-pointer flex items-center justify-center gap-1.5 w-full sm:w-auto"
+              title="Click to check if your payment or plan has been updated"
+            >
+              <i :class="refreshingPlan ? 'pi pi-spin pi-spinner' : 'pi pi-sync'" class="text-[10px]"></i>
+              <span>Already Paid? Refresh</span>
+            </button>
+          </div>
         </div>
 
         <!-- The 3 Core Upgrade Options Strip -->
@@ -1016,6 +1144,48 @@ async function refreshAdminData() {
   }
 }
 
+// --- ADMIN QUICK PLAN MODAL ---
+const showAdminPlanModal = ref(false);
+const selectedAdminClient = ref(null);
+const adminSelectedPlan = ref('turbo');
+const savingAdminPlan = ref(false);
+const adminPlanSuccessMsg = ref('');
+
+function openAdminPlanModal(client) {
+  selectedAdminClient.value = client;
+  adminSelectedPlan.value = client.plan_type || 'turbo';
+  adminPlanSuccessMsg.value = '';
+  showAdminPlanModal.value = true;
+}
+
+async function saveAdminClientPlan() {
+  if (!selectedAdminClient.value) return;
+  savingAdminPlan.value = true;
+  adminPlanSuccessMsg.value = '';
+  try {
+    const res = await $fetch('/api/admin/manage-user', {
+      method: 'POST',
+      body: {
+        action: 'update-plan',
+        userId: selectedAdminClient.value.id,
+        newPlan: adminSelectedPlan.value
+      }
+    });
+    if (res.success) {
+      adminPlanSuccessMsg.value = `Access granted! ${selectedAdminClient.value.name} is now on ${adminSelectedPlan.value ? adminSelectedPlan.value.toUpperCase() : 'FREE'} tier.`;
+      selectedAdminClient.value.plan_type = adminSelectedPlan.value;
+      await refreshAdminData();
+      setTimeout(() => {
+        showAdminPlanModal.value = false;
+      }, 1200);
+    }
+  } catch (err) {
+    alert(err.data?.statusMessage || 'Failed to update user plan.');
+  } finally {
+    savingAdminPlan.value = false;
+  }
+}
+
 // --- ADMIN IN-APP BANNER BROADCAST MANAGER ---
 const announcementForm = ref({
   id: null,
@@ -1274,7 +1444,28 @@ function getScoreRatingClass(score) {
   return 'bg-red-500/10 border-red-500/20 text-red-600';
 }
 
-// --- 3. LIFECYCLE HOOK ---
+// --- 3. LIFECYCLE HOOK & USER PLAN SYNC ---
+const refreshingPlan = ref(false);
+
+async function refreshUserPlan() {
+  refreshingPlan.value = true;
+  try {
+    const res = await $fetch('/api/user/refresh-session');
+    if (res.success && res.user) {
+      user.value = { ...user.value, ...res.user };
+      if (res.user.plan_type === 'turbo') {
+        alert('🎉 Turbo Plan is active! All Pro features unlocked.');
+      } else {
+        alert('Your account is currently on the Free plan. If you recently paid via PayPal with a different email, please contact support or your strategist.');
+      }
+    }
+  } catch (err) {
+    alert('Failed to refresh plan status. Please try again.');
+  } finally {
+    refreshingPlan.value = false;
+  }
+}
+
 onMounted(async () => {
   if (isAdmin.value) {
     await refreshAdminData();
@@ -1283,6 +1474,9 @@ onMounted(async () => {
     try {
       const res = await $fetch('/api/dashboard-summary');
       clientData.value = res;
+      if (res && res.user) {
+        user.value = { ...user.value, ...res.user };
+      }
     } catch (err) {
       console.error('Failed to load dashboard summary:', err);
     }

@@ -54,6 +54,7 @@ export default defineNitroPlugin(async () => {
     await safeAddColumn(`identityiq_password VARCHAR(255) NULL`);
     await safeAddColumn(`identityiq_secret_answer VARCHAR(255) NULL`);
     await safeAddColumn(`ai_credits INT NOT NULL DEFAULT 100`);
+    await safeAddColumn(`paypal_subscription_id VARCHAR(255) NULL`);
 
     // Ensure default admin and client exist with valid 60-character bcrypt hashes for 'password'
     const defaultPasswordHash = bcryptjs.hashSync('password', 10);
@@ -80,6 +81,30 @@ export default defineNitroPlugin(async () => {
       await useQuery(`
         UPDATE users SET password = ?, registration_status = 'completed' WHERE email = 'rmillscompany@gmail.com'
       `, [defaultPasswordHash]);
+    }
+
+    // Ensure Ashleigh Steele (recent PayPal subscriber I-3N1WRTN9DEHF) exists with active Turbo Plan
+    const ashleighRows = await useQuery(`SELECT id FROM users WHERE email = 'powerofthep.co@gmail.com'`);
+    if (ashleighRows.length === 0) {
+      await useQuery(`
+        INSERT INTO users (
+          name, email, password, role, plan_type, has_paid, registration_status,
+          paid_amount, pm_type, paypal_subscription_id, ai_credits,
+          address, city, state, zipcode, created_at, updated_at
+        ) VALUES (
+          'Ashleigh Steele', 'powerofthep.co@gmail.com', ?, 'user', 'turbo', 1, 'completed',
+          29.99, 'paypal', 'I-3N1WRTN9DEHF', 100,
+          '11601 Erwin Ridge Ave', 'Charlotte', 'NC', '28213', NOW(), NOW()
+        )
+      `, [defaultPasswordHash]);
+    } else {
+      await useQuery(`
+        UPDATE users 
+        SET plan_type = 'turbo', has_paid = 1, registration_status = 'completed', 
+            paypal_subscription_id = 'I-3N1WRTN9DEHF', paid_amount = 29.99, pm_type = 'paypal',
+            address = '11601 Erwin Ridge Ave', city = 'Charlotte', state = 'NC', zipcode = '28213'
+        WHERE email = 'powerofthep.co@gmail.com'
+      `);
     }
 
     // 2. Ensure `user_assessments` table exists

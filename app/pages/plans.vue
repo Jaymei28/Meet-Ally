@@ -159,16 +159,14 @@
           </div>
 
           <!-- Select Button -->
-          <a 
-            href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-5BF7297880088450BNKLEPNY"
-            target="_blank"
-            rel="noopener noreferrer"
+          <button 
+            @click="selectPlan('turbo')"
             class="w-full py-3.5 bg-gradient-to-r from-[#00828E] to-[#00A3B0] hover:from-[#005F6A] hover:to-[#00828E] text-white font-black rounded-2xl transition duration-200 shadow-lg cursor-pointer text-xs active:scale-[0.98] text-center flex items-center justify-center gap-2"
           >
             <i class="pi pi-paypal text-sm"></i>
             <span>Subscribe with PayPal ($29.99/mo)</span>
-            <i class="pi pi-external-link text-[10px]"></i>
-          </a>
+            <i class="pi pi-arrow-right text-[10px]"></i>
+          </button>
         </div>
 
       </div>
